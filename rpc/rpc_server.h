@@ -91,7 +91,7 @@ class RpcServer {
 
         HashMap method_hashmap_;
 
-        LibevConnector libev_connector_ptr_;
+        LibevConnector* libev_connector_ptr_;
 
         IOThread* io_thread_ptr_;
 

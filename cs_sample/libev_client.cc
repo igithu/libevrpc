@@ -26,7 +26,7 @@ int main() {
     EchoRequest echo_request;
     echo_request.set_request("Hello! test");
 
-    Channel rpc_channel("127.0.0.1", 9998);
+    Channel rpc_channel("127.0.0.1", "9997");
 
     EchoService::Stub stub(&rpc_channel);
 

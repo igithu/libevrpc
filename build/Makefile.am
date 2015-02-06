@@ -4,15 +4,23 @@
 
 COMM_LIB =../cs_sample/proto/simple_rpc.pb.h \
 		  ../cs_sample/proto/simple_rpc.pb.cc \
+		  ../rpc/socket_util.h \
+		  ../rpc/socket_util.cpp \
 		  ../rpc/rpc_msg.pb.h \
 		  ../rpc/rpc_msg.pb.cc \
 		  ../rpc/rpc_util.h \
-		  ../rpc/rpc_util.cpp
+		  ../rpc/rpc_util.cpp \
+		  ../log/ds_log.h \
+		  ../log/ds_log.cpp
 
-COMMON_CF = -I../../third-64/protobuf/include/
+COMMON_CF = -I../../third-64/protobuf/include/ \
+			-I../../third-64/glog/include/ \
+			-I../../third-64/libev/include/
 
 COMMON_LD = -lpthread -lz -ldl -lrt \
-			../../../third-64/protobuf/lib/*.a
+			../../third-64/protobuf/lib/*.a \
+			../../third-64/glog/lib/*.a \
+		    ../../third-64/libev/lib/*.a	
 
 
 
@@ -20,8 +28,6 @@ bin_PROGRAMS = rpc_client rpc_service
 
 rpc_client_SOURCES = \
 		      ../cs_sample/libev_client.cc \
-			  ../rpc/connection_manager.h \
-			  ../rpc/connection_manager.cpp \
 			  ../rpc/rpc_channel.h \
 			  ../rpc/rpc_channel.cpp \
 			  $(COMM_LIB)
@@ -32,8 +38,8 @@ rpc_client_LDADD =  $(COMMON_LD)
 
 rpc_service_SOURCES = \
 		      ../cs_sample/libev_server.cc \
-			  ../rpc/connection_manager.h \
-			  ../rpc/connection_manager.cpp \
+			  ../rpc/libev_connector.h \
+			  ../rpc/libev_connector.cpp \
 			  ../rpc/rpc_server.h \
 			  ../rpc/rpc_server.cpp \
 			  ../rpc/io_thread.h \

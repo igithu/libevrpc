@@ -47,6 +47,7 @@ class LibevConnector {
 
         struct ev_loop *epoller_;
 
+        struct ev_io socket_watcher_;
 };
 
 

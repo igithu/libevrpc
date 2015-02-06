@@ -31,7 +31,7 @@ LibevConnector::LibevConnector() : epoller_(NULL) {
 }
 
 LibevConnector::~LibevConnector() {
-    if (NULL == epoller_) {
+    if (NULL != epoller_) {
         ev_loop_destroy(epoller_);
     }
 }
@@ -39,14 +39,14 @@ LibevConnector::~LibevConnector() {
 bool LibevConnector::Initialize(const char *host, const char *port) {
     int32_t listenfd = TcpListen(host, port);
     if (listenfd < 0) {
+        DS_LOG(ERROR, "rpc server listen failed!")
         return false;
     }
     
     epoller_ = ev_loop_new(EVBACKEND_EPOLL | EVFLAG_NOENV);
-    struct ev_io socket_watcher;
 
-    ev_io_init(&socket_watcher, LibevConnector::AcceptCb, listenfd, EV_READ);
-    ev_io_start(epoller_, &socket_watcher);
+    ev_io_init(&socket_watcher_, LibevConnector::AcceptCb, listenfd, EV_READ);
+    ev_io_start(epoller_, &socket_watcher_);
 
     return true;
 }
@@ -59,10 +59,12 @@ void LibevConnector::LibevLoop() {
     
     while (true) {
         ev_loop(epoller_, 0);
+        printf("TTest loop io\n");
     }
 }
 
 void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
+    printf("TTest accrpt\n");
     if (EV_ERROR & revents) {
         DS_LOG(ERROR, "ERROR event in accept callback! exit!");
         return;

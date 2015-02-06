@@ -32,6 +32,7 @@
 
 #include "../log/ds_log.h"
 
+namespace libevrpc {
 
 using std::string;
 
@@ -231,7 +232,7 @@ int32_t SendMsg(int32_t fd, std::string& send_msg_str) {
     return 0;
 }   
 
-
+}  // end of namespace libevrpc
 
 
 

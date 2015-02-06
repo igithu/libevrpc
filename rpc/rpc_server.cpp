@@ -22,8 +22,9 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/common.h>
 
-#include "../include/inter_include.h"
+#include "socket_util.h"
 #include "rpc_util.h"
+#include "../log/ds_log.h"
 
 namespace libevrpc {
 
@@ -113,6 +114,13 @@ bool RpcServer::Start(int32_t thread_num, const char* addr, const char* port) {
 }
 
 bool RpcServer::Wait() {
+
+
+    if (false == io_thread_ptr_->IsAlive()) {
+        //worker_threads_ptr_->Destroy();
+        return false;
+    }
+
     if (NULL != io_thread_ptr_) {
         io_thread_ptr_->Wait();
     }
