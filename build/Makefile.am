@@ -10,8 +10,8 @@ COMM_LIB =../cs_sample/proto/simple_rpc.pb.h \
 		  ../rpc/rpc_msg.pb.cc \
 		  ../rpc/rpc_util.h \
 		  ../rpc/rpc_util.cpp \
-		  ../log/ds_log.h \
-		  ../log/ds_log.cpp
+		  ../log/libevrpc_log.h \
+		  ../log/libevrpc_log.cpp
 
 COMMON_CF = -I../../third-64/protobuf/include/ \
 			-I../../third-64/glog/include/ \

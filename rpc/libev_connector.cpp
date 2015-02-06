@@ -21,7 +21,7 @@
 
 #include "socket_util.h"
 #include "rpc_server.h"
-#include "../log/ds_log.h"
+#include "../log/libevrpc_log.h"
 
 namespace libevrpc {
 
@@ -39,7 +39,7 @@ LibevConnector::~LibevConnector() {
 bool LibevConnector::Initialize(const char *host, const char *port) {
     int32_t listenfd = TcpListen(host, port);
     if (listenfd < 0) {
-        DS_LOG(ERROR, "rpc server listen failed!")
+        LIBEVRPC_LOG(ERROR, "rpc server listen failed!")
         return false;
     }
     
@@ -53,7 +53,7 @@ bool LibevConnector::Initialize(const char *host, const char *port) {
 
 void LibevConnector::LibevLoop() {
     if (NULL == epoller_) {
-        DS_LOG(ERROR, "It is not Initialize!");
+        LIBEVRPC_LOG(ERROR, "It is not Initialize!");
         return;
     }
     
@@ -66,7 +66,7 @@ void LibevConnector::LibevLoop() {
 void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     printf("TTest accrpt\n");
     if (EV_ERROR & revents) {
-        DS_LOG(ERROR, "ERROR event in accept callback! exit!");
+        LIBEVRPC_LOG(ERROR, "ERROR event in accept callback! exit!");
         return;
     }
     struct sockaddr_in client_addr;
@@ -76,7 +76,7 @@ void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
         return;
     }
 
-    DS_LOG(INFO, "NEW connection coming!!");
+    LIBEVRPC_LOG(INFO, "NEW connection coming!!");
     struct ev_io *client_eio = (struct ev_io*)malloc(sizeof(struct ev_io));
     ev_io_init(client_eio, LibevConnector::ProcessCb, cfd, EV_READ);
     ev_io_start(loop, client_eio);
@@ -84,7 +84,7 @@ void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
 
 void LibevConnector::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (EV_ERROR & revents) {
-        DS_LOG(ERROR, "ERROR event in process callback! exit!");
+        LIBEVRPC_LOG(ERROR, "ERROR event in process callback! exit!");
         free(watcher);
         return;
     }

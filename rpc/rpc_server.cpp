@@ -24,7 +24,7 @@
 
 #include "socket_util.h"
 #include "rpc_util.h"
-#include "../log/ds_log.h"
+#include "../log/libevrpc_log.h"
 
 namespace libevrpc {
 
@@ -102,7 +102,7 @@ bool RpcServer::RegisteService(Service* reg_service) {
 
 bool RpcServer::Start(int32_t thread_num, const char* addr, const char* port) {
 
-    DS_LOG(INFO, "rpc server start info, thread pool num: %d, addr: %s, port: %s", 
+    LIBEVRPC_LOG(INFO, "rpc server start info, thread pool num: %d, addr: %s, port: %s", 
             thread_num, addr, port);
 
     libev_connector_ptr_ = new LibevConnector();
@@ -169,14 +169,14 @@ void* RpcServer::RpcProcessor(void *arg) {
     HashMap& method_hashmap = rpc_serv_ptr->method_hashmap_;
     HashMap::iterator method_iter = method_hashmap.find(hash_code);
     if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
-        DS_LOG(ERROR, "find hash code failed! request hash code is: %u", hash_code);
+        LIBEVRPC_LOG(ERROR, "find hash code failed! request hash code is: %u", hash_code);
         rpc_serv_ptr->ErrorSendMsg(event_fd, "find hash code failed!");
         return NULL;
     }
     RpcMethod* rpc_method = method_iter->second;
     Message* request = rpc_method->request->New();
     if (!request->ParseFromString(recv_rpc_msg.body_msg())) {
-        DS_LOG(ERROR, "parse body msg error!");
+        LIBEVRPC_LOG(ERROR, "parse body msg error!");
         rpc_serv_ptr->ErrorSendMsg(event_fd, "parse body msg error!");
         delete request;
         return NULL;
@@ -187,7 +187,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     rpc_method->service->CallMethod(method_desc, NULL, request, response, NULL);
     
     if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, response)) {
-        DS_LOG(ERROR, "send format response failed!");
+        LIBEVRPC_LOG(ERROR, "send format response failed!");
         rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
     }
     delete request;
@@ -199,7 +199,7 @@ void* RpcServer::RpcProcessor(void *arg) {
 bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
     string msg_str;
     if (RecvMsg(event_fd, msg_str) < 0) {
-        DS_LOG(ERROR, "rpc server recv msg failed!");
+        LIBEVRPC_LOG(ERROR, "rpc server recv msg failed!");
         return false;
     }
 
@@ -209,7 +209,7 @@ bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
     }
 
     if (!recv_rpc_msg.ParseFromString(msg_str)) {
-        DS_LOG(ERROR, "parse from string msg failed!");
+        LIBEVRPC_LOG(ERROR, "parse from string msg failed!");
         return false;
     }
     return true;
@@ -218,7 +218,7 @@ bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
 bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
     string response_str;
     if (!response->SerializeToString(&response_str)) {
-        DS_LOG(ERROR, "response_str SerializeToString failed!");
+        LIBEVRPC_LOG(ERROR, "response_str SerializeToString failed!");
         return false;
     }
     if (0 == response_str.size()) {
@@ -230,7 +230,7 @@ bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
     send_rpc_msg.set_body_msg(response_str);
     string send_str;
     if (!send_rpc_msg.SerializeToString(&send_str)) {
-        DS_LOG(ERROR, "send_str SerializeToString failed!");
+        LIBEVRPC_LOG(ERROR, "send_str SerializeToString failed!");
         return false;
     }
     SendMsg(event_fd, send_str);
@@ -251,7 +251,7 @@ bool RpcServer::ErrorSendMsg(int32_t event_fd, const string& error_msg) {
 
     string err_msg_str;
     if (!error_rpc_msg.SerializeToString(&err_msg_str)) {
-        DS_LOG(ERROR, "error send error!");
+        LIBEVRPC_LOG(ERROR, "error send error!");
         return false;
     }
     SendMsg(event_fd, err_msg_str);

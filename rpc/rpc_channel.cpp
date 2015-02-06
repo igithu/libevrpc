@@ -22,7 +22,7 @@
 #include "rpc_util.h"
 #include "rpc_msg.pb.h"
 #include "socket_util.h"
-#include "../log/ds_log.h"
+#include "../log/libevrpc_log.h"
 
 namespace libevrpc {
 
@@ -54,7 +54,7 @@ void Channel::CallMethod(const MethodDescriptor* method,
 
     connect_fd_ = TcpConnect(addr_, port_);
     if (connect_fd_ < 0) {
-        DS_LOG(ERROR, "rpc connect server failed!");
+        LIBEVRPC_LOG(ERROR, "rpc connect server failed!");
         return;
     }
 
@@ -64,17 +64,17 @@ void Channel::CallMethod(const MethodDescriptor* method,
     }
   
     if (SendMsg(connect_fd_, send_str) < 0) {
-        DS_LOG(ERROR, "send msg error!");
+        LIBEVRPC_LOG(ERROR, "send msg error!");
     }
 
     string recv_str;
     if (RecvMsg(connect_fd_, recv_str) < 0) {
-        DS_LOG(ERROR, "rcv msg error!");
+        LIBEVRPC_LOG(ERROR, "rcv msg error!");
     }
     close(connect_fd_);
 
     if (!FormatRecvMsg(recv_str, response)) {
-        DS_LOG(ERROR, "format recv msg failed!");
+        LIBEVRPC_LOG(ERROR, "format recv msg failed!");
     }
 }
 
@@ -87,13 +87,13 @@ bool FormatSendMsg(
     uint32_t hash_code = BKDRHash(method->full_name().c_str());
 
     if (NULL == request) {
-        DS_LOG(ERROR, "request is null ptr!");
+        LIBEVRPC_LOG(ERROR, "request is null ptr!");
         return false;
     }
 
     string request_str;
     if (!request->SerializeToString(&request_str)) {
-        DS_LOG(ERROR, "request SerializeToString has failed!");
+        LIBEVRPC_LOG(ERROR, "request SerializeToString has failed!");
         return false;
     }
     RpcMessage rpc_msg;
@@ -102,7 +102,7 @@ bool FormatSendMsg(
 
 
     if (!rpc_msg.SerializeToString(&send_str)) {
-        DS_LOG(ERROR, "request SerializeToString has failed!");
+        LIBEVRPC_LOG(ERROR, "request SerializeToString has failed!");
         return false;
     }
     return true;
@@ -111,17 +111,17 @@ bool FormatSendMsg(
 bool FormatRecvMsg(const string& recv_str, Message* response) {
     RpcMessage recv_rpc_msg;
     if (!recv_rpc_msg.ParseFromString(recv_str)) {
-        DS_LOG(ERROR, "parse recv msg error! %s", recv_str.c_str());
+        LIBEVRPC_LOG(ERROR, "parse recv msg error! %s", recv_str.c_str());
         return false;
     }
 
     if (500 == recv_rpc_msg.head_code()) {
-        DS_LOG(ERROR, "server internal error!");
+        LIBEVRPC_LOG(ERROR, "server internal error!");
     }
 
     if ("0" != recv_rpc_msg.body_msg() && 
         !response->ParseFromString(recv_rpc_msg.body_msg())) {
-        DS_LOG(ERROR, "parse recv body msg error!");
+        LIBEVRPC_LOG(ERROR, "parse recv body msg error!");
         return false;
     }
     return true;
