@@ -49,8 +49,8 @@ rpc_service_SOURCES = \
 			  $(COMM_LIB)
 
 rpc_service_CPPFLAGS = -I../../third-64/boost/include/ \
-					   -I../../util/thread/include/ \
-					   -I../../util/tools/include/ \
+					   -I../../pub_util/thread/include/ \
+					   -I../../pub_util/tools/include/ \
 					   $(COMMON_CF)
 rpc_service_LDFLAGS =-DHAVE_INTTYPES_H -DHAVE_NETINET_IN_H -fpermissive 
 rpc_service_LDADD = $(COMMON_LD) \
