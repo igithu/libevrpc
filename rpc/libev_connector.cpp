@@ -44,7 +44,8 @@ bool LibevConnector::Initialize(const char *host, const char *port) {
     }
     
     epoller_ = ev_loop_new(EVBACKEND_EPOLL | EVFLAG_NOENV);
-
+    
+    // set callback AcceptCb, Note the function AcceptCb must be static function
     ev_io_init(&socket_watcher_, LibevConnector::AcceptCb, listenfd, EV_READ);
     ev_io_start(epoller_, &socket_watcher_);
 
@@ -59,12 +60,10 @@ void LibevConnector::LibevLoop() {
     
     while (true) {
         ev_loop(epoller_, 0);
-        printf("TTest loop io\n");
     }
 }
 
 void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
-    printf("TTest accrpt\n");
     if (EV_ERROR & revents) {
         LIBEVRPC_LOG(ERROR, "ERROR event in accept callback! exit!");
         return;

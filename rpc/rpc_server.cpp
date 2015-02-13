@@ -84,15 +84,18 @@ bool RpcServer::RegisteService(Service* reg_service) {
         const Message* request = &reg_service->GetRequestPrototype(method_desc);
         const Message* response = &reg_service->GetResponsePrototype(method_desc);
 
+        // format rpc method
         RpcMethod* rpc_method =
             new RpcMethod(reg_service, request, response, method_desc);
 
+        // format hash code of function called
         uint32_t hash_code = BKDRHash(method_desc->full_name().c_str());
 
         HashMap::iterator ret_iter = method_hashmap_.find(hash_code);
         if (ret_iter == method_hashmap_.end()) {
             method_hashmap_.insert(std::make_pair(hash_code, rpc_method));
         } else {
+            // if conflict, replace old one
             delete ret_iter->second;
             method_hashmap_[hash_code] = rpc_method;
         }
@@ -139,6 +142,7 @@ bool RpcServer::RpcCall(int32_t event_fd) {
     CallBackParams* cb_params_ptr = new CallBackParams();
     cb_params_ptr->event_fd = event_fd;
     cb_params_ptr->rpc_server_ptr = this;
+    // push the task to thread pool
     worker_threads_ptr_->Processor(RpcServer::RpcProcessor, cb_params_ptr);
     return true;
 }
@@ -167,6 +171,7 @@ void* RpcServer::RpcProcessor(void *arg) {
 
     uint32_t hash_code = recv_rpc_msg.head_code();
     HashMap& method_hashmap = rpc_serv_ptr->method_hashmap_;
+    // find the function will be called
     HashMap::iterator method_iter = method_hashmap.find(hash_code);
     if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
         LIBEVRPC_LOG(ERROR, "find hash code failed! request hash code is: %u", hash_code);
@@ -184,6 +189,7 @@ void* RpcServer::RpcProcessor(void *arg) {
 
     const MethodDescriptor* method_desc = rpc_method->method;
     Message* response = rpc_method->response->New();
+    // call method!
     rpc_method->service->CallMethod(method_desc, NULL, request, response, NULL);
     
     if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, response)) {

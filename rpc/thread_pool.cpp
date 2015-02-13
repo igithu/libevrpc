@@ -54,6 +54,7 @@ bool ThreadPool::Initialize() {
 
 
 bool ThreadPool::Start() {
+    // start all threads in the pool
     for (int i = 0; i < nthread_num_; ++i) {
         pthread_create(&thread_ids_[i], NULL, WorkerThread, this);
     }

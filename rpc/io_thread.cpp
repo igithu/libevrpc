@@ -29,7 +29,6 @@ namespace libevrpc {
 IOThread::IOThread(const char* addr, const char* port) {
     strcpy(addr_ = (char*)malloc(strlen(addr) + 1), addr);
     strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
-    printf("Test %s, %s", addr_, port_);
 }
 
 IOThread::~IOThread() {
@@ -44,6 +43,7 @@ void IOThread::Run() {
         return;
     }
     libev_connector_ptr->Initialize(addr_, port_);
+    // call loop and block here
     libev_connector_ptr->LibevLoop();
 
 }
