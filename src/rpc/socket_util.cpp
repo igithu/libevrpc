@@ -30,7 +30,7 @@
 #include <netinet/tcp.h> 
 #include <netdb.h>
 
-#include "../log/libevrpc_log.h"
+#include "log/libevrpc_log.h"
 
 namespace libevrpc {
 

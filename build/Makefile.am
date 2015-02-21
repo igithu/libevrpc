@@ -2,6 +2,10 @@
 #SUBDIRS=src
 #DIST_SUBDIRS=src
 
+ROOT_DIR=${top_srcdir}/../src
+
+INCLUDES=-I${ROOT_DIR}/
+
 COMM_LIB =../src/cs_sample/proto/simple_rpc.pb.h \
 		  ../src/cs_sample/proto/simple_rpc.pb.cc \
 		  ../src/rpc/socket_util.h \

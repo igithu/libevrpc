@@ -30,7 +30,7 @@
 #include <netdb.h>
 
 #include "connection_manager.h"
-#include "../log/libevrpc_log.h"
+#include "log/libevrpc_log.h"
 
 namespace libevrpc {
 

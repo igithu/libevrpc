@@ -22,7 +22,7 @@
 #include "rpc_util.h"
 #include "rpc_msg.pb.h"
 #include "socket_util.h"
-#include "../log/libevrpc_log.h"
+#include "log/libevrpc_log.h"
 
 namespace libevrpc {
 

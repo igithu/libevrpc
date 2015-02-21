@@ -15,7 +15,7 @@
  **/
 
 #include "proto/simple_rpc.pb.h"
-#include "../rpc/rpc_channel.h"
+#include "rpc/rpc_channel.h"
 
 using namespace libevrpc;
 using namespace google::protobuf;
