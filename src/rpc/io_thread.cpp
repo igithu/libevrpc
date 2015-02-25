@@ -16,7 +16,6 @@
 
 #include "io_thread.h"
 
-//#include <sys/epoll.h>
 #include <sys/socket.h>
 
 #include "rpc_server.h"
@@ -32,8 +31,8 @@ IOThread::IOThread(const char* addr, const char* port) {
 }
 
 IOThread::~IOThread() {
-    delete addr_;
-    delete port_;
+    free(addr_);
+    free(port_);
 }
 
 void IOThread::Run() {
