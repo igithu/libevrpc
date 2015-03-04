@@ -62,7 +62,6 @@ int32_t Socket(int32_t family, int32_t type, int32_t protocol) {
 }
 
 int32_t TcpListen(const char *host, const char *port, int32_t family) {
-    int32_t listenfd;
     struct addrinfo hints, *res, *ressave;
 
     bzero(&hints, sizeof(struct addrinfo));
@@ -76,6 +75,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
     }
 
     ressave = res;
+    int32_t listenfd;
     const int on = 1;
     do {
         if (NULL == res) {
@@ -87,7 +87,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
         }
         
         if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
-            LIBEVRPC_LOG(ERROR, "setsockopt error listenfd %d", listenfd);
+            LIBEVRPC_LOG(ERROR, "Setsockopt error listenfd %d.", listenfd);
             return -1;
         }
 
@@ -95,6 +95,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
         if (bind(listenfd, res->ai_addr, res->ai_addrlen) == 0) {
             break;
         }
+        LIBEVRPC_LOG(WARNING, "Bind failed!, errno is: %s.", strerror(errno));
         close(listenfd);    
     } while ((res = res->ai_next) != NULL);
 
@@ -118,7 +119,6 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
 }
 
 int32_t TcpConnect(const char *host, const char *port, int32_t family) {
-    int32_t  sockfd;
     struct addrinfo hints, *res, *ressave;
        
     bzero(&hints, sizeof(struct addrinfo));
@@ -130,6 +130,7 @@ int32_t TcpConnect(const char *host, const char *port, int32_t family) {
         return -1;
     }
     
+    int32_t  sockfd;
     ressave = res;
     do {
         sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -144,7 +145,7 @@ int32_t TcpConnect(const char *host, const char *port, int32_t family) {
     } while ((res = res->ai_next) != NULL);
     
     if (res == NULL) {    /* errno set from final connect() */
-        LIBEVRPC_LOG(ERROR, "tcp_connect error!");
+        LIBEVRPC_LOG(ERROR, "tcp_connect error! the errno is: %s", strerror(errno));
         return -1;
     }
     freeaddrinfo(ressave);
