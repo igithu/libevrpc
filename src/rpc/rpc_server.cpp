@@ -216,6 +216,7 @@ bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
 
     if (!recv_rpc_msg.ParseFromString(msg_str)) {
         LIBEVRPC_LOG(ERROR, "parse from string msg failed!");
+        close(event_fd);
         return false;
     }
     return true;
@@ -258,6 +259,7 @@ bool RpcServer::ErrorSendMsg(int32_t event_fd, const string& error_msg) {
     string err_msg_str;
     if (!error_rpc_msg.SerializeToString(&err_msg_str)) {
         LIBEVRPC_LOG(ERROR, "error send error!");
+        close(event_fd);
         return false;
     }
     SendMsg(event_fd, err_msg_str);
