@@ -80,7 +80,11 @@ then
     exit -1
 fi
 
-echo "build the name server successfully!!"
+echo ""
+echo "*******************************************"
+echo "build the libevrpc successfully!!"
+echo "*******************************************"
+echo ""
 
 make distclean && ./bootstrap.sh clean && rm COPYING
 

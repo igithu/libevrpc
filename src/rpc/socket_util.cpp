@@ -177,7 +177,7 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen) {
 int32_t RecvMsg(int32_t fd, std::string& recv_msg_str) {
     recv_msg_str = "";
 
-    const uint32_t MAXBUFLEN = 512;
+    const uint32_t MAXBUFLEN = 1024 * 1024;
     char buf[MAXBUFLEN];
     memset(buf, 0, MAXBUFLEN);
 
@@ -196,8 +196,7 @@ int32_t RecvMsg(int32_t fd, std::string& recv_msg_str) {
 
 
         if (buf_len > 0) {
-            string new_buf(buf);
-            recv_msg_str.append(new_buf);
+            recv_msg_str.append(buf, strlen(buf));
             memset(buf, 0, MAXBUFLEN);
             continue;
         }

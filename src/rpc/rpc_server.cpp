@@ -180,7 +180,8 @@ void* RpcServer::RpcProcessor(void *arg) {
     }
     RpcMethod* rpc_method = method_iter->second;
     Message* request = rpc_method->request->New();
-    if (!request->ParseFromString(recv_rpc_msg.body_msg())) {
+    if ("0" != recv_rpc_msg.body_msg() &&
+         !request->ParseFromString(recv_rpc_msg.body_msg())) {
         LIBEVRPC_LOG(ERROR, "parse body msg error!");
         rpc_serv_ptr->ErrorSendMsg(event_fd, "parse body msg error!");
         delete request;
