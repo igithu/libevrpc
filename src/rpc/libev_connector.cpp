@@ -52,6 +52,7 @@ bool LibevConnector::Initialize(const char *host, const char *port) {
     return true;
 }
 
+// start run loop
 void LibevConnector::LibevLoop() {
     if (NULL == epoller_) {
         LIBEVRPC_LOG(ERROR, "It is not Initialize!");
@@ -63,6 +64,7 @@ void LibevConnector::LibevLoop() {
     }
 }
 
+// accept the new connection
 void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (EV_ERROR & revents) {
         LIBEVRPC_LOG(ERROR, "ERROR event in accept callback! exit!");
@@ -81,6 +83,7 @@ void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
     ev_io_start(loop, client_eio);
 }
 
+// handle the connection and push the connection fd to thread pool waiting list
 void LibevConnector::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (EV_ERROR & revents) {
         LIBEVRPC_LOG(ERROR, "ERROR event in process callback! exit!");

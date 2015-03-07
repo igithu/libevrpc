@@ -43,6 +43,7 @@ ThreadPool::~ThreadPool() {
 }
 
 bool ThreadPool::Initialize() {
+    // init the task list
     thread_ids_ = (pthread_t *) malloc(nthread_num_ * sizeof(pthread_t));
     task_list_.task_head = (Task*) malloc(sizeof(Task));
     memset(thread_ids_, 0, sizeof(thread_ids_));

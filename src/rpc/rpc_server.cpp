@@ -117,8 +117,6 @@ bool RpcServer::Start(int32_t thread_num, const char* addr, const char* port) {
 }
 
 bool RpcServer::Wait() {
-
-
     if (false == io_thread_ptr_->IsAlive()) {
         //worker_threads_ptr_->Destroy();
         return false;
@@ -139,6 +137,7 @@ bool RpcServer::RpcCall(int32_t event_fd) {
     if (NULL == worker_threads_ptr_) {
         return false;
     }
+
     CallBackParams* cb_params_ptr = new CallBackParams();
     cb_params_ptr->event_fd = event_fd;
     cb_params_ptr->rpc_server_ptr = this;
