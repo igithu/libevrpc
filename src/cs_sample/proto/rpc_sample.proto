@@ -1,0 +1,19 @@
+package echo;
+
+option cc_generic_services = true;
+
+
+message EchoRequest {
+    optional string request = 1 [default = ""];
+}
+
+message EchoResponse {
+    optional string response = 1 [default = ""];
+}
+
+service EchoService {
+    rpc Echo(EchoRequest) returns (EchoResponse);
+};
+
+
+

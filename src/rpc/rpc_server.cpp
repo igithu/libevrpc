@@ -24,7 +24,7 @@
 
 #include "socket_util.h"
 #include "rpc_util.h"
-#include "log/libevrpc_log.h"
+#include "libevrpc_log.h"
 
 namespace libevrpc {
 

@@ -1,0 +1,2 @@
+autoscan: warning: missing AC_PROG_AWK wanted by: 
+	libevrpc.sh:22

@@ -6,11 +6,16 @@
 #must install automake
 
 BUILD_ROOT=$PWD
+
+SRC_ROOT=$BUILD_ROOT/src
+CLIENT_SRC_PATH=$SRC_ROOT/cs_sample
+SERVER_SRC_PATH=$SRC_ROOT/cs_sample
+
 START_FILE=$BUILD_ROOT/libevrpc.sh
 SERVER_PATH=$BUILD_ROOT/libevrpc
 SERVER_BIN_PATH=$SERVER_PATH/bin
 CONF_PATH=$BUILD_ROOT/../../conf
-CONF_FILE=$CONF_PATH/ds.ini 
+CONF_FILE=$CONF_PATH/ds.ini
 
 echo $BUILD_ROOT
 
@@ -70,7 +75,7 @@ then
 fi 
 
 
-mv rpc_client rpc_server $SERVER_BIN_PATH && \
+mv $CLIENT_SRC_PATH/rpc_client $SERVER_SRC_PATH/rpc_server $SERVER_BIN_PATH && \
 #cp -r $CONF_PATH $SERVER_PATH && \
 #cp $START_FILE $SERVER_BIN_PATH
 
@@ -86,6 +91,6 @@ echo "build the libevrpc successfully!!"
 echo "*******************************************"
 echo ""
 
-make distclean && ./bootstrap.sh clean && rm COPYING
+make distclean && ./bootstrap.sh clean
 
 

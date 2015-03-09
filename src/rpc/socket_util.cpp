@@ -30,7 +30,7 @@
 #include <netinet/tcp.h> 
 #include <netdb.h>
 
-#include "log/libevrpc_log.h"
+#include "libevrpc_log.h"
 
 namespace libevrpc {
 
@@ -85,7 +85,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
         if (listenfd < 0) {
             continue;       /* error, try next one */
         }
-        
+
         if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
             LIBEVRPC_LOG(ERROR, "Setsockopt error listenfd %d.", listenfd);
             continue;
@@ -96,7 +96,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
             break;
         }
         LIBEVRPC_LOG(WARNING, "Bind failed!, errno is: %s.", strerror(errno));
-        close(listenfd);    
+        close(listenfd);
     } while ((res = res->ai_next) != NULL);
 
     if (NULL == res) {
@@ -121,7 +121,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
 
 int32_t TcpConnect(const char *host, const char *port, int32_t family) {
     struct addrinfo hints, *res = NULL, *ressave = NULL;
-       
+
     bzero(&hints, sizeof(struct addrinfo));
     hints.ai_family = family;
     hints.ai_socktype = SOCK_STREAM;
@@ -130,7 +130,7 @@ int32_t TcpConnect(const char *host, const char *port, int32_t family) {
         LIBEVRPC_LOG(ERROR,"tcp_connect error for %s, %s", host, port);
         return -1;
     }
-    
+
     int32_t  sockfd;
     ressave = res;
     do {
@@ -144,7 +144,7 @@ int32_t TcpConnect(const char *host, const char *port, int32_t family) {
         }
         close(sockfd);  /* ignore this one */
     } while ((res = res->ai_next) != NULL);
-    
+
     if (res == NULL) {    /* errno set from final connect() */
         LIBEVRPC_LOG(ERROR, "tcp_connect error! the errno is: %s", strerror(errno));
         freeaddrinfo(ressave);
@@ -232,7 +232,7 @@ int32_t SendMsg(int32_t fd, std::string& send_msg_str) {
     } while(send_size > 0);
 
     return 0;
-}   
+}
 
 }  // end of namespace libevrpc
 
