@@ -25,3 +25,9 @@
         
     2.log：log日志调用，现阶段使用glog
     3.cs_sample: rpc使用C++实例
+
+
+设计说明：
+
+        1.目前采用的是reactor + worker ThreadPool 模式，在实现的过程中，reactor(libev)只负责接收io接收转发
+        2.考虑进一步加强功能: 模拟类似proactor做法，在reactor结构中增加ThreadPool来负责接收数据，当数据接收完毕，将数据,和fd移交下游的woker ThreadPool进行逻辑计算处理，这样基本实现了接收数据和逻辑的处理异步实现
