@@ -100,7 +100,7 @@ bool RpcServer::RegisteService(Service* reg_service) {
             method_hashmap_[hash_code] = rpc_method;
         }
     }
-   return true; 
+   return true;
 }
 
 bool RpcServer::Start(int32_t thread_num, const char* addr, const char* port) {
@@ -191,7 +191,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     Message* response = rpc_method->response->New();
     // call method!
     rpc_method->service->CallMethod(method_desc, NULL, request, response, NULL);
-    
+
     if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, response)) {
         LIBEVRPC_LOG(ERROR, "send format response failed!");
         rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");

@@ -68,7 +68,6 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void protobuf_ShutdownFile_rpc_5fmsg_2eproto() {
   delete RpcMessage::default_instance_;
   delete RpcMessage_reflection_;
-  delete RpcMessage::_default_body_msg_;
 }
 
 void protobuf_AddDesc_rpc_5fmsg_2eproto() {
@@ -78,12 +77,10 @@ void protobuf_AddDesc_rpc_5fmsg_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rrpc_msg.proto\"7\n\nRpcMessage\022\024\n\thead_co"
-    "de\030\001 \001(\r:\0010\022\023\n\010body_msg\030\002 \001(\t:\001 ", 72);
+    "\n\rrpc_msg.proto\"6\n\nRpcMessage\022\024\n\thead_co"
+    "de\030\001 \001(\r:\0010\022\022\n\010body_msg\030\002 \001(\014:\000", 71);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "rpc_msg.proto", &protobuf_RegisterTypes);
-  RpcMessage::_default_body_msg_ =
-      new ::std::string(" ", 1);
   RpcMessage::default_instance_ = new RpcMessage();
   RpcMessage::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_rpc_5fmsg_2eproto);
@@ -98,7 +95,6 @@ struct StaticDescriptorInitializer_rpc_5fmsg_2eproto {
 
 // ===================================================================
 
-::std::string* RpcMessage::_default_body_msg_ = NULL;
 #ifndef _MSC_VER
 const int RpcMessage::kHeadCodeFieldNumber;
 const int RpcMessage::kBodyMsgFieldNumber;
@@ -124,7 +120,7 @@ void RpcMessage::SharedCtor() {
   ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   head_code_ = 0u;
-  body_msg_ = const_cast< ::std::string*>(_default_body_msg_);
+  body_msg_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -134,7 +130,7 @@ RpcMessage::~RpcMessage() {
 }
 
 void RpcMessage::SharedDtor() {
-  if (body_msg_ != _default_body_msg_) {
+  if (body_msg_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete body_msg_;
   }
   if (this != default_instance_) {
@@ -166,8 +162,8 @@ void RpcMessage::Clear() {
   if (_has_bits_[0 / 32] & 3) {
     head_code_ = 0u;
     if (has_body_msg()) {
-      if (body_msg_ != _default_body_msg_) {
-        body_msg_->assign(*_default_body_msg_);
+      if (body_msg_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        body_msg_->clear();
       }
     }
   }
@@ -199,16 +195,12 @@ bool RpcMessage::MergePartialFromCodedStream(
         break;
       }
 
-      // optional string body_msg = 2 [default = " "];
+      // optional bytes body_msg = 2 [default = ""];
       case 2: {
         if (tag == 18) {
          parse_body_msg:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_body_msg()));
-          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->body_msg().data(), this->body_msg().length(),
-            ::google::protobuf::internal::WireFormat::PARSE,
-            "body_msg");
         } else {
           goto handle_unusual;
         }
@@ -246,13 +238,9 @@ void RpcMessage::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->head_code(), output);
   }
 
-  // optional string body_msg = 2 [default = " "];
+  // optional bytes body_msg = 2 [default = ""];
   if (has_body_msg()) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->body_msg().data(), this->body_msg().length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "body_msg");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
       2, this->body_msg(), output);
   }
 
@@ -271,14 +259,10 @@ void RpcMessage::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->head_code(), target);
   }
 
-  // optional string body_msg = 2 [default = " "];
+  // optional bytes body_msg = 2 [default = ""];
   if (has_body_msg()) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->body_msg().data(), this->body_msg().length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "body_msg");
     target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         2, this->body_msg(), target);
   }
 
@@ -301,10 +285,10 @@ int RpcMessage::ByteSize() const {
           this->head_code());
     }
 
-    // optional string body_msg = 2 [default = " "];
+    // optional bytes body_msg = 2 [default = ""];
     if (has_body_msg()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::StringSize(
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
           this->body_msg());
     }
 

@@ -95,14 +95,14 @@ class RpcMessage : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 head_code() const;
   inline void set_head_code(::google::protobuf::uint32 value);
 
-  // optional string body_msg = 2 [default = " "];
+  // optional bytes body_msg = 2 [default = ""];
   inline bool has_body_msg() const;
   inline void clear_body_msg();
   static const int kBodyMsgFieldNumber = 2;
   inline const ::std::string& body_msg() const;
   inline void set_body_msg(const ::std::string& value);
   inline void set_body_msg(const char* value);
-  inline void set_body_msg(const char* value, size_t size);
+  inline void set_body_msg(const void* value, size_t size);
   inline ::std::string* mutable_body_msg();
   inline ::std::string* release_body_msg();
   inline void set_allocated_body_msg(::std::string* body_msg);
@@ -118,7 +118,6 @@ class RpcMessage : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  static ::std::string* _default_body_msg_;
   ::std::string* body_msg_;
   ::google::protobuf::uint32 head_code_;
   friend void  protobuf_AddDesc_rpc_5fmsg_2eproto();
@@ -159,7 +158,7 @@ inline void RpcMessage::set_head_code(::google::protobuf::uint32 value) {
   // @@protoc_insertion_point(field_set:RpcMessage.head_code)
 }
 
-// optional string body_msg = 2 [default = " "];
+// optional bytes body_msg = 2 [default = ""];
 inline bool RpcMessage::has_body_msg() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -170,8 +169,8 @@ inline void RpcMessage::clear_has_body_msg() {
   _has_bits_[0] &= ~0x00000002u;
 }
 inline void RpcMessage::clear_body_msg() {
-  if (body_msg_ != _default_body_msg_) {
-    body_msg_->assign(*_default_body_msg_);
+  if (body_msg_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    body_msg_->clear();
   }
   clear_has_body_msg();
 }
@@ -181,7 +180,7 @@ inline const ::std::string& RpcMessage::body_msg() const {
 }
 inline void RpcMessage::set_body_msg(const ::std::string& value) {
   set_has_body_msg();
-  if (body_msg_ == _default_body_msg_) {
+  if (body_msg_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     body_msg_ = new ::std::string;
   }
   body_msg_->assign(value);
@@ -189,15 +188,15 @@ inline void RpcMessage::set_body_msg(const ::std::string& value) {
 }
 inline void RpcMessage::set_body_msg(const char* value) {
   set_has_body_msg();
-  if (body_msg_ == _default_body_msg_) {
+  if (body_msg_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     body_msg_ = new ::std::string;
   }
   body_msg_->assign(value);
   // @@protoc_insertion_point(field_set_char:RpcMessage.body_msg)
 }
-inline void RpcMessage::set_body_msg(const char* value, size_t size) {
+inline void RpcMessage::set_body_msg(const void* value, size_t size) {
   set_has_body_msg();
-  if (body_msg_ == _default_body_msg_) {
+  if (body_msg_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     body_msg_ = new ::std::string;
   }
   body_msg_->assign(reinterpret_cast<const char*>(value), size);
@@ -205,24 +204,24 @@ inline void RpcMessage::set_body_msg(const char* value, size_t size) {
 }
 inline ::std::string* RpcMessage::mutable_body_msg() {
   set_has_body_msg();
-  if (body_msg_ == _default_body_msg_) {
-    body_msg_ = new ::std::string(*_default_body_msg_);
+  if (body_msg_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    body_msg_ = new ::std::string;
   }
   // @@protoc_insertion_point(field_mutable:RpcMessage.body_msg)
   return body_msg_;
 }
 inline ::std::string* RpcMessage::release_body_msg() {
   clear_has_body_msg();
-  if (body_msg_ == _default_body_msg_) {
+  if (body_msg_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     return NULL;
   } else {
     ::std::string* temp = body_msg_;
-    body_msg_ = const_cast< ::std::string*>(_default_body_msg_);
+    body_msg_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
     return temp;
   }
 }
 inline void RpcMessage::set_allocated_body_msg(::std::string* body_msg) {
-  if (body_msg_ != _default_body_msg_) {
+  if (body_msg_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete body_msg_;
   }
   if (body_msg) {
@@ -230,7 +229,7 @@ inline void RpcMessage::set_allocated_body_msg(::std::string* body_msg) {
     body_msg_ = body_msg;
   } else {
     clear_has_body_msg();
-    body_msg_ = const_cast< ::std::string*>(_default_body_msg_);
+    body_msg_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
   // @@protoc_insertion_point(field_set_allocated:RpcMessage.body_msg)
 }

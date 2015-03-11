@@ -176,13 +176,16 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen) {
 
 int32_t RecvMsg(int32_t fd, std::string& recv_msg_str) {
     recv_msg_str = "";
-
     const uint32_t MAXBUFLEN = 1024 * 1024;
+    // const uint32_t MAXBUFLEN = 16;
+
     char buf[MAXBUFLEN];
     memset(buf, 0, MAXBUFLEN);
 
     do {
-        int32_t buf_len = recv(fd, buf, sizeof(buf) + 1, 0);
+        int32_t buf_len = recv(fd, buf, MAXBUFLEN + 1, 0);
+        // fflush, why work??
+        fflush(stdin);
         if (buf_len < 0) {
             if (EAGAIN == errno || EINTR == errno) {
                 //LIBEVRPC_LOG(ERROR, "EAGAIN or EINTR in RecvMsg!");
@@ -193,7 +196,7 @@ int32_t RecvMsg(int32_t fd, std::string& recv_msg_str) {
         } else if (0 == buf_len) {
             break;
         }
-
+        buf[buf_len] = '\0';
 
         if (buf_len > 0) {
             recv_msg_str.append(buf, strlen(buf));

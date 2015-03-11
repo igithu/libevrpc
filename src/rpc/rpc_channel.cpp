@@ -61,7 +61,7 @@ void Channel::CallMethod(const MethodDescriptor* method,
     if (!FormatSendMsg(method, request, send_str)) {
         return;
     }
-  
+
     if (SendMsg(connect_fd_, send_str) < 0) {
         LIBEVRPC_LOG(ERROR, "send msg error!");
     }
@@ -70,11 +70,11 @@ void Channel::CallMethod(const MethodDescriptor* method,
     if (RecvMsg(connect_fd_, recv_str) < 0) {
         LIBEVRPC_LOG(ERROR, "rcv msg error!");
     }
-    close(connect_fd_);
 
     if (!FormatRecvMsg(recv_str, response)) {
         LIBEVRPC_LOG(ERROR, "format recv msg failed!");
     }
+    close(connect_fd_);
 }
 
 void Channel::Close() {
@@ -123,7 +123,7 @@ bool FormatRecvMsg(const string& recv_str, Message* response) {
         LIBEVRPC_LOG(ERROR, "server internal error!");
     }
 
-    if ("0" != recv_rpc_msg.body_msg() && 
+    if ("0" != recv_rpc_msg.body_msg() &&
         !response->ParseFromString(recv_rpc_msg.body_msg())) {
         LIBEVRPC_LOG(ERROR, "parse recv body msg error!");
         return false;
