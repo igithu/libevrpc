@@ -82,11 +82,11 @@ class RpcServer {
 
         bool ErrorSendMsg(int32_t event_fd, const string& error_msg);
 
-        //DISALLOW_COPY_AND_ASSIGN(RpcServer);
+        DISALLOW_COPY_AND_ASSIGN(RpcServer);
 
 
     private:
-        
+
         PUBLIC_UTIL::Mutex hashmap_mutex_;
 
         HashMap method_hashmap_;
