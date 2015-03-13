@@ -3,12 +3,12 @@
 
 总体说明：
 
-    1.在tp_rpc基础上进一步改进 去除epoll的裸使用 改用libev作为io_thread的代码核心， protobuf，线程池部分不变
+    1.在tp_rpc基础上进一步改进 去除epoll的裸使用 改用libev作为io_thread的代码核心， protobuf、线程池部分不变
     2.rpc下的connection_manager.h connection_manager.h为原来裸用epoll代码 现已经从rpc中分离开
 
 编译说明：
 
-    需要安装automake，并下载目录文件third-64,pub_util目录并放在与libevrpc目录平行处，然后在libevrpc下的build目录下 执行build.sh脚本
+    需要安装automake，并下载目录文件third-64,pub_util目录并放在与libevrpc目录平行处，然后在libevrpc下目录下 执行build.sh脚本
 
 
 代码说明：
@@ -30,4 +30,4 @@
 设计说明：
 
         1.目前采用的是reactor + worker ThreadPool 模式，在实现的过程中，reactor(libev)只负责接收io接收转发
-        2.考虑进一步加强功能: 模拟类似proactor做法，在reactor结构中增加ThreadPool来负责接收数据，当数据接收完毕，将数据,和fd移交下游的woker ThreadPool进行逻辑计算处理，这样基本实现了接收数据和逻辑的处理异步实现
+        2.考虑进一步加强功能，来适合大量数据的读写，以及计算密集型的要求: 模拟类似proactor做法，在reactor结构和worker ThreadPool之间增加ReaderPool，WriterPool，ReaderPool负责接收数据，来当数据接收完毕，将数据和fd移交下游的woker ThreadPool进行逻辑计算处理，逻辑计算处理之后门将产生的数据，移交给WritePool，将结果数据返回，这样基本实现了接收数据，产生数据和逻辑计算之间的异步处理实现
