@@ -159,7 +159,6 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen) {
     int32_t new_fd;
     do {
         new_fd = accept(fd, (struct sockaddr *) &sa, (socklen_t *) &addrlen);
-        SetNonBlock(new_fd);
 
         if (new_fd < 0) {
 #ifdef  EPROTO
@@ -171,6 +170,28 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen) {
         }
 
     } while (false);
+
+    int32_t optval = 1;
+    // if client lose connection
+    if (setsockopt(new_fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval)) < 0) {
+        close(new_fd);
+        return -1;
+    }
+
+    // 1s interval keepalive
+    if (setsockopt(new_fd, SOL_TCP, TCP_KEEPIDLE, &optval, sizeof(optval)) < 0) {
+        close(new_fd);
+        return -1;
+    }
+
+    optval = 3;
+    // 3 times retry
+    if (setsockopt(new_fd, SOL_TCP, TCP_KEEPCNT, &optval, sizeof(optval)) < 0) {
+        close(new_fd);
+        return -1;
+    }
+
+    SetNonBlock(new_fd);
     return new_fd;
 }
 
