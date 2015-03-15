@@ -30,7 +30,8 @@
 设计说明：
 
         1.目前采用的是reactor + worker ThreadPool 模式，在实现的过程中，reactor(libev)只负责接收io接收转发
-        2.考虑进一步加强功能，来适合大量数据的读写，以及计算密集型的要求: 模拟类似proactor做法，在reactor结构和worker ThreadPool之间增加ReaderPool，WriterPool，ReaderPool负责接收数据，来当数据接收完毕，将数据和fd移交下游的woker ThreadPool进行逻辑计算处理，逻辑计算处理之后门将产生的数据，移交给WritePool，将结果数据返回，这样基本实现了接收数据，产生数据和逻辑计算之间的异步处理实现
+        2.注意：当前的实现只适合，插入数据比较短，逻辑比较简单系统使用，例如key value数据的读取（db_engine）
+        3.考虑进一步加强功能，来适合大量数据的读写，以及计算密集型的要求: 模拟类似proactor做法，在reactor结构和worker ThreadPool之间增加ReaderPool，WriterPool，ReaderPool负责接收数据，来当数据接收完毕，将数据和fd移交下游的woker ThreadPool进行逻辑计算处理，逻辑计算处理之后门将产生的数据，移交给WritePool，将结果数据返回，这样基本实现了接收数据，产生数据和逻辑计算之间的异步处理实现
         
         
 
