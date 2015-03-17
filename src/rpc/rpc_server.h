@@ -39,8 +39,14 @@ using namespace google::protobuf;
 using __gnu_cxx::hash_map;
 
 struct RpcMethod {
-    RpcMethod(Service* p_service, const Message* p_req, const Message* p_rep, const MethodDescriptor* p_meth)
-        : service(p_service), request(p_req), response(p_rep), method(p_meth) {
+    RpcMethod(Service* p_service,
+              const Message* p_req,
+              const Message* p_rep,
+              const MethodDescriptor* p_meth)
+        : service(p_service),
+          request(p_req),
+          response(p_rep),
+          method(p_meth) {
     }
 
     Service* service;
