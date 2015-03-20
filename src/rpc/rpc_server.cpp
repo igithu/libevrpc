@@ -35,7 +35,9 @@ namespace libevrpc {
 RpcServer::RpcServer() :
     libev_connector_ptr_(NULL),
     io_thread_ptr_(NULL),
-    worker_threads_ptr_(NULL) {
+    worker_threads_ptr_(NULL),
+    reader_threads_ptr_(NULL), 
+    writer_threads_ptr_(NULL) {
     Initialize();
 }
 
@@ -50,12 +52,22 @@ RpcServer::~RpcServer() {
         }
     }
 
+    if (NULL != reader_threads_ptr_) {
+        delete reader_threads_ptr_;
+    }
+
+    if (NULL != writer_threads_ptr_) {
+        delete writer_threads_ptr_;
+    }
+
     if (NULL != worker_threads_ptr_) {
         delete worker_threads_ptr_;
     }
+
     if (NULL != io_thread_ptr_) {
         delete io_thread_ptr_;
     }
+
     if (NULL != libev_connector_ptr_) {
         delete libev_connector_ptr_;
     }
@@ -103,7 +115,11 @@ bool RpcServer::RegisteService(Service* reg_service) {
    return true;
 }
 
-bool RpcServer::Start(int32_t thread_num, const char* addr, const char* port) {
+bool RpcServer::Start(const char* addr,
+                      const char* port,
+                      int32_t thread_num,
+                      int32_t reader_num,
+                      int32_t writer_num) {
 
     LIBEVRPC_LOG(INFO, "rpc server start info, thread pool num: %d, addr: %s, port: %s", 
             thread_num, addr, port);
@@ -114,6 +130,17 @@ bool RpcServer::Start(int32_t thread_num, const char* addr, const char* port) {
 
     io_thread_ptr_->Start();
     worker_threads_ptr_->Start();
+
+    // if start readerpool or writerpool
+    if (0 != reader_num) {
+        reader_threads_ptr_ = new ThreadPool(reader_num);
+        reader_threads_ptr_->Start();
+    }
+
+    if (0 != writer_num) {
+        writer_threads_ptr_ = new ThreadPool(writer_num);
+        writer_threads_ptr_->Start();
+    }
 }
 
 bool RpcServer::Wait() {
@@ -128,6 +155,14 @@ bool RpcServer::Wait() {
 
     if (NULL != worker_threads_ptr_) {
         worker_threads_ptr_->Wait();
+    }
+
+    if (NULL != reader_threads_ptr_) {
+        reader_threads_ptr_->Wait();
+    }
+
+    if (NULL != writer_threads_ptr_) {
+        writer_threads_ptr_->Wait();
     }
 
     return true;

@@ -66,7 +66,11 @@ class RpcServer {
 
         bool RegisteService(Service* reg_service);
 
-        bool Start(int32_t thread_num = 20, const char* addr = "", const char* port = "");
+        bool Start(const char* addr = "",
+                   const char* port = "",
+                   int32_t thread_num = 20,
+                   int32_t reader_num = 0,
+                   int32_t writer_num = 0);
 
         bool Wait();
 
@@ -102,6 +106,10 @@ class RpcServer {
         IOThread* io_thread_ptr_;
 
         ThreadPool* worker_threads_ptr_;
+
+        ThreadPool* reader_threads_ptr_;
+
+        ThreadPool* writer_threads_ptr_;
 
         struct CallBackParams {
             int32_t event_fd;
