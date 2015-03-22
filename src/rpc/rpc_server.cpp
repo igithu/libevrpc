@@ -177,13 +177,19 @@ bool RpcServer::RpcCall(int32_t event_fd) {
     cb_params_ptr->event_fd = event_fd;
     cb_params_ptr->rpc_server_ptr = this;
     // push the task to thread pool
-    worker_threads_ptr_->Processor(RpcServer::RpcProcessor, cb_params_ptr);
+
+    if (NULL != reader_threads_ptr_) {
+        reader_threads_ptr_->Processor(RpcServer::RpcReader, cb_params_ptr);
+    }else {
+        worker_threads_ptr_->Processor(RpcServer::RpcProcessor, cb_params_ptr);
+    }
     return true;
 }
 
 LibevConnector* RpcServer::GetLibevConnector() {
     return libev_connector_ptr_;
 }
+
 
 void* RpcServer::RpcProcessor(void *arg) {
 
@@ -236,6 +242,23 @@ void* RpcServer::RpcProcessor(void *arg) {
     delete cb_params_ptr;
 }
 
+void* RpcServer::RpcReader(void *arg) {
+
+    CallBackParams* cb_params_ptr = (CallBackParams*) arg;
+    if (NULL == cb_params_ptr) {
+        return NULL;
+    }
+    RpcServer* rpc_serv_ptr = cb_params_ptr->rpc_server_ptr;
+    if (NULL == rpc_serv_ptr) {
+        return NULL;
+    }
+    int32_t event_fd = cb_params_ptr->event_fd;
+
+
+}
+
+void* RpcServer::RpcWriter(void *arg) {
+}
 
 bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
     string msg_str;

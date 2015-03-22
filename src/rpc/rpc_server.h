@@ -80,6 +80,10 @@ class RpcServer {
 
         static void* RpcProcessor(void *arg);
 
+        static void* RpcReader(void *arg);
+
+        static void* RpcWriter(void *arg);
+
 
     private:
         RpcServer();
@@ -114,6 +118,9 @@ class RpcServer {
         struct CallBackParams {
             int32_t event_fd;
             RpcServer* rpc_server_ptr;
+            // 
+            RpcMessage rpc_recv_msg;
+            RpcMessage rpc_send_msg;
         };
 
 };
