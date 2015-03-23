@@ -180,7 +180,7 @@ bool RpcServer::RpcCall(int32_t event_fd) {
 
     if (NULL != reader_threads_ptr_) {
         reader_threads_ptr_->Processor(RpcServer::RpcReader, cb_params_ptr);
-    }else {
+    } else {
         worker_threads_ptr_->Processor(RpcServer::RpcProcessor, cb_params_ptr);
     }
     return true;
@@ -203,10 +203,14 @@ void* RpcServer::RpcProcessor(void *arg) {
     }
     int32_t event_fd = cb_params_ptr->event_fd;
 
-    RpcMessage recv_rpc_msg;
-    if (!rpc_serv_ptr->GetMethodRequest(event_fd, recv_rpc_msg)) {
-        //rpc_serv_ptr->ErrorSendMsg(event_fd, "get method request failed!");
-        return NULL;
+    RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
+    if (NULL == rpc_serv_ptr->reader_threads_ptr_) {
+        /*the reader pool is not started*/
+        if (!rpc_serv_ptr->GetMethodRequest(event_fd, recv_rpc_msg)) {
+            //rpc_serv_ptr->ErrorSendMsg(event_fd, "get method request failed!");
+            return NULL;
+        }
+    } else {
     }
 
     uint32_t hash_code = recv_rpc_msg.head_code();
@@ -254,7 +258,13 @@ void* RpcServer::RpcReader(void *arg) {
     }
     int32_t event_fd = cb_params_ptr->event_fd;
 
-
+    RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
+    if (!rpc_serv_ptr->GetMethodRequest(event_fd, recv_rpc_msg)) {
+        rpc_serv_ptr->ErrorSendMsg(event_fd, "Get method request failed!");
+        return NULL;
+    }
+    rpc_serv_ptr->worker_threads_ptr_->Processor(
+            RpcServer::RpcProcessor, cb_params_ptr);
 }
 
 void* RpcServer::RpcWriter(void *arg) {

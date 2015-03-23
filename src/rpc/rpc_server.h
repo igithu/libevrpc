@@ -117,8 +117,9 @@ class RpcServer {
 
         struct CallBackParams {
             int32_t event_fd;
+            // current rpc server ptr
             RpcServer* rpc_server_ptr;
-            // 
+
             RpcMessage rpc_recv_msg;
             RpcMessage rpc_send_msg;
         };
