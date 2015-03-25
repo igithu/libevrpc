@@ -210,7 +210,6 @@ void* RpcServer::RpcProcessor(void *arg) {
             //rpc_serv_ptr->ErrorSendMsg(event_fd, "get method request failed!");
             return NULL;
         }
-    } else {
     }
 
     uint32_t hash_code = recv_rpc_msg.head_code();
@@ -234,16 +233,25 @@ void* RpcServer::RpcProcessor(void *arg) {
 
     const MethodDescriptor* method_desc = rpc_method->method;
     Message* response = rpc_method->response->New();
-    // call method!
+    // call method! execute the code of user!
     rpc_method->service->CallMethod(method_desc, NULL, request, response, NULL);
 
-    if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, response)) {
-        LIBEVRPC_LOG(ERROR, "send format response failed!");
-        rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
+    if (NULL == rpc_serv_ptr->writer_threads_ptr_) {
+        /*The writer pool is not started*/
+        if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, response)) {
+            LIBEVRPC_LOG(ERROR, "send format response failed!");
+            rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
+        }
+        delete cb_params_ptr;
+        delete response;
+    } else {
+        /*The writer pool is started, push the task to writer pool */
+        cb_params_ptr->response_ptr = response;
+        rpc_serv_ptr->writer_threads_ptr_->Processor(
+            RpcServer::RpcWriter, cb_params_ptr);
     }
+
     delete request;
-    delete response;
-    delete cb_params_ptr;
 }
 
 void* RpcServer::RpcReader(void *arg) {
@@ -268,6 +276,22 @@ void* RpcServer::RpcReader(void *arg) {
 }
 
 void* RpcServer::RpcWriter(void *arg) {
+    CallBackParams* cb_params_ptr = (CallBackParams*) arg;
+    if (NULL == cb_params_ptr) {
+        return NULL;
+    }
+    RpcServer* rpc_serv_ptr = cb_params_ptr->rpc_server_ptr;
+    if (NULL == rpc_serv_ptr) {
+        return NULL;
+    }
+    int32_t event_fd = cb_params_ptr->event_fd;
+
+    RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
+    if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, cb_params_ptr->response_ptr)) {
+        LIBEVRPC_LOG(ERROR, "send format response failed!");
+        rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
+    }
+    delete cb_params_ptr;
 }
 
 bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {

@@ -116,12 +116,26 @@ class RpcServer {
         ThreadPool* writer_threads_ptr_;
 
         struct CallBackParams {
+            CallBackParams() :
+                rpc_server_ptr(NULL),
+                response_ptr(NULL){
+            }
+
+            ~CallBackParams() {
+                if (NULL != rpc_server_ptr) {
+                    delete rpc_server_ptr;
+                }
+                if (NULL != response_ptr) {
+                    delete response_ptr;
+                }
+            }
+
             int32_t event_fd;
             // current rpc server ptr
             RpcServer* rpc_server_ptr;
 
             RpcMessage rpc_recv_msg;
-            RpcMessage rpc_send_msg;
+            Message* response_ptr;
         };
 
 };
