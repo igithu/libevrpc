@@ -122,9 +122,6 @@ class RpcServer {
             }
 
             ~CallBackParams() {
-                if (NULL != rpc_server_ptr) {
-                    delete rpc_server_ptr;
-                }
                 if (NULL != response_ptr) {
                     delete response_ptr;
                 }

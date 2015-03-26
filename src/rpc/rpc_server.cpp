@@ -192,7 +192,6 @@ LibevConnector* RpcServer::GetLibevConnector() {
 
 
 void* RpcServer::RpcProcessor(void *arg) {
-
     CallBackParams* cb_params_ptr = (CallBackParams*) arg;
     if (NULL == cb_params_ptr) {
         return NULL;
@@ -291,6 +290,7 @@ void* RpcServer::RpcWriter(void *arg) {
         LIBEVRPC_LOG(ERROR, "send format response failed!");
         rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
     }
+    // The current cb_params_ptr never be used!
     delete cb_params_ptr;
 }
 
@@ -334,10 +334,6 @@ bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
     }
     SendMsg(event_fd, send_str);
     close(event_fd);
-    //fsync(event_fd);
-    //close(event_fd);
-    //fflush(event_fd);
-
 
     return true;
 }
