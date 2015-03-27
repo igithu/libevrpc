@@ -42,9 +42,9 @@ bool LibevConnector::Initialize(const char *host, const char *port) {
         LIBEVRPC_LOG(ERROR, "rpc server listen failed!")
         return false;
     }
-    
+
     epoller_ = ev_loop_new(EVBACKEND_EPOLL | EVFLAG_NOENV);
-    
+
     // set callback AcceptCb, Note the function AcceptCb must be static function
     ev_io_init(&socket_watcher_, LibevConnector::AcceptCb, listenfd, EV_READ);
     ev_io_start(epoller_, &socket_watcher_);
@@ -58,7 +58,7 @@ void LibevConnector::LibevLoop() {
         LIBEVRPC_LOG(ERROR, "It is not Initialize!");
         return;
     }
-    
+
     while (true) {
         ev_loop(epoller_, 0);
     }

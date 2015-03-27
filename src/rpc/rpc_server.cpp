@@ -28,15 +28,11 @@
 
 namespace libevrpc {
 
-//using std::string;
-
-#define MAXEVENTS 100
-
 RpcServer::RpcServer() :
     libev_connector_ptr_(NULL),
     io_thread_ptr_(NULL),
     worker_threads_ptr_(NULL),
-    reader_threads_ptr_(NULL), 
+    reader_threads_ptr_(NULL),
     writer_threads_ptr_(NULL) {
     Initialize();
 }
@@ -88,7 +84,7 @@ RpcServer& RpcServer::GetInstance() {
     return server_instance;
 }
 
-// Registe the serverice into map
+// Registe the service into map
 bool RpcServer::RegisteService(Service* reg_service) {
     const ServiceDescriptor* descriptor = reg_service->GetDescriptor();
     for (int32_t i = 0; i < descriptor->method_count(); ++i) {
