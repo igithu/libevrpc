@@ -30,7 +30,7 @@
 #include <netdb.h>
 
 #include "connection_manager.h"
-#include "libevrpc_log.h"
+#include "logger.h"
 
 namespace libevrpc {
 
@@ -56,7 +56,7 @@ bool ConnectionManager::Initialize() {
     rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE;
 
     if (setrlimit(RLIMIT_NOFILE, &rt) == -1) {
-        LIBEVRPC_LOG(ERROR, "set setrlimit falied size %d", MAXEPOLLSIZE);
+        LOGGING(ERROR, "set setrlimit falied size %d", MAXEPOLLSIZE);
         return false;
     }
     return true;
@@ -89,7 +89,7 @@ int32_t ConnectionManager::TcpListen(
     hints.ai_socktype = SOCK_TYPE_;
 
     if ((getaddrinfo(set_host_, set_port_, &hints, &res)) != 0) {  
-        LIBEVRPC_LOG(ERROR, "tcp_connect error for %s, %s", set_host_, set_port_);
+        LOGGING(ERROR, "tcp_connect error for %s, %s", set_host_, set_port_);
         return -1;
     }
 
@@ -105,7 +105,7 @@ int32_t ConnectionManager::TcpListen(
         }
         
         if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
-            LIBEVRPC_LOG(ERROR, "setsockopt error listenfd %d", listenfd);
+            LOGGING(ERROR, "setsockopt error listenfd %d", listenfd);
             return -1;
         }
 
@@ -121,7 +121,7 @@ int32_t ConnectionManager::TcpListen(
     }
 
     if (listen(listenfd, 20/*LISTENQ*/) < 0) {
-        LIBEVRPC_LOG(ERROR, "listen error listenfd is %d\n", listenfd);
+        LOGGING(ERROR, "listen error listenfd is %d\n", listenfd);
         return -1;
     }
 
@@ -148,7 +148,7 @@ int32_t ConnectionManager::TcpConnect(
     hints.ai_socktype = SOCK_TYPE_;
 
     if ((getaddrinfo(set_host_, set_port_, &hints, &res)) != 0) {  
-        LIBEVRPC_LOG(ERROR,"tcp_connect error for %s, %s", set_host_, set_port_);
+        LOGGING(ERROR,"tcp_connect error for %s, %s", set_host_, set_port_);
         return -1;
     }
     
@@ -166,7 +166,7 @@ int32_t ConnectionManager::TcpConnect(
     } while ( (res = res->ai_next) != NULL);
     
     if (res == NULL) {    /* errno set from final connect() */
-        LIBEVRPC_LOG(ERROR, "tcp_connect error!");
+        LOGGING(ERROR, "tcp_connect error!");
         return -1;
     }
     freeaddrinfo(ressave);
@@ -231,7 +231,7 @@ int32_t ConnectionManager::SendMsg(int32_t fd, string& send_msg_str) {
         int32_t buf_len = send(fd, send_ptr, send_size + 1, 0);
         if (buf_len < 0) {
             if (EINTR == errno) {
-                LIBEVRPC_LOG(ERROR, "send error errno is EINTR");
+                LOGGING(ERROR, "send error errno is EINTR");
                 return -1;
             } 
             if (EAGAIN == errno) {
@@ -261,7 +261,7 @@ int32_t ConnectionManager::EpollInit(int32_t listenfd) {
     ev_.events = EPOLLIN | EPOLLET;
     ev_.data.fd = listenfd;
     if (epoll_ctl(ep_create_fd_, EPOLL_CTL_ADD, listenfd, &ev_) < 0) {
-        LIBEVRPC_LOG(ERROR, "epoll set insertion error: fd = %u", listenfd);
+        LOGGING(ERROR, "epoll set insertion error: fd = %u", listenfd);
         return -1;
     }
     return 0;
@@ -271,7 +271,7 @@ int32_t ConnectionManager::EpollWait(int32_t max_events, struct epoll_event* eve
     int32_t ready_nfds = epoll_wait(ep_create_fd_, events, max_events, -1);
 
     if (ready_nfds < 0) {
-        LIBEVRPC_LOG(ERROR, "epoll wait error return fd is %d\n", ready_nfds);
+        LOGGING(ERROR, "epoll wait error return fd is %d\n", ready_nfds);
         return -1;
     }
     return ready_nfds;
@@ -288,7 +288,7 @@ int32_t ConnectionManager::EpollNewConnect(int32_t listenfd) {
         ev_.events = EPOLLIN | EPOLLET;
         ev_.data.fd = connect_fd;
         if (epoll_ctl(ep_create_fd_, EPOLL_CTL_ADD, connect_fd, &ev_) < 0) {
-            LIBEVRPC_LOG(ERROR, "epoll_ctl error\n");
+            LOGGING(ERROR, "epoll_ctl error\n");
             return -1;
         }
     }
@@ -317,7 +317,7 @@ int32_t ConnectionManager::EpollRecvMsg(int32_t fd, string& recv_msg_str) {
     ev_.events = EPOLLOUT | EPOLLET;
 
     if (epoll_ctl(ep_create_fd_, EPOLL_CTL_MOD, fd, &ev_) == -1) {
-        LIBEVRPC_LOG(ERROR, "epoll_ctl error");
+        LOGGING(ERROR, "epoll_ctl error");
         return -1;
     }
 
@@ -347,7 +347,7 @@ int32_t ConnectionManager::EpollClose(int32_t fd) {
     ev_.events = EPOLLIN | EPOLLOUT;
 
     if (epoll_ctl(ep_create_fd_, EPOLL_CTL_DEL, fd, &ev_) == -1) {
-        LIBEVRPC_LOG(ERROR, "epoll_ctl error");
+        LOGGING(ERROR, "epoll_ctl error");
         return -1;
     }
 
@@ -360,13 +360,13 @@ bool ConnectionManager::SetNonBlock(int32_t sock) {
     int32_t opts = fcntl(sock, F_GETFL);
 
     if (opts < 0) {
-        LIBEVRPC_LOG(ERROR, "set non block failed! fcntl(sock,GETFL).");
+        LOGGING(ERROR, "set non block failed! fcntl(sock,GETFL).");
         return false;
     }
 
     opts = opts | O_NONBLOCK;
     if (fcntl(sock, F_SETFL, opts) < 0) {
-        LIBEVRPC_LOG(ERROR, "set non block failed! fcntl(sock,GETFL).");
+        LOGGING(ERROR, "set non block failed! fcntl(sock,GETFL).");
         return false;
     }
     return true;
@@ -383,11 +383,11 @@ bool ConnectionManager::ConfigSet(const char* host, const char* port) {
 
 
     if (conf_host_size > SOCKINFO_MAXSIZE || param_host_size > SOCKINFO_MAXSIZE) {
-        LIBEVRPC_LOG(ERROR, "invalid host  conf host: %s, param host: %s\n",  conf_host_, host);
+        LOGGING(ERROR, "invalid host  conf host: %s, param host: %s\n",  conf_host_, host);
         return false;
     }
     if (conf_port_size > SOCKINFO_MAXSIZE || param_port_size > SOCKINFO_MAXSIZE) {
-        LIBEVRPC_LOG(ERROR, "invalid port  conf port: %s, param port: %s\n", conf_port_, port);
+        LOGGING(ERROR, "invalid port  conf port: %s, param port: %s\n", conf_port_, port);
         return false;
     }
 

@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 
 #include "rpc_server.h"
-#include "libevrpc_log.h"
+#include "logger.h"
 
 namespace libevrpc {
 

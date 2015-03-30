@@ -32,8 +32,8 @@ RPC_SRC = ${rpc_rootdir}/rpc_server.h \
 		  ${rpc_rootdir}/socket_util.cpp \
 		  ${rpc_rootdir}/rpc_msg.pb.h \
 		  ${rpc_rootdir}/rpc_msg.pb.cc \
-		  ${rpc_rootdir}/libevrpc_log.h \
-		  ${rpc_rootdir}/libevrpc_log.cpp
+		  ${rpc_rootdir}/logger.h \
+		  ${rpc_rootdir}/logger.cpp
 
 
 noinst_LIBRARIES = librpc.a

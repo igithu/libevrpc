@@ -24,7 +24,7 @@
 
 #include "socket_util.h"
 #include "rpc_util.h"
-#include "libevrpc_log.h"
+#include "logger.h"
 
 namespace libevrpc {
 
@@ -117,7 +117,7 @@ bool RpcServer::Start(const char* addr,
                       int32_t reader_num,
                       int32_t writer_num) {
 
-    LIBEVRPC_LOG(INFO, "rpc server start info, thread pool num: %d, addr: %s, port: %s", 
+    LOGGING(INFO, "rpc server start info, thread pool num: %d, addr: %s, port: %s", 
             thread_num, addr, port);
 
     libev_connector_ptr_ = new LibevConnector();
@@ -212,7 +212,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     // find the function will be called
     HashMap::iterator method_iter = method_hashmap.find(hash_code);
     if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
-        LIBEVRPC_LOG(ERROR, "find hash code failed! request hash code is: %u", hash_code);
+        LOGGING(ERROR, "find hash code failed! request hash code is: %u", hash_code);
         rpc_serv_ptr->ErrorSendMsg(event_fd, "find hash code failed!");
         return NULL;
     }
@@ -220,7 +220,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     Message* request = rpc_method->request->New();
     if ("0" != recv_rpc_msg.body_msg() &&
          !request->ParseFromString(recv_rpc_msg.body_msg())) {
-        LIBEVRPC_LOG(ERROR, "parse body msg error!");
+        LOGGING(ERROR, "parse body msg error!");
         rpc_serv_ptr->ErrorSendMsg(event_fd, "parse body msg error!");
         delete request;
         return NULL;
@@ -234,7 +234,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     if (NULL == rpc_serv_ptr->writer_threads_ptr_) {
         /*The writer pool is not started*/
         if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, response)) {
-            LIBEVRPC_LOG(ERROR, "send format response failed!");
+            LOGGING(ERROR, "send format response failed!");
             rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
         }
         delete cb_params_ptr;
@@ -283,7 +283,7 @@ void* RpcServer::RpcWriter(void *arg) {
 
     RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
     if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, cb_params_ptr->response_ptr)) {
-        LIBEVRPC_LOG(ERROR, "send format response failed!");
+        LOGGING(ERROR, "send format response failed!");
         rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
     }
     // The current cb_params_ptr never be used!
@@ -293,7 +293,7 @@ void* RpcServer::RpcWriter(void *arg) {
 bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
     string msg_str;
     if (RecvMsg(event_fd, msg_str) < 0) {
-        LIBEVRPC_LOG(ERROR, "rpc server recv msg failed!");
+        LOGGING(ERROR, "rpc server recv msg failed!");
         return false;
     }
 
@@ -303,7 +303,7 @@ bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
     }
 
     if (!recv_rpc_msg.ParseFromString(msg_str)) {
-        LIBEVRPC_LOG(ERROR, "parse from string msg failed!");
+        LOGGING(ERROR, "parse from string msg failed!");
         close(event_fd);
         return false;
     }
@@ -313,7 +313,7 @@ bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
 bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
     string response_str;
     if (!response->SerializeToString(&response_str)) {
-        LIBEVRPC_LOG(ERROR, "response_str SerializeToString failed!");
+        LOGGING(ERROR, "response_str SerializeToString failed!");
         return false;
     }
     if (0 == response_str.size()) {
@@ -325,7 +325,7 @@ bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
     send_rpc_msg.set_body_msg(response_str);
     string send_str;
     if (!send_rpc_msg.SerializeToString(&send_str)) {
-        LIBEVRPC_LOG(ERROR, "send_str SerializeToString failed!");
+        LOGGING(ERROR, "send_str SerializeToString failed!");
         return false;
     }
     SendMsg(event_fd, send_str);
@@ -342,7 +342,7 @@ bool RpcServer::ErrorSendMsg(int32_t event_fd, const string& error_msg) {
 
     string err_msg_str;
     if (!error_rpc_msg.SerializeToString(&err_msg_str)) {
-        LIBEVRPC_LOG(ERROR, "error send error!");
+        LOGGING(ERROR, "error send error!");
         close(event_fd);
         return false;
     }

@@ -7,7 +7,7 @@
  
  
 /**
- * @file libevrpc_log.cpp
+ * @file logger.cpp
  * @author aishuyu(asy5178@163.com)
  * @date 2014/12/12 17:21:01
  * @brief 
@@ -15,7 +15,7 @@
  **/
 
 
-#include "libevrpc_log.h"
+#include "logger.h"
 
 namespace libevrpc {
 
@@ -41,7 +41,7 @@ bool DSLogInit(int argc, char* argv[], const char* log_level, const char* log_di
     //google::ParseCommandLineFlags(&argc, &argv, true);
     int32_t level = LogLevelMapping(log_level);
     if (level == INVALID_LEVEL) {
-        LIBEVRPC_LOG(ERROR, "DSLogInit failed! set invalid level!");
+        LOGGING(ERROR, "DSLogInit failed! set invalid level!");
         return false;
     }
     FLAGS_logbuflevel = -1;
