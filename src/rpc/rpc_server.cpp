@@ -260,6 +260,7 @@ void* RpcServer::RpcReader(void *arg) {
         return NULL;
     }
     int32_t event_fd = cb_params_ptr->event_fd;
+    LOGGING(INFO, "The RpcReader is Called!");
 
     RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
     if (!rpc_serv_ptr->GetMethodRequest(event_fd, recv_rpc_msg)) {
@@ -280,6 +281,7 @@ void* RpcServer::RpcWriter(void *arg) {
         return NULL;
     }
     int32_t event_fd = cb_params_ptr->event_fd;
+    LOGGING(INFO, "The RpcWriter is Called!");
 
     RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
     if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, cb_params_ptr->response_ptr)) {
