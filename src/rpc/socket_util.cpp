@@ -27,10 +27,11 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <fcntl.h>
-#include <netinet/tcp.h> 
+#include <netinet/tcp.h>
 #include <netdb.h>
 
 #include "logger.h"
+#include "pub_define.h"
 
 namespace libevrpc {
 
@@ -235,7 +236,7 @@ int32_t SendMsg(int32_t fd, std::string& send_msg_str) {
     const char* send_ptr = send_msg_str.c_str();
 
     do {
-        int32_t buf_len = send(fd, send_ptr, send_size + 1, 0);
+        int32_t buf_len = send(fd, send_ptr, MAX_INFO_LEN, 0);
         if (buf_len < 0) {
             if (EINTR == errno) {
                 LOGGING(ERROR, "send error errno is EINTR");

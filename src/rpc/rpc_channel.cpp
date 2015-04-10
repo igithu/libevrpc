@@ -19,10 +19,11 @@
 
 #include <string>
 
+#include "logger.h"
 #include "rpc_util.h"
 #include "rpc_msg.pb.h"
+#include "pub_define.h"
 #include "socket_util.h"
-#include "logger.h"
 
 namespace libevrpc {
 
@@ -119,7 +120,7 @@ bool FormatRecvMsg(const string& recv_str, Message* response) {
         return false;
     }
 
-    if (500 == recv_rpc_msg.head_code()) {
+    if (SER_INTERNAL_ERROR == recv_rpc_msg.head_code()) {
         LOGGING(ERROR, "server internal error!");
     }
 

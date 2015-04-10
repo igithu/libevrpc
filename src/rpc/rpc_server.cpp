@@ -22,9 +22,10 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/common.h>
 
-#include "socket_util.h"
-#include "rpc_util.h"
 #include "logger.h"
+#include "rpc_util.h"
+#include "socket_util.h"
+#include "pub_define.h"
 
 namespace libevrpc {
 
@@ -186,7 +187,6 @@ LibevConnector* RpcServer::GetLibevConnector() {
     return libev_connector_ptr_;
 }
 
-
 void* RpcServer::RpcProcessor(void *arg) {
     CallBackParams* cb_params_ptr = (CallBackParams*) arg;
     if (NULL == cb_params_ptr) {
@@ -255,6 +255,7 @@ void* RpcServer::RpcReader(void *arg) {
     if (NULL == cb_params_ptr) {
         return NULL;
     }
+
     RpcServer* rpc_serv_ptr = cb_params_ptr->rpc_server_ptr;
     if (NULL == rpc_serv_ptr) {
         return NULL;
@@ -267,6 +268,8 @@ void* RpcServer::RpcReader(void *arg) {
         rpc_serv_ptr->ErrorSendMsg(event_fd, "Get method request failed!");
         return NULL;
     }
+
+    // push the task into processor
     rpc_serv_ptr->worker_threads_ptr_->Processor(
             RpcServer::RpcProcessor, cb_params_ptr);
 }
@@ -276,6 +279,7 @@ void* RpcServer::RpcWriter(void *arg) {
     if (NULL == cb_params_ptr) {
         return NULL;
     }
+
     RpcServer* rpc_serv_ptr = cb_params_ptr->rpc_server_ptr;
     if (NULL == rpc_serv_ptr) {
         return NULL;
@@ -323,7 +327,7 @@ bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
     }
 
     RpcMessage send_rpc_msg;
-    send_rpc_msg.set_head_code(200);
+    send_rpc_msg.set_head_code(SER_RETURN_SUCC);
     send_rpc_msg.set_body_msg(response_str);
     string send_str;
     if (!send_rpc_msg.SerializeToString(&send_str)) {
@@ -339,7 +343,7 @@ bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
 bool RpcServer::ErrorSendMsg(int32_t event_fd, const string& error_msg) {
     RpcMessage error_rpc_msg;
     // 500 means internal error
-    error_rpc_msg.set_head_code(500);
+    error_rpc_msg.set_head_code(SER_INTERNAL_ERROR);
     error_rpc_msg.set_body_msg(error_msg);
 
     string err_msg_str;
