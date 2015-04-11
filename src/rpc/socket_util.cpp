@@ -59,6 +59,7 @@ int32_t Socket(int32_t family, int32_t type, int32_t protocol) {
     if ((fd = socket(family, type, protocol)) < 0) {
         return -1;
     }
+
     return fd;
 }
 
@@ -228,7 +229,6 @@ int32_t RecvMsg(int32_t fd, std::string& recv_msg_str) {
     } while (true);
 
     return 0;
-
 }
 
 int32_t SendMsg(int32_t fd, std::string& send_msg_str) {

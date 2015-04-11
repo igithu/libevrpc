@@ -97,7 +97,7 @@ void LibevConnector::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int 
     free(watcher);
 }
 
-}  // end namespace libevrpc
+}  // end of namespace libevrpc
 
 
 /* vim: set expandtab ts=4 sw=4 sts=4 tw=100: */

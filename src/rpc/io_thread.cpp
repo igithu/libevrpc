@@ -37,14 +37,15 @@ IOThread::~IOThread() {
 
 void IOThread::Run() {
     RpcServer& rpc_server = RpcServer::GetInstance();
+
     LibevConnector* libev_connector_ptr = rpc_server.GetLibevConnector();
     if (NULL == libev_connector_ptr) {
         return;
     }
+
     libev_connector_ptr->Initialize(addr_, port_);
     // call loop and block here
     libev_connector_ptr->LibevLoop();
-
 }
 
 }  // end of namespace libevrpc
