@@ -39,8 +39,14 @@ using namespace google::protobuf;
 using __gnu_cxx::hash_map;
 
 struct RpcMethod {
-    RpcMethod(Service* p_service, const Message* p_req, const Message* p_rep, const MethodDescriptor* p_meth)
-        : service(p_service), request(p_req), response(p_rep), method(p_meth) {
+    RpcMethod(Service* p_service,
+              const Message* p_req,
+              const Message* p_rep,
+              const MethodDescriptor* p_meth)
+        : service(p_service),
+          request(p_req),
+          response(p_rep),
+          method(p_meth) {
     }
 
     Service* service;
@@ -60,7 +66,11 @@ class RpcServer {
 
         bool RegisteService(Service* reg_service);
 
-        bool Start(int32_t thread_num = 20, const char* addr = "", const char* port = "");
+        bool Start(const char* addr = "",
+                   const char* port = "",
+                   int32_t thread_num = 20,
+                   int32_t reader_num = 0,
+                   int32_t writer_num = 0);
 
         bool Wait();
 
@@ -69,6 +79,10 @@ class RpcServer {
         LibevConnector* GetLibevConnector();
 
         static void* RpcProcessor(void *arg);
+
+        static void* RpcReader(void *arg);
+
+        static void* RpcWriter(void *arg);
 
 
     private:
@@ -97,9 +111,28 @@ class RpcServer {
 
         ThreadPool* worker_threads_ptr_;
 
+        ThreadPool* reader_threads_ptr_;
+
+        ThreadPool* writer_threads_ptr_;
+
         struct CallBackParams {
+            CallBackParams() :
+                rpc_server_ptr(NULL),
+                response_ptr(NULL){
+            }
+
+            ~CallBackParams() {
+                if (NULL != response_ptr) {
+                    delete response_ptr;
+                }
+            }
+
             int32_t event_fd;
+            // current rpc server ptr
             RpcServer* rpc_server_ptr;
+
+            RpcMessage rpc_recv_msg;
+            Message* response_ptr;
         };
 
 };

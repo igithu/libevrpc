@@ -21,7 +21,7 @@
 
 #include "socket_util.h"
 #include "rpc_server.h"
-#include "libevrpc_log.h"
+#include "logger.h"
 
 namespace libevrpc {
 
@@ -39,12 +39,12 @@ LibevConnector::~LibevConnector() {
 bool LibevConnector::Initialize(const char *host, const char *port) {
     int32_t listenfd = TcpListen(host, port);
     if (listenfd < 0) {
-        LIBEVRPC_LOG(ERROR, "rpc server listen failed!")
+        LOGGING(ERROR, "rpc server listen failed!")
         return false;
     }
-    
+
     epoller_ = ev_loop_new(EVBACKEND_EPOLL | EVFLAG_NOENV);
-    
+
     // set callback AcceptCb, Note the function AcceptCb must be static function
     ev_io_init(&socket_watcher_, LibevConnector::AcceptCb, listenfd, EV_READ);
     ev_io_start(epoller_, &socket_watcher_);
@@ -55,10 +55,10 @@ bool LibevConnector::Initialize(const char *host, const char *port) {
 // start run loop
 void LibevConnector::LibevLoop() {
     if (NULL == epoller_) {
-        LIBEVRPC_LOG(ERROR, "It is not Initialize!");
+        LOGGING(ERROR, "It is not Initialize!");
         return;
     }
-    
+
     while (true) {
         ev_loop(epoller_, 0);
     }
@@ -67,7 +67,7 @@ void LibevConnector::LibevLoop() {
 // accept the new connection
 void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (EV_ERROR & revents) {
-        LIBEVRPC_LOG(ERROR, "ERROR event in accept callback! exit!");
+        LOGGING(ERROR, "ERROR event in accept callback! exit!");
         return;
     }
     struct sockaddr_in client_addr;
@@ -77,7 +77,7 @@ void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
         return;
     }
 
-    LIBEVRPC_LOG(INFO, "NEW connection coming!!");
+    LOGGING(INFO, "NEW connection coming!!");
     struct ev_io *client_eio = (struct ev_io*)malloc(sizeof(struct ev_io));
     ev_io_init(client_eio, LibevConnector::ProcessCb, cfd, EV_READ);
     ev_io_start(loop, client_eio);
@@ -86,7 +86,7 @@ void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
 // handle the connection and push the connection fd to thread pool waiting list
 void LibevConnector::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (EV_ERROR & revents) {
-        LIBEVRPC_LOG(ERROR, "ERROR event in process callback! exit!");
+        LOGGING(ERROR, "ERROR event in process callback! exit!");
         free(watcher);
         return;
     }
@@ -97,7 +97,7 @@ void LibevConnector::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int 
     free(watcher);
 }
 
-}  // end namespace libevrpc
+}  // end of namespace libevrpc
 
 
 /* vim: set expandtab ts=4 sw=4 sts=4 tw=100: */

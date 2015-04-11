@@ -22,20 +22,19 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/common.h>
 
-#include "socket_util.h"
+#include "logger.h"
 #include "rpc_util.h"
-#include "libevrpc_log.h"
+#include "socket_util.h"
+#include "pub_define.h"
 
 namespace libevrpc {
-
-//using std::string;
-
-#define MAXEVENTS 100
 
 RpcServer::RpcServer() :
     libev_connector_ptr_(NULL),
     io_thread_ptr_(NULL),
-    worker_threads_ptr_(NULL) {
+    worker_threads_ptr_(NULL),
+    reader_threads_ptr_(NULL),
+    writer_threads_ptr_(NULL) {
     Initialize();
 }
 
@@ -50,12 +49,22 @@ RpcServer::~RpcServer() {
         }
     }
 
+    if (NULL != reader_threads_ptr_) {
+        delete reader_threads_ptr_;
+    }
+
+    if (NULL != writer_threads_ptr_) {
+        delete writer_threads_ptr_;
+    }
+
     if (NULL != worker_threads_ptr_) {
         delete worker_threads_ptr_;
     }
+
     if (NULL != io_thread_ptr_) {
         delete io_thread_ptr_;
     }
+
     if (NULL != libev_connector_ptr_) {
         delete libev_connector_ptr_;
     }
@@ -76,7 +85,7 @@ RpcServer& RpcServer::GetInstance() {
     return server_instance;
 }
 
-// Registe the serverice into map
+// Registe the service into map
 bool RpcServer::RegisteService(Service* reg_service) {
     const ServiceDescriptor* descriptor = reg_service->GetDescriptor();
     for (int32_t i = 0; i < descriptor->method_count(); ++i) {
@@ -103,9 +112,13 @@ bool RpcServer::RegisteService(Service* reg_service) {
    return true;
 }
 
-bool RpcServer::Start(int32_t thread_num, const char* addr, const char* port) {
+bool RpcServer::Start(const char* addr,
+                      const char* port,
+                      int32_t thread_num,
+                      int32_t reader_num,
+                      int32_t writer_num) {
 
-    LIBEVRPC_LOG(INFO, "rpc server start info, thread pool num: %d, addr: %s, port: %s", 
+    LOGGING(INFO, "rpc server start info, thread pool num: %d, addr: %s, port: %s", 
             thread_num, addr, port);
 
     libev_connector_ptr_ = new LibevConnector();
@@ -114,6 +127,17 @@ bool RpcServer::Start(int32_t thread_num, const char* addr, const char* port) {
 
     io_thread_ptr_->Start();
     worker_threads_ptr_->Start();
+
+    // if start readerpool or writerpool
+    if (0 != reader_num) {
+        reader_threads_ptr_ = new ThreadPool(reader_num);
+        reader_threads_ptr_->Start();
+    }
+
+    if (0 != writer_num) {
+        writer_threads_ptr_ = new ThreadPool(writer_num);
+        writer_threads_ptr_->Start();
+    }
 }
 
 bool RpcServer::Wait() {
@@ -130,6 +154,14 @@ bool RpcServer::Wait() {
         worker_threads_ptr_->Wait();
     }
 
+    if (NULL != reader_threads_ptr_) {
+        reader_threads_ptr_->Wait();
+    }
+
+    if (NULL != writer_threads_ptr_) {
+        writer_threads_ptr_->Wait();
+    }
+
     return true;
 }
 
@@ -142,7 +174,12 @@ bool RpcServer::RpcCall(int32_t event_fd) {
     cb_params_ptr->event_fd = event_fd;
     cb_params_ptr->rpc_server_ptr = this;
     // push the task to thread pool
-    worker_threads_ptr_->Processor(RpcServer::RpcProcessor, cb_params_ptr);
+
+    if (NULL != reader_threads_ptr_) {
+        reader_threads_ptr_->Processor(RpcServer::RpcReader, cb_params_ptr);
+    } else {
+        worker_threads_ptr_->Processor(RpcServer::RpcProcessor, cb_params_ptr);
+    }
     return true;
 }
 
@@ -151,7 +188,6 @@ LibevConnector* RpcServer::GetLibevConnector() {
 }
 
 void* RpcServer::RpcProcessor(void *arg) {
-
     CallBackParams* cb_params_ptr = (CallBackParams*) arg;
     if (NULL == cb_params_ptr) {
         return NULL;
@@ -162,10 +198,13 @@ void* RpcServer::RpcProcessor(void *arg) {
     }
     int32_t event_fd = cb_params_ptr->event_fd;
 
-    RpcMessage recv_rpc_msg;
-    if (!rpc_serv_ptr->GetMethodRequest(event_fd, recv_rpc_msg)) {
-        //rpc_serv_ptr->ErrorSendMsg(event_fd, "get method request failed!");
-        return NULL;
+    RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
+    if (NULL == rpc_serv_ptr->reader_threads_ptr_) {
+        /*the reader pool is not started*/
+        if (!rpc_serv_ptr->GetMethodRequest(event_fd, recv_rpc_msg)) {
+            //rpc_serv_ptr->ErrorSendMsg(event_fd, "get method request failed!");
+            return NULL;
+        }
     }
 
     uint32_t hash_code = recv_rpc_msg.head_code();
@@ -173,7 +212,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     // find the function will be called
     HashMap::iterator method_iter = method_hashmap.find(hash_code);
     if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
-        LIBEVRPC_LOG(ERROR, "find hash code failed! request hash code is: %u", hash_code);
+        LOGGING(ERROR, "find hash code failed! request hash code is: %u", hash_code);
         rpc_serv_ptr->ErrorSendMsg(event_fd, "find hash code failed!");
         return NULL;
     }
@@ -181,7 +220,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     Message* request = rpc_method->request->New();
     if ("0" != recv_rpc_msg.body_msg() &&
          !request->ParseFromString(recv_rpc_msg.body_msg())) {
-        LIBEVRPC_LOG(ERROR, "parse body msg error!");
+        LOGGING(ERROR, "parse body msg error!");
         rpc_serv_ptr->ErrorSendMsg(event_fd, "parse body msg error!");
         delete request;
         return NULL;
@@ -189,23 +228,78 @@ void* RpcServer::RpcProcessor(void *arg) {
 
     const MethodDescriptor* method_desc = rpc_method->method;
     Message* response = rpc_method->response->New();
-    // call method!
+    // call method! execute the code of user!
     rpc_method->service->CallMethod(method_desc, NULL, request, response, NULL);
 
-    if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, response)) {
-        LIBEVRPC_LOG(ERROR, "send format response failed!");
-        rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
+    if (NULL == rpc_serv_ptr->writer_threads_ptr_) {
+        /*The writer pool is not started*/
+        if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, response)) {
+            LOGGING(ERROR, "send format response failed!");
+            rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
+        }
+        delete cb_params_ptr;
+        delete response;
+    } else {
+        /*The writer pool is started, push the task to writer pool */
+        cb_params_ptr->response_ptr = response;
+        rpc_serv_ptr->writer_threads_ptr_->Processor(
+            RpcServer::RpcWriter, cb_params_ptr);
     }
+
     delete request;
-    delete response;
-    delete cb_params_ptr;
 }
 
+void* RpcServer::RpcReader(void *arg) {
+
+    CallBackParams* cb_params_ptr = (CallBackParams*) arg;
+    if (NULL == cb_params_ptr) {
+        return NULL;
+    }
+
+    RpcServer* rpc_serv_ptr = cb_params_ptr->rpc_server_ptr;
+    if (NULL == rpc_serv_ptr) {
+        return NULL;
+    }
+    int32_t event_fd = cb_params_ptr->event_fd;
+    LOGGING(INFO, "The RpcReader is Called!");
+
+    RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
+    if (!rpc_serv_ptr->GetMethodRequest(event_fd, recv_rpc_msg)) {
+        rpc_serv_ptr->ErrorSendMsg(event_fd, "Get method request failed!");
+        return NULL;
+    }
+
+    // push the task into processor
+    rpc_serv_ptr->worker_threads_ptr_->Processor(
+            RpcServer::RpcProcessor, cb_params_ptr);
+}
+
+void* RpcServer::RpcWriter(void *arg) {
+    CallBackParams* cb_params_ptr = (CallBackParams*) arg;
+    if (NULL == cb_params_ptr) {
+        return NULL;
+    }
+
+    RpcServer* rpc_serv_ptr = cb_params_ptr->rpc_server_ptr;
+    if (NULL == rpc_serv_ptr) {
+        return NULL;
+    }
+    int32_t event_fd = cb_params_ptr->event_fd;
+    LOGGING(INFO, "The RpcWriter is Called!");
+
+    RpcMessage& recv_rpc_msg = cb_params_ptr->rpc_recv_msg;
+    if (!rpc_serv_ptr->SendFormatStringMsg(event_fd, cb_params_ptr->response_ptr)) {
+        LOGGING(ERROR, "send format response failed!");
+        rpc_serv_ptr->ErrorSendMsg(event_fd, "send format response failed!");
+    }
+    // The current cb_params_ptr never be used!
+    delete cb_params_ptr;
+}
 
 bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
     string msg_str;
     if (RecvMsg(event_fd, msg_str) < 0) {
-        LIBEVRPC_LOG(ERROR, "rpc server recv msg failed!");
+        LOGGING(ERROR, "rpc server recv msg failed!");
         return false;
     }
 
@@ -215,7 +309,7 @@ bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
     }
 
     if (!recv_rpc_msg.ParseFromString(msg_str)) {
-        LIBEVRPC_LOG(ERROR, "parse from string msg failed!");
+        LOGGING(ERROR, "parse from string msg failed!");
         close(event_fd);
         return false;
     }
@@ -225,7 +319,7 @@ bool RpcServer::GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg) {
 bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
     string response_str;
     if (!response->SerializeToString(&response_str)) {
-        LIBEVRPC_LOG(ERROR, "response_str SerializeToString failed!");
+        LOGGING(ERROR, "response_str SerializeToString failed!");
         return false;
     }
     if (0 == response_str.size()) {
@@ -233,19 +327,15 @@ bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
     }
 
     RpcMessage send_rpc_msg;
-    send_rpc_msg.set_head_code(200);
+    send_rpc_msg.set_head_code(SER_RETURN_SUCC);
     send_rpc_msg.set_body_msg(response_str);
     string send_str;
     if (!send_rpc_msg.SerializeToString(&send_str)) {
-        LIBEVRPC_LOG(ERROR, "send_str SerializeToString failed!");
+        LOGGING(ERROR, "send_str SerializeToString failed!");
         return false;
     }
     SendMsg(event_fd, send_str);
     close(event_fd);
-    //fsync(event_fd);
-    //close(event_fd);
-    //fflush(event_fd);
-
 
     return true;
 }
@@ -253,12 +343,12 @@ bool RpcServer::SendFormatStringMsg(int32_t event_fd, Message* response) {
 bool RpcServer::ErrorSendMsg(int32_t event_fd, const string& error_msg) {
     RpcMessage error_rpc_msg;
     // 500 means internal error
-    error_rpc_msg.set_head_code(500);
+    error_rpc_msg.set_head_code(SER_INTERNAL_ERROR);
     error_rpc_msg.set_body_msg(error_msg);
 
     string err_msg_str;
     if (!error_rpc_msg.SerializeToString(&err_msg_str)) {
-        LIBEVRPC_LOG(ERROR, "error send error!");
+        LOGGING(ERROR, "error send error!");
         close(event_fd);
         return false;
     }

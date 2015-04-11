@@ -27,10 +27,11 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <fcntl.h>
-#include <netinet/tcp.h> 
+#include <netinet/tcp.h>
 #include <netdb.h>
 
-#include "libevrpc_log.h"
+#include "logger.h"
+#include "pub_define.h"
 
 namespace libevrpc {
 
@@ -40,13 +41,13 @@ bool SetNonBlock(int32_t sock) {
     int32_t opts = fcntl(sock, F_GETFL);
 
     if (opts < 0) {
-        LIBEVRPC_LOG(ERROR, "set non block failed! fcntl(sock,GETFL).");
+        LOGGING(ERROR, "set non block failed! fcntl(sock,GETFL).");
         return false;
     }
 
     opts = opts | O_NONBLOCK;
     if (fcntl(sock, F_SETFL, opts) < 0) {
-        LIBEVRPC_LOG(ERROR, "set non block failed! fcntl(sock,GETFL).");
+        LOGGING(ERROR, "set non block failed! fcntl(sock,GETFL).");
         return false;
     }
     return true;
@@ -58,6 +59,7 @@ int32_t Socket(int32_t family, int32_t type, int32_t protocol) {
     if ((fd = socket(family, type, protocol)) < 0) {
         return -1;
     }
+
     return fd;
 }
 
@@ -70,7 +72,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
     hints.ai_socktype = SOCK_STREAM;
 
     if ((getaddrinfo(host, port, &hints, &res)) != 0) {  
-        LIBEVRPC_LOG(ERROR, "tcp_connect error for %s, %s", host, port);
+        LOGGING(ERROR, "tcp_connect error for %s, %s", host, port);
         return -1;
     }
 
@@ -87,7 +89,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
         }
 
         if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
-            LIBEVRPC_LOG(ERROR, "Setsockopt error listenfd %d.", listenfd);
+            LOGGING(ERROR, "Setsockopt error listenfd %d.", listenfd);
             continue;
         }
 
@@ -95,7 +97,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
         if (bind(listenfd, res->ai_addr, res->ai_addrlen) == 0) {
             break;
         }
-        LIBEVRPC_LOG(WARNING, "Bind failed!, errno is: %s.", strerror(errno));
+        LOGGING(WARNING, "Bind failed!, errno is: %s.", strerror(errno));
         close(listenfd);
     } while ((res = res->ai_next) != NULL);
 
@@ -104,7 +106,7 @@ int32_t TcpListen(const char *host, const char *port, int32_t family) {
     }
 
     if (listen(listenfd, 20/*LISTENQ*/) < 0) {
-        LIBEVRPC_LOG(ERROR, "listen error listenfd is %d\n", listenfd);
+        LOGGING(ERROR, "listen error listenfd is %d\n", listenfd);
         freeaddrinfo(ressave);
         return -1;
     }
@@ -127,7 +129,7 @@ int32_t TcpConnect(const char *host, const char *port, int32_t family) {
     hints.ai_socktype = SOCK_STREAM;
 
     if ((getaddrinfo(host, port, &hints, &res)) != 0) {  
-        LIBEVRPC_LOG(ERROR,"tcp_connect error for %s, %s", host, port);
+        LOGGING(ERROR,"tcp_connect error for %s, %s", host, port);
         return -1;
     }
 
@@ -146,7 +148,7 @@ int32_t TcpConnect(const char *host, const char *port, int32_t family) {
     } while ((res = res->ai_next) != NULL);
 
     if (res == NULL) {    /* errno set from final connect() */
-        LIBEVRPC_LOG(ERROR, "tcp_connect error! the errno is: %s", strerror(errno));
+        LOGGING(ERROR, "tcp_connect error! the errno is: %s", strerror(errno));
         freeaddrinfo(ressave);
         return -1;
     }
@@ -209,7 +211,7 @@ int32_t RecvMsg(int32_t fd, std::string& recv_msg_str) {
         fflush(stdin);
         if (buf_len < 0) {
             if (EAGAIN == errno || EINTR == errno) {
-                //LIBEVRPC_LOG(ERROR, "EAGAIN or EINTR in RecvMsg!");
+                //LOGGING(ERROR, "EAGAIN or EINTR in RecvMsg!");
                 break;
             } else {
                 return -1;
@@ -227,7 +229,6 @@ int32_t RecvMsg(int32_t fd, std::string& recv_msg_str) {
     } while (true);
 
     return 0;
-
 }
 
 int32_t SendMsg(int32_t fd, std::string& send_msg_str) {
@@ -235,10 +236,10 @@ int32_t SendMsg(int32_t fd, std::string& send_msg_str) {
     const char* send_ptr = send_msg_str.c_str();
 
     do {
-        int32_t buf_len = send(fd, send_ptr, send_size + 1, 0);
+        int32_t buf_len = send(fd, send_ptr, MAX_INFO_LEN, 0);
         if (buf_len < 0) {
             if (EINTR == errno) {
-                LIBEVRPC_LOG(ERROR, "send error errno is EINTR");
+                LOGGING(ERROR, "send error errno is EINTR");
                 return -1;
             } 
             if (EAGAIN == errno) {
