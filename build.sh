@@ -42,7 +42,7 @@ then
 fi
 
 # make the project
-./configure && make
+./configure --disable-dependency-tracking && make
 if [ $? -ne 0 ]
 then
     echo "make the project failed!"

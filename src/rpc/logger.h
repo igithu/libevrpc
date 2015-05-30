@@ -20,6 +20,8 @@
 #ifndef  __LOGGING_H_
 #define  __LOGGING_H_
 
+#include <stdio.h>
+
 #include <glog/logging.h>
 
 #define MAX_BUF 256

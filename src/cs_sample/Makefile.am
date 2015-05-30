@@ -1,7 +1,8 @@
+AUTOMAKE_OPTIONS=foreign subdir-objects
 
 top_dir = ${top_srcdir}/..
 cs_rootdir = ${top_srcdir}/src/cs_sample
-third_dir = ${top_dir}/third-64
+third_dir = ${top_dir}/third-32
 pub_dir = ${top_dir}/pub_util
 
 SUBDIRS = proto

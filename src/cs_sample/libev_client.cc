@@ -14,6 +14,8 @@
  *  
  **/
 
+#include <stdio.h>
+
 #include "proto/rpc_sample.pb.h"
 #include "rpc/rpc_channel.h"
 

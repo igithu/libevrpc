@@ -42,5 +42,6 @@ AC_CHECK_FUNCS([bzero memset socket strerror])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/cs_sample/Makefile
+                 src/cs_sample/proto/Makefile
                  src/rpc/Makefile])
 AC_OUTPUT
