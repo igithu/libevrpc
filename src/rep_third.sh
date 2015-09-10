@@ -1,3 +1,5 @@
 
 
-sed -i "s/third-32/third-32/g" `grep 'third-32' -rl .`
+#sed -i "s/third-64/third-64/g" `grep 'third-64' -rl .`
+
+sed  "s/third-64/third-64/g" `grep 'third-64' -rl .`

@@ -1,5 +1,0 @@
-
-message RpcMessage {
-    optional uint32 head_code = 1 [default = 0];
-    optional bytes body_msg = 2 [default = ""];
-}

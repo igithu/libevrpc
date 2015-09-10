@@ -2,18 +2,21 @@ AUTOMAKE_OPTIONS=foreign subdir-objects
 
 top_dir = ${top_srcdir}/..
 rpc_rootdir = ${top_srcdir}/src/rpc
-third_dir = ${top_dir}/third-32
+third_dir = ${top_dir}/third-64
 pub_dir = ${top_dir}/pub_util
 
-AM_CPPFLAGS = -I${third_dir}/protobuf/include/ \
+AM_CPPFLAGS = -I${third_dir}/gperftools/include/ \
+			  -I${third_dir}/protobuf/include/ \
 			  -I${third_dir}/libev/include/ \
 			  -I${third_dir}/boost/include/ \
 			  -I${third_dir}/glog/include/ \
 			  -I${pub_dir}
 
-AM_LDFLAGS = -lz -lrt
+#AM_LDFLAGS = -lz -lrt
+AM_LDFLAGS = -lz -lstdc++
 
-LDADD = ${third_dir}/protobuf/lib/*.a \
+LDADD = ${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
+		${third_dir}/protobuf/lib/*.a \
 		${third_dir}/libev/lib/*.a \
 		${third_dir}/boost/lib/*.a \
 		${third_dir}/glog/lib/*.a
@@ -30,12 +33,8 @@ RPC_SRC = ${rpc_rootdir}/rpc_server.h \
 		  ${rpc_rootdir}/rpc_channel.cpp \
 		  ${rpc_rootdir}/rpc_util.h \
 		  ${rpc_rootdir}/rpc_util.cpp \
-		  ${rpc_rootdir}/socket_util.h \
-		  ${rpc_rootdir}/socket_util.cpp \
-		  ${rpc_rootdir}/rpc_msg.pb.h \
-		  ${rpc_rootdir}/rpc_msg.pb.cc \
-		  ${rpc_rootdir}/logger.h \
-		  ${rpc_rootdir}/logger.cpp
+		  ${rpc_rootdir}/rpc_communication.h \
+		  ${rpc_rootdir}/rpc_communication.cpp
 
 
 noinst_LIBRARIES = librpc.a

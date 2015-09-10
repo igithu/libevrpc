@@ -26,9 +26,9 @@ using namespace echo;
 int main() {
 
     EchoRequest echo_request;
-    echo_request.set_request("Hello! test123432423423424253543");
+    echo_request.set_request("Hello! test123456789012345678901234567890");
 
-    Channel rpc_channel("127.0.0.1", "9997");
+    Channel rpc_channel("127.0.0.1", "9999");
 
     EchoService::Stub stub(&rpc_channel);
 

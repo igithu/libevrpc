@@ -19,7 +19,6 @@
 #include <sys/socket.h>
 
 #include "rpc_server.h"
-#include "logger.h"
 
 namespace libevrpc {
 

@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS=foreign subdir-objects
 
 top_dir = ${top_srcdir}/..
 cs_rootdir = ${top_srcdir}/src/cs_sample
-third_dir = ${top_dir}/third-32
+third_dir = ${top_dir}/third-64
 pub_dir = ${top_dir}/pub_util
 
 SUBDIRS = proto
@@ -15,7 +15,8 @@ AM_CPPFLAGS = -I${top_srcdir}/src \
 			  -I${pub_dir}
 
 
-AM_LDFLAGS = -rdynamic -lpthread -lz -lm -lrt
+#AM_LDFLAGS = -rdynamic -lpthread -lz -lm -lrt
+AM_LDFLAGS = -lpthread -lz -lm
 
 
 LDADD = $(top_builddir)/src/rpc/librpc.a \

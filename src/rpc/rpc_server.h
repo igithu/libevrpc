@@ -26,7 +26,6 @@
 
 #include "disallow_copy_and_assign.h"
 #include "libev_connector.h"
-#include "rpc_msg.pb.h"
 #include "pthread_mutex.h"
 #include "io_thread.h"
 #include "thread_pool.h"
@@ -90,10 +89,6 @@ class RpcServer {
 
         bool Initialize();
 
-        bool GetMethodRequest(int32_t event_fd, RpcMessage& recv_rpc_msg);
-
-        bool SendFormatStringMsg(int32_t event_fd, Message* response);
-
         bool ErrorSendMsg(int32_t event_fd, const string& error_msg);
 
         DISALLOW_COPY_AND_ASSIGN(RpcServer);
@@ -128,10 +123,11 @@ class RpcServer {
             }
 
             int32_t event_fd;
+            int32_t call_id;
             // current rpc server ptr
             RpcServer* rpc_server_ptr;
 
-            RpcMessage rpc_recv_msg;
+            std::string recv_info;
             Message* response_ptr;
         };
 
