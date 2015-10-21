@@ -29,6 +29,8 @@ RPC_SRC = ${rpc_rootdir}/rpc_server.h \
 		  ${rpc_rootdir}/io_thread.cpp \
 		  ${rpc_rootdir}/thread_pool.h \
 		  ${rpc_rootdir}/thread_pool.cpp \
+		  ${rpc_rootdir}/rpc_client.h \
+		  ${rpc_rootdir}/rpc_client.cpp \
 		  ${rpc_rootdir}/rpc_channel.h \
 		  ${rpc_rootdir}/rpc_channel.cpp \
 		  ${rpc_rootdir}/rpc_util.h \

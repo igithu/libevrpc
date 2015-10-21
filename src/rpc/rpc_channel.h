@@ -41,13 +41,19 @@ class Channel : public RpcChannel {
                                 Closure* done);
 
         void Close();
-    
+
+        bool OpenRpcAsyncMode();
+
+        bool RpcCommunication();
+
     private:
         char* addr_;
 
         char* port_;
 
         int32_t connect_fd_;
+
+        bool is_channel_async_call_;
 
 };
 

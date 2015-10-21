@@ -26,7 +26,8 @@ namespace libevrpc {
 
 using std::string;
 
-Channel::Channel(const char* addr, const char* port) {
+Channel::Channel(const char* addr, const char* port) :
+    is_channel_async_call_(false) {
     strcpy(addr_ = (char*)malloc(strlen(addr) + 1), addr);
     strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
 }
@@ -44,13 +45,13 @@ void Channel::CallMethod(const MethodDescriptor* method,
 
     connect_fd_ = TcpConnect(addr_, port_);
     if (connect_fd_ < 0) {
-        perror("Rpc connect server failed!\n");
+        perror("Rpc connect server failed!");
         return;
     }
 
     string send_str;
     if (!request->SerializeToString(&send_str)) {
-        perror("SerializeToString request failed!\n");
+        perror("SerializeToString request failed!");
         return;
     }
     uint32_t hash_code = BKDRHash(method->full_name().c_str());
@@ -61,12 +62,12 @@ void Channel::CallMethod(const MethodDescriptor* method,
     string recv_str;
     int32_t ret_id = RpcRecv(connect_fd_, recv_str, true);
     if (ERROR_RECV == ret_id) {
-        perror("Recv data error in rpc channel\n");
+        perror("Recv data error in rpc channel");
         return;
     }
 
     if (!response->ParseFromString(recv_str)) {
-        perror("SerializeToString response error in RpcChannel!\n");
+        perror("SerializeToString response error in RpcChannel!");
         // TODO
     }
 
@@ -74,6 +75,18 @@ void Channel::CallMethod(const MethodDescriptor* method,
 
 void Channel::Close() {
 }
+
+bool Channel::OpenRpcAsyncMode() {
+    is_channel_async_call_ = true;
+    return true;
+}
+
+bool Channel::RpcCommunication() {
+    return true;
+}
+
+
+
 
 
 }  // end of namespace libevrpc

@@ -17,24 +17,49 @@
 #include <stdio.h>
 
 #include "proto/rpc_sample.pb.h"
-#include "rpc/rpc_channel.h"
+#include "rpc/rpc_client.h"
 
 using namespace libevrpc;
 using namespace google::protobuf;
 using namespace echo;
+
+class RpcClientImp : public RpcClient {
+    public:
+        RpcClientImp();
+
+        ~RpcClientImp();
+
+        // void* GenerateServerCall(const RpcChannel* service_call_ptr);
+
+        // bool EchoRpcCallExample(const EchoRequest& req, EchoResponse& resp);
+
+        EchoService_Stub& RpcCall();
+
+    private:
+        EchoService_Stub* service_call_ptr;
+};
+
+RpcClientImp::RpcClientImp() {
+    InitClient("127.0.0.1", "9999");
+    service_call_ptr = new EchoService_Stub(GetRpcChannel());
+}
+
+RpcClientImp::~RpcClientImp() {
+}
+
+EchoService_Stub& RpcClientImp::RpcCall() {
+    return (*service_call_ptr);
+}
+
 
 int main() {
 
     EchoRequest echo_request;
     echo_request.set_request("Hello! test123456789012345678901234567890");
 
-    Channel rpc_channel("127.0.0.1", "9999");
-
-    EchoService::Stub stub(&rpc_channel);
-
     EchoResponse echo_response;
-    stub.Echo(NULL, &echo_request, &echo_response, NULL);
-
+    RpcClientImp rpc_client;
+    rpc_client.RpcCall().Echo(NULL, &echo_request, &echo_response, NULL);;
     echo_response.PrintDebugString();
     string ret = echo_response.response();
     printf("echo recv msg is %s\n", ret.c_str());
