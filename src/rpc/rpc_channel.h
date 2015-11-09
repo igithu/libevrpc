@@ -65,6 +65,9 @@ class Channel : public RpcChannel {
         static void* RpcProcessor(void *arg);
 
     private:
+        bool StartWorkerThread();
+
+    private:
         char* addr_;
 
         char* port_;

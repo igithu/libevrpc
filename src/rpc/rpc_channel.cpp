@@ -51,7 +51,7 @@ bool Channel::OpenRpcAsyncMode(bool is_threadpool) {
     return true;
 }
 
-bool Channel::RpcCommunication(RpcCallParams& rpc_params) {
+bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
     const MethodDescriptor* method = rpc_params->p_method;
     const Message* request = rpc_params->p_request;
     Message* response = rpc_params->p_response;
@@ -78,6 +78,10 @@ bool Channel::RpcCommunication(RpcCallParams& rpc_params) {
         // TODO
     }
 
+    if (NULL != rpc_params) {
+        delete rpc_params;
+    }
+
     return true;
 }
 
@@ -86,8 +90,10 @@ void* Channel::RpcProcessor(void *arg) {
 }
 
 bool Channel::AsyncRpcCall(RpcCallParams& rpc_params) {
-
-
+    if (NULL == async_threads_ptr_) {
+    } else {
+        async_threads_ptr_->Processor();
+    }
 
     return true;
 }
@@ -105,11 +111,12 @@ void Channel::CallMethod(const MethodDescriptor* method,
         return;
     }
 
-    RpcCallParams rpc_params(method, request, response, this);
+    RpcCallParams* rpc_params_ptr = new RpcCallParams(method, request, response, this);
 
     if (is_channel_async_call_) {
+        AsyncRpcCall(rpc_params_ptr);
     } else {
-        RpcCommunication(rpc_params);
+        RpcCommunication(rpc_params_ptr);
     }
 
 /*
