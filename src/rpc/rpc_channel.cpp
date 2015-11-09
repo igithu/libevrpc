@@ -27,27 +27,34 @@ namespace libevrpc {
 using std::string;
 
 Channel::Channel(const char* addr, const char* port) :
-    is_channel_async_call_(false) {
+    is_channel_async_call_(false), async_threads_ptr_(NULL) {
     strcpy(addr_ = (char*)malloc(strlen(addr) + 1), addr);
     strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
+
 }
 
 Channel::~Channel() {
     free(addr_);
     free(port_);
+
+    if (NULL != async_threads_ptr_) {
+        delete async_threads_ptr_;
+    }
 }
 
-void Channel::CallMethod(const MethodDescriptor* method,
-                         RpcController* control,
-                         const Message* request,
-                         Message* response,
-                         Closure* done) {
-
-    connect_fd_ = TcpConnect(addr_, port_);
-    if (connect_fd_ < 0) {
-        perror("Rpc connect server failed!");
-        return;
+bool Channel::OpenRpcAsyncMode(bool is_threadpool) {
+    is_channel_async_call_ = true;
+    if (is_threadpool) {
+        async_threads_ptr_ = new ThreadPool(5);
+        async_threads_ptr_->Start();
     }
+    return true;
+}
+
+bool Channel::RpcCommunication(RpcCallParams& rpc_params) {
+    const MethodDescriptor* method = rpc_params->p_method;
+    const Message* request = rpc_params->p_request;
+    Message* response = rpc_params->p_response;
 
     string send_str;
     if (!request->SerializeToString(&send_str)) {
@@ -71,18 +78,67 @@ void Channel::CallMethod(const MethodDescriptor* method,
         // TODO
     }
 
+    return true;
+}
+
+void* Channel::RpcProcessor(void *arg) {
+    RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
+}
+
+bool Channel::AsyncRpcCall(RpcCallParams& rpc_params) {
+
+
+
+    return true;
+}
+
+
+void Channel::CallMethod(const MethodDescriptor* method,
+                         RpcController* control,
+                         const Message* request,
+                         Message* response,
+                         Closure* done) {
+
+    connect_fd_ = TcpConnect(addr_, port_);
+    if (connect_fd_ < 0) {
+        perror("Rpc connect server failed!");
+        return;
+    }
+
+    RpcCallParams rpc_params(method, request, response, this);
+
+    if (is_channel_async_call_) {
+    } else {
+        RpcCommunication(rpc_params);
+    }
+
+/*
+    string send_str;
+    if (!request->SerializeToString(&send_str)) {
+        perror("SerializeToString request failed!");
+        return;
+    }
+    uint32_t hash_code = BKDRHash(method->full_name().c_str());
+    if (RpcSend(connect_fd_, hash_code, send_str, false) < 0) {
+        return;
+    }
+
+    string recv_str;
+    int32_t ret_id = RpcRecv(connect_fd_, recv_str, true);
+    if (ERROR_RECV == ret_id) {
+        perror("Recv data error in rpc channel");
+        return;
+    }
+
+    if (!response->ParseFromString(recv_str)) {
+        perror("SerializeToString response error in RpcChannel!");
+        // TODO
+    }
+*/
+
 }
 
 void Channel::Close() {
-}
-
-bool Channel::OpenRpcAsyncMode() {
-    is_channel_async_call_ = true;
-    return true;
-}
-
-bool Channel::RpcCommunication() {
-    return true;
 }
 
 

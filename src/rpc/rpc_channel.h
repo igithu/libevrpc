@@ -3,9 +3,9 @@
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
  * 
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file rpc_channel.h
  * @author aishuyu(asy5178@163.com)
@@ -24,9 +24,23 @@
 #include <google/protobuf/service.h>
 #include <google/protobuf/message.h>
 
+#include "thread_pool.h"
+
 namespace libevrpc {
 
 using namespace google::protobuf;
+
+class Channel;
+
+struct RpcCallParams {
+    RpcCallParams(const MethodDescriptor* method, const Message* request, Message* response, Channel* channel) :
+        p_method(method), p_request(request), p_response(response), p_channel(channel) {
+        }
+    const MethodDescriptor* p_method;
+    const Message* p_request;
+    Message* p_response;
+    Channel* p_channel;
+};
 
 class Channel : public RpcChannel {
     public:
@@ -42,9 +56,13 @@ class Channel : public RpcChannel {
 
         void Close();
 
-        bool OpenRpcAsyncMode();
+        bool OpenRpcAsyncMode(bool is_threadpool = false);
 
-        bool RpcCommunication();
+        bool RpcCommunication(RpcCallParams& rpc_params);
+
+        bool AsyncRpcCall(RpcCallParams& rpc_params);
+
+        static void* RpcProcessor(void *arg);
 
     private:
         char* addr_;
@@ -54,6 +72,8 @@ class Channel : public RpcChannel {
         int32_t connect_fd_;
 
         bool is_channel_async_call_;
+
+        ThreadPool* async_threads_ptr_;
 
 };
 
