@@ -60,12 +60,12 @@ class Channel : public RpcChannel {
 
         bool RpcCommunication(RpcCallParams& rpc_params);
 
-        bool AsyncRpcCall(RpcCallParams& rpc_params);
+        bool AsyncRpcCall(RpcCallParams* rpc_params_ptr);
 
         static void* RpcProcessor(void *arg);
 
     private:
-        bool StartWorkerThread();
+        bool AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr);
 
     private:
         char* addr_;

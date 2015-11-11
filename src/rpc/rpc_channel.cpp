@@ -78,23 +78,31 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
         // TODO
     }
 
-    if (NULL != rpc_params) {
-        delete rpc_params;
-    }
-
     return true;
 }
 
 void* Channel::RpcProcessor(void *arg) {
+    if (NULL == arg) {
+        return;
+    }
     RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
+    // TODO
+    delete rpc_params_ptr;
 }
 
-bool Channel::AsyncRpcCall(RpcCallParams& rpc_params) {
+bool Channel::AsyncRpcCall(RpcCallParams* rpc_params_ptr) {
     if (NULL == async_threads_ptr_) {
+        // Single thread mode
+        AsyncSingleThreadCall(rpc_params_ptr);
     } else {
-        async_threads_ptr_->Processor();
+        // Thread pool mode
+        async_threads_ptr_->Processor(Channel::RpcProcessor, rpc_params_ptr);
     }
+    return true;
+}
 
+bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
+    pthread_create(NULL, NULL, Channel::RpcProcessor, rpc_params_ptr);
     return true;
 }
 
@@ -117,6 +125,7 @@ void Channel::CallMethod(const MethodDescriptor* method,
         AsyncRpcCall(rpc_params_ptr);
     } else {
         RpcCommunication(rpc_params_ptr);
+        delete rpc_params_ptr;
     }
 
 /*
