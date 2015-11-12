@@ -58,7 +58,7 @@ class Channel : public RpcChannel {
 
         bool OpenRpcAsyncMode(bool is_threadpool = false);
 
-        bool RpcCommunication(RpcCallParams& rpc_params);
+        bool RpcCommunication(RpcCallParams* rpc_params);
 
         bool AsyncRpcCall(RpcCallParams* rpc_params_ptr);
 

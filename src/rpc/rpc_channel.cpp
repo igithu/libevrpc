@@ -59,18 +59,18 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
     string send_str;
     if (!request->SerializeToString(&send_str)) {
         perror("SerializeToString request failed!");
-        return;
+        return false;
     }
     uint32_t hash_code = BKDRHash(method->full_name().c_str());
     if (RpcSend(connect_fd_, hash_code, send_str, false) < 0) {
-        return;
+        return false;
     }
 
     string recv_str;
     int32_t ret_id = RpcRecv(connect_fd_, recv_str, true);
     if (ERROR_RECV == ret_id) {
         perror("Recv data error in rpc channel");
-        return;
+        return false;
     }
 
     if (!response->ParseFromString(recv_str)) {
@@ -83,7 +83,7 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
 
 void* Channel::RpcProcessor(void *arg) {
     if (NULL == arg) {
-        return;
+        return NULL;
     }
     RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
     // TODO
