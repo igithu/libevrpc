@@ -102,7 +102,9 @@ bool Channel::AsyncRpcCall(RpcCallParams* rpc_params_ptr) {
 }
 
 bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
-    pthread_create(NULL, NULL, Channel::RpcProcessor, rpc_params_ptr);
+    pthread_t tid;
+    pthread_create(&tid, NULL, Channel::RpcProcessor, rpc_params_ptr);
+    thread_ids_vec_.push_back(tid);
     return true;
 }
 
@@ -127,30 +129,6 @@ void Channel::CallMethod(const MethodDescriptor* method,
         RpcCommunication(rpc_params_ptr);
         delete rpc_params_ptr;
     }
-
-/*
-    string send_str;
-    if (!request->SerializeToString(&send_str)) {
-        perror("SerializeToString request failed!");
-        return;
-    }
-    uint32_t hash_code = BKDRHash(method->full_name().c_str());
-    if (RpcSend(connect_fd_, hash_code, send_str, false) < 0) {
-        return;
-    }
-
-    string recv_str;
-    int32_t ret_id = RpcRecv(connect_fd_, recv_str, true);
-    if (ERROR_RECV == ret_id) {
-        perror("Recv data error in rpc channel");
-        return;
-    }
-
-    if (!response->ParseFromString(recv_str)) {
-        perror("SerializeToString response error in RpcChannel!");
-        // TODO
-    }
-*/
 
 }
 

@@ -78,6 +78,8 @@ class Channel : public RpcChannel {
 
         ThreadPool* async_threads_ptr_;
 
+        std::vector<pthread_t> thread_ids_vec_;
+
 };
 
 }  // end of namespace libevrpc
