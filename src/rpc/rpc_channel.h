@@ -20,6 +20,7 @@
 #ifndef  __RPC_CHANNEL_H_
 #define  __RPC_CHANNEL_H_
 
+#include <vector>
 
 #include <google/protobuf/service.h>
 #include <google/protobuf/message.h>

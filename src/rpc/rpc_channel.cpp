@@ -25,6 +25,7 @@
 namespace libevrpc {
 
 using std::string;
+using std::vector;
 
 Channel::Channel(const char* addr, const char* port) :
     is_channel_async_call_(false), async_threads_ptr_(NULL) {
@@ -39,6 +40,12 @@ Channel::~Channel() {
 
     if (NULL != async_threads_ptr_) {
         delete async_threads_ptr_;
+    }
+
+    if (!thread_ids_vec_.empty()) {
+        for (int i = 0; i < thread_ids_vec_.size(); ++i) {
+            pthread_join(thread_ids_vec_[i], NULL);
+        }
     }
 }
 
