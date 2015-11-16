@@ -49,13 +49,26 @@ Channel::~Channel() {
     }
 }
 
-bool Channel::OpenRpcAsyncMode(bool is_threadpool) {
-    is_channel_async_call_ = true;
-    if (is_threadpool) {
-        async_threads_ptr_ = new ThreadPool(5);
-        async_threads_ptr_->Start();
+void Channel::CallMethod(const MethodDescriptor* method,
+                         RpcController* control,
+                         const Message* request,
+                         Message* response,
+                         Closure* done) {
+
+    connect_fd_ = TcpConnect(addr_, port_);
+    if (connect_fd_ < 0) {
+        perror("Rpc connect server failed!");
+        return;
     }
-    return true;
+
+    RpcCallParams* rpc_params_ptr = new RpcCallParams(method, request, response, this);
+
+    if (is_channel_async_call_) {
+        AsyncRpcCall(rpc_params_ptr);
+    } else {
+        RpcCommunication(rpc_params_ptr);
+        delete rpc_params_ptr;
+    }
 }
 
 bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
@@ -88,13 +101,13 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
     return true;
 }
 
-void* Channel::RpcProcessor(void *arg) {
-    if (NULL == arg) {
-        return NULL;
+bool Channel::OpenRpcAsyncMode(bool is_threadpool) {
+    is_channel_async_call_ = true;
+    if (is_threadpool) {
+        async_threads_ptr_ = new ThreadPool(5);
+        async_threads_ptr_->Start();
     }
-    RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
-    // TODO
-    delete rpc_params_ptr;
+    return true;
 }
 
 bool Channel::AsyncRpcCall(RpcCallParams* rpc_params_ptr) {
@@ -115,28 +128,13 @@ bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
     return true;
 }
 
-
-void Channel::CallMethod(const MethodDescriptor* method,
-                         RpcController* control,
-                         const Message* request,
-                         Message* response,
-                         Closure* done) {
-
-    connect_fd_ = TcpConnect(addr_, port_);
-    if (connect_fd_ < 0) {
-        perror("Rpc connect server failed!");
-        return;
+void* Channel::RpcProcessor(void *arg) {
+    if (NULL == arg) {
+        return NULL;
     }
-
-    RpcCallParams* rpc_params_ptr = new RpcCallParams(method, request, response, this);
-
-    if (is_channel_async_call_) {
-        AsyncRpcCall(rpc_params_ptr);
-    } else {
-        RpcCommunication(rpc_params_ptr);
-        delete rpc_params_ptr;
-    }
-
+    RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
+    RpcCommunication(rpc_params_ptr);
+    delete rpc_params_ptr;
 }
 
 void Channel::Close() {
