@@ -30,14 +30,33 @@
 namespace libevrpc {
 
 using namespace google::protobuf;
+using __gnu_cxx::hash_map;
+
+typedef hash_map<uint32_t, RpcMethod*> HashMap;
 
 class Channel;
 
 struct RpcCallParams {
-    RpcCallParams(const MethodDescriptor* method, const Message* request, Message* response, Channel* channel) :
-        p_method(method), p_request(request), p_response(response), p_channel(channel) {
+    RpcCallParams(const string& method_name, const Message* request, Message* response, Channel* channel) :
+        method_name(method_name), p_channel(channel) {
+            p_request->CopyFrom();
+            p_response->CopyFrom();
         }
-    const MethodDescriptor* p_method;
+
+    RpcCallParams(const string& method_name, const Message* request, Message* response) :
+        method_name(method_name), p_request(request), p_response(response) {
+        }
+
+    ~RpcCallParams () {
+        if (NULL != p_request) {
+            delete p_request;
+        }
+        if (NULL != p_response) {
+            delete p_response;
+        }
+    }
+
+    const std::string method_name;
     const Message* p_request;
     Message* p_response;
     Channel* p_channel;
@@ -80,6 +99,8 @@ class Channel : public RpcChannel {
         ThreadPool* async_threads_ptr_;
 
         std::vector<pthread_t> thread_ids_vec_;
+
+
 
 };
 

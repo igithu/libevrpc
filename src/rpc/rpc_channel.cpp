@@ -61,18 +61,19 @@ void Channel::CallMethod(const MethodDescriptor* method,
         return;
     }
 
-    RpcCallParams* rpc_params_ptr = new RpcCallParams(method, request, response, this);
 
     if (is_channel_async_call_) {
+        RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, response, this);
         AsyncRpcCall(rpc_params_ptr);
     } else {
+        RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, response);
         RpcCommunication(rpc_params_ptr);
-        delete rpc_params_ptr;
+//        delete rpc_params_ptr;
     }
 }
 
 bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
-    const MethodDescriptor* method = rpc_params->p_method;
+    const string& method_name = rpc_params->method_name;
     const Message* request = rpc_params->p_request;
     Message* response = rpc_params->p_response;
 
@@ -81,7 +82,7 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
         perror("SerializeToString request failed!");
         return false;
     }
-    uint32_t hash_code = BKDRHash(method->full_name().c_str());
+    uint32_t hash_code = BKDRHash(method_name.c_str());
     if (RpcSend(connect_fd_, hash_code, send_str, false) < 0) {
         return false;
     }
