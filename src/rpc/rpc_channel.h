@@ -20,6 +20,8 @@
 #ifndef  __RPC_CHANNEL_H_
 #define  __RPC_CHANNEL_H_
 
+#include <ext/hash_map>
+
 #include <vector>
 
 #include <google/protobuf/service.h>
@@ -32,19 +34,19 @@ namespace libevrpc {
 using namespace google::protobuf;
 using __gnu_cxx::hash_map;
 
-typedef hash_map<uint32_t, RpcMethod*> HashMap;
+typedef hash_map<uint32_t, std::string> HashMap;
 
 class Channel;
 
 struct RpcCallParams {
     RpcCallParams(const string& method_name, const Message* request, Message* response, Channel* channel) :
-        method_name(method_name), p_channel(channel) {
-            p_request->CopyFrom();
-            p_response->CopyFrom();
+        method_name(method_name), p_channel(const_cast<Channel*>(channel)) {
+            p_request->CopyFrom(*request);
+            p_response->CopyFrom(*response);
         }
 
     RpcCallParams(const string& method_name, const Message* request, Message* response) :
-        method_name(method_name), p_request(request), p_response(response) {
+        method_name(method_name), p_channel(NULL), p_request(const_cast<Message*>(request)), p_response(response) {
         }
 
     ~RpcCallParams () {
@@ -57,9 +59,10 @@ struct RpcCallParams {
     }
 
     const std::string method_name;
-    const Message* p_request;
-    Message* p_response;
     Channel* p_channel;
+
+    Message* p_request;
+    Message* p_response;
 };
 
 class Channel : public RpcChannel {

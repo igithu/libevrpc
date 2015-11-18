@@ -134,7 +134,10 @@ void* Channel::RpcProcessor(void *arg) {
         return NULL;
     }
     RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
-    RpcCommunication(rpc_params_ptr);
+    Channel* channel_ptr = rpc_params_ptr->p_channel;
+    if (NULL != rpc_params_ptr) {
+        channel_ptr->RpcCommunication(rpc_params_ptr);
+    }
     delete rpc_params_ptr;
 }
 
