@@ -138,6 +138,20 @@ void* Channel::RpcProcessor(void *arg) {
     if (NULL != rpc_params_ptr) {
         channel_ptr->RpcCommunication(rpc_params_ptr);
     }
+    Message* response_ptr = rpc_params_ptr->p_response;
+    if (NULL != response_ptr) {
+        Message* response_ret->CopyFrom(*response_ptr);
+        HashMap& ret_map = channel_ptr->call_results_map_;
+        uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
+        HashMap::iterator ret_iter = ret_map.find(hash_code);
+        if (ret_iter == ret_map.end()) {
+            method_hashmap_.insert(std::make_pair(hash_code, response_ret));
+        } else {
+            // if conflict, replace old one
+            delete ret_iter->second;
+            ret_map[hash_code] = response_ret;
+        }
+    }
     delete rpc_params_ptr;
 }
 
