@@ -40,29 +40,14 @@ class Channel;
 
 struct RpcCallParams {
     RpcCallParams(const string& method_name, const Message* request, Message* response, Channel* channel) :
-        method_name(method_name), p_channel(const_cast<Channel*>(channel)) {
-            p_request->CopyFrom(*request);
-            p_response->CopyFrom(*response);
+        method_name(method_name), p_request(request), p_response(response), p_channel(const_cast<Channel*>(channel)) {
         }
 
-    RpcCallParams(const string& method_name, const Message* request, Message* response) :
-        method_name(method_name), p_channel(NULL), p_request(const_cast<Message*>(request)), p_response(response) {
-        }
-
-    ~RpcCallParams () {
-        if (NULL != p_request) {
-            delete p_request;
-        }
-        if (NULL != p_response) {
-            delete p_response;
-        }
-    }
 
     const std::string method_name;
-    Channel* p_channel;
-
-    Message* p_request;
+    const Message* p_request;
     Message* p_response;
+    Channel* p_channel;
 };
 
 class Channel : public RpcChannel {

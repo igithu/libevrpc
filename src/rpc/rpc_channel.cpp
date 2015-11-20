@@ -62,13 +62,12 @@ void Channel::CallMethod(const MethodDescriptor* method,
     }
 
 
+    RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, response, this);
     if (is_channel_async_call_) {
-        RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, response, this);
         AsyncRpcCall(rpc_params_ptr);
     } else {
-        RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, response);
         RpcCommunication(rpc_params_ptr);
-//        delete rpc_params_ptr;
+        delete rpc_params_ptr;
     }
 }
 
@@ -135,21 +134,18 @@ void* Channel::RpcProcessor(void *arg) {
     }
     RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
     Channel* channel_ptr = rpc_params_ptr->p_channel;
-    if (NULL != rpc_params_ptr) {
-        channel_ptr->RpcCommunication(rpc_params_ptr);
-    }
-    Message* response_ptr = rpc_params_ptr->p_response;
+    Message* response_ptr = rpc_params_ptr->p_response->New();
+    channel_ptr->RpcCommunication(rpc_params_ptr);
     if (NULL != response_ptr) {
-        Message* response_ret->CopyFrom(*response_ptr);
         HashMap& ret_map = channel_ptr->call_results_map_;
         uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
         HashMap::iterator ret_iter = ret_map.find(hash_code);
         if (ret_iter == ret_map.end()) {
-            method_hashmap_.insert(std::make_pair(hash_code, response_ret));
+            ret_map.insert(std::make_pair(hash_code, response_ptr));
         } else {
             // if conflict, replace old one
             delete ret_iter->second;
-            ret_map[hash_code] = response_ret;
+            ret_map[hash_code] = response_ptr;
         }
     }
     delete rpc_params_ptr;
