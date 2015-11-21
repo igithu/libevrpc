@@ -140,6 +140,7 @@ void* Channel::RpcProcessor(void *arg) {
         HashMap& ret_map = channel_ptr->call_results_map_;
         uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
         HashMap::iterator ret_iter = ret_map.find(hash_code);
+//        pthread_t cur_tid = pthread_self();
         if (ret_iter == ret_map.end()) {
             ret_map.insert(std::make_pair(hash_code, response_ptr));
         } else {
@@ -149,6 +150,10 @@ void* Channel::RpcProcessor(void *arg) {
         }
     }
     delete rpc_params_ptr;
+}
+
+bool Channel::GetAsyncCall(const string& method_name, Message* response) {
+
 }
 
 void Channel::Close() {

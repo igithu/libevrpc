@@ -62,8 +62,6 @@ class Channel : public RpcChannel {
                                 Message* response,
                                 Closure* done);
 
-        void Close();
-
         bool OpenRpcAsyncMode(bool is_threadpool = false);
 
         bool RpcCommunication(RpcCallParams* rpc_params);
@@ -71,6 +69,10 @@ class Channel : public RpcChannel {
         bool AsyncRpcCall(RpcCallParams* rpc_params_ptr);
 
         static void* RpcProcessor(void *arg);
+
+        bool GetAsyncCall(const std::string& method_name, Message* response);
+
+        void Close();
 
     private:
         bool AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr);
