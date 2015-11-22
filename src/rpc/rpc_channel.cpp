@@ -102,6 +102,7 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
 }
 
 bool Channel::OpenRpcAsyncMode(bool is_threadpool) {
+    is_threadpool = false; // shutdown the thread pool
     is_channel_async_call_ = true;
     if (is_threadpool) {
         async_threads_ptr_ = new ThreadPool(5);
@@ -124,6 +125,8 @@ bool Channel::AsyncRpcCall(RpcCallParams* rpc_params_ptr) {
 bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
     pthread_t tid;
     pthread_create(&tid, NULL, Channel::RpcProcessor, rpc_params_ptr);
+    uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
+    call_tids_map_.insert(std::make_pair(hash_code, tid));
     thread_ids_vec_.push_back(tid);
     return true;
 }
@@ -137,10 +140,10 @@ void* Channel::RpcProcessor(void *arg) {
     Message* response_ptr = rpc_params_ptr->p_response->New();
     channel_ptr->RpcCommunication(rpc_params_ptr);
     if (NULL != response_ptr) {
-        HashMap& ret_map = channel_ptr->call_results_map_;
+        MsgHashMap& ret_map = channel_ptr->call_results_map_;
         uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
-        HashMap::iterator ret_iter = ret_map.find(hash_code);
-//        pthread_t cur_tid = pthread_self();
+        MsgHashMap::iterator ret_iter = ret_map.find(hash_code);
+        // pthread_t cur_tid = pthread_self();
         if (ret_iter == ret_map.end()) {
             ret_map.insert(std::make_pair(hash_code, response_ptr));
         } else {
@@ -153,7 +156,15 @@ void* Channel::RpcProcessor(void *arg) {
 }
 
 bool Channel::GetAsyncCall(const string& method_name, Message* response) {
+    uint32_t method_code = BKDRHash(method_name.c_str());
+    PthreadHashMap::iterator ret_iter = call_tids_map_.find(method_code);
+    if (ret_iter == call_tids_map_.end()) {
+        return false;
+    }
+    pthread_t& cur_tid = ret_iter->second;
+    pthread_join(cur_tid, NULL);
 
+    return true;
 }
 
 void Channel::Close() {

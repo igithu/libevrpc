@@ -34,7 +34,9 @@ namespace libevrpc {
 using namespace google::protobuf;
 using __gnu_cxx::hash_map;
 
-typedef hash_map<uint32_t, Message*> HashMap;
+typedef hash_map<uint32_t, Message*> MsgHashMap;
+typedef hash_map<uint32_t, pthread_t> PthreadHashMap;
+
 
 class Channel;
 
@@ -90,7 +92,9 @@ class Channel : public RpcChannel {
 
         std::vector<pthread_t> thread_ids_vec_;
 
-        HashMap call_results_map_;
+        MsgHashMap call_results_map_;
+
+        PthreadHashMap call_tids_map_;
 
 };
 
