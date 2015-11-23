@@ -27,6 +27,7 @@
 #include <google/protobuf/service.h>
 #include <google/protobuf/message.h>
 
+#include "pthread_rwlock.h"
 #include "thread_pool.h"
 
 namespace libevrpc {
@@ -95,6 +96,8 @@ class Channel : public RpcChannel {
         MsgHashMap call_results_map_;
 
         PthreadHashMap call_tids_map_;
+
+        PUBLIC_UTIL::RWLock tids_map_rwlock_;
 
 };
 
