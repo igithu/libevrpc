@@ -23,6 +23,7 @@
 #include <ext/hash_map>
 
 #include <vector>
+#include <unordered_map>
 
 #include <google/protobuf/service.h>
 #include <google/protobuf/message.h>
@@ -33,10 +34,9 @@
 namespace libevrpc {
 
 using namespace google::protobuf;
-using __gnu_cxx::hash_map;
 
-typedef hash_map<uint32_t, Message*> MsgHashMap;
-typedef hash_map<uint32_t, pthread_t> PthreadHashMap;
+typedef std::unordered_map<uint32_t, pthread_t> PthreadHashMap;
+typedef std::unordered_map<pthread_t, Message*> MsgHashMap;
 
 
 class Channel;

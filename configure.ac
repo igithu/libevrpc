@@ -39,6 +39,8 @@ AC_TYPE_UINT32_T
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([bzero memset socket strerror])
 
+CXXFLAGS=-std=c++11
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/cs_sample/Makefile

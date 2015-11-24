@@ -62,7 +62,7 @@ void Channel::CallMethod(const MethodDescriptor* method,
     }
 
 
-    RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, response, this);
+    RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, NULL, this);
     if (is_channel_async_call_) {
         AsyncRpcCall(rpc_params_ptr);
     } else {
@@ -140,19 +140,22 @@ void* Channel::RpcProcessor(void *arg) {
     }
     RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
     Channel* channel_ptr = rpc_params_ptr->p_channel;
+    if (!channel_ptr->RpcCommunication(rpc_params_ptr)) {
+        return NULL;
+    }
     Message* response_ptr = rpc_params_ptr->p_response->New();
-    channel_ptr->RpcCommunication(rpc_params_ptr);
+    pthread_t cur_tid = pthread_self();
     if (NULL != response_ptr) {
         MsgHashMap& ret_map = channel_ptr->call_results_map_;
-        uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
-        MsgHashMap::iterator ret_iter = ret_map.find(hash_code);
+//         uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
+        MsgHashMap::iterator ret_iter = ret_map.find(cur_tid);
         // pthread_t cur_tid = pthread_self();
         if (ret_map.end() == ret_iter) {
-            ret_map.insert(std::make_pair(hash_code, response_ptr));
+            ret_map.insert(std::make_pair(cur_tid, response_ptr));
         } else {
             // if conflict, replace old one
             delete ret_iter->second;
-            ret_map[hash_code] = response_ptr;
+            ret_map[cur_tid] = response_ptr;
         }
     }
     delete rpc_params_ptr;
@@ -171,11 +174,15 @@ bool Channel::GetAsyncCall(const string& method_name, Message* response) {
         cur_tid = ret_iter->second;
     }
     pthread_join(cur_tid, NULL);
-    MsgHashMap::iterator msg_iter = call_results_map_.find(method_code);
+    MsgHashMap::iterator msg_iter = call_results_map_.find(cur_tid);
     if (call_results_map_.end() == msg_iter) {
         return false;
     }
-    response = msg_iter->second;
+    const Message* response_ptr = msg_iter->second;
+    if (NULL == response_ptr) {
+        return false;
+    }
+    response->CopyFrom(*response_ptr);
 
     return true;
 }
