@@ -82,22 +82,18 @@ class Channel : public RpcChannel {
 
     private:
         char* addr_;
-
         char* port_;
-
         int32_t connect_fd_;
-
         bool is_channel_async_call_;
 
         ThreadPool* async_threads_ptr_;
 
         std::vector<pthread_t> thread_ids_vec_;
-
         MsgHashMap call_results_map_;
-
         PthreadHashMap call_tids_map_;
 
         PUBLIC_UTIL::RWLock tids_map_rwlock_;
+        PUBLIC_UTIL::RWLock ret_map_rwlock_;
 
 };
 

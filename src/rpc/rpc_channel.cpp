@@ -148,6 +148,7 @@ void* Channel::RpcProcessor(void *arg) {
     if (NULL != response_ptr) {
         MsgHashMap& ret_map = channel_ptr->call_results_map_;
 //         uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
+        WriteLockGuard wguard(channel_ptr->ret_map_rwlock_);
         MsgHashMap::iterator ret_iter = ret_map.find(cur_tid);
         // pthread_t cur_tid = pthread_self();
         if (ret_map.end() == ret_iter) {
@@ -174,15 +175,21 @@ bool Channel::GetAsyncCall(const string& method_name, Message* response) {
         cur_tid = ret_iter->second;
     }
     pthread_join(cur_tid, NULL);
-    MsgHashMap::iterator msg_iter = call_results_map_.find(cur_tid);
-    if (call_results_map_.end() == msg_iter) {
-        return false;
+    Message* response_ptr = NULL;
+    {
+        WriteLockGuard wguard(ret_map_rwlock_);
+        MsgHashMap::iterator msg_iter = call_results_map_.find(cur_tid);
+        if (call_results_map_.end() == msg_iter) {
+            return false;
+        }
+        response_ptr = msg_iter->second;
+        call_results_map_.erase(msg_iter);
     }
-    const Message* response_ptr = msg_iter->second;
     if (NULL == response_ptr) {
         return false;
     }
     response->CopyFrom(*response_ptr);
+    delete response_ptr;
 
     return true;
 }
