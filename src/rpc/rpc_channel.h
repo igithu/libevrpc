@@ -23,6 +23,8 @@
 #include <ext/hash_map>
 
 #include <vector>
+#include <list>
+#include <memory>
 #include <unordered_map>
 
 #include <google/protobuf/service.h>
@@ -35,7 +37,9 @@ namespace libevrpc {
 
 using namespace google::protobuf;
 
-typedef std::unordered_map<uint32_t, pthread_t> PthreadHashMap;
+typedef std::list<pthread_t> TidList;
+typedef std::unique_ptr<TidList> TidListPtr;
+typedef std::unordered_map<uint32_t, TidListPtr> PthreadHashMap;
 typedef std::unordered_map<pthread_t, Message*> MsgHashMap;
 
 
