@@ -50,7 +50,7 @@ bool RpcClient::OpenRpcAsyncMode() {
         perror("Maybe YOU DIDNOT call InitClient first! open the async failed!");
         return false;
     }
-    is_async_ = true;
+    rpc_channel_ptr_->OpenRpcAsyncMode();
     return true;
 }
 
@@ -60,6 +60,13 @@ void* RpcClient::ServerCall() {
         exit(0);
     }
     return service_call_ptr_;
+}
+
+bool RpcClient::GetAsyncCall(const std::string& method_name, Message* response) {
+    if (NULL == rpc_channel_ptr_) {
+        return false;
+    }
+    return rpc_channel_ptr_->GetAsyncCall(method_name, response);
 }
 
 

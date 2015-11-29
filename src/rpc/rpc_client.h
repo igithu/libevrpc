@@ -33,8 +33,11 @@ class RpcClient {
 
         virtual ~RpcClient();
 
-    protected:
         bool OpenRpcAsyncMode();
+
+        bool GetAsyncCall(const std::string& method_name, Message* response);
+
+    protected:
 
         bool InitClient(const char* addr = "127.0.0.1", const char* port = "8899");
 

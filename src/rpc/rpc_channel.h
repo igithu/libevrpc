@@ -38,7 +38,7 @@ namespace libevrpc {
 using namespace google::protobuf;
 
 typedef std::list<pthread_t> TidList;
-typedef std::unique_ptr<TidList> TidListPtr;
+typedef std::shared_ptr<TidList> TidListPtr;
 typedef std::unordered_map<uint32_t, TidListPtr> PthreadHashMap;
 typedef std::unordered_map<pthread_t, Message*> MsgHashMap;
 

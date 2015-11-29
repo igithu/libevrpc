@@ -51,8 +51,7 @@ EchoService_Stub& RpcClientImp::RpcCall() {
     return (*service_call_ptr);
 }
 
-
-int main() {
+void SysncCall() {
 
     EchoRequest echo_request;
     echo_request.set_request("Hello! test123456789012345678901234567890");
@@ -63,6 +62,27 @@ int main() {
     echo_response.PrintDebugString();
     string ret = echo_response.response();
     printf("echo recv msg is %s\n", ret.c_str());
+
+}
+
+void AsyscCall() {
+    EchoRequest echo_request;
+    echo_request.set_request("Hello! test123456789012345678901234567890");
+
+    RpcClientImp rpc_client;
+    rpc_client.OpenRpcAsyncMode();
+    rpc_client.RpcCall().Echo(NULL, &echo_request, NULL, NULL);
+
+    sleep(5);
+    EchoResponse echo_response;
+    rpc_client.RpcClient::GetAsyncCall("Echo", &echo_response);
+    echo_response.PrintDebugString();
+    string ret = echo_response.response();
+    printf("Async call echo recv msg is %s\n", ret.c_str());
+
+}
+
+int main() {
 
     return 0;
 }

@@ -128,9 +128,9 @@ bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
     uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
     {
         WriteLockGuard wguard(tids_map_rwlock_);
-        PthreadHashMap::iterator ret_iter = call_tids_map_.find(method_code);
+        PthreadHashMap::iterator ret_iter = call_tids_map_.find(hash_code);
         if (ret_iter == call_tids_map_.end()) {
-            TidListPtr tids_ptr = new TidList();
+            TidListPtr tids_ptr(new TidList());
             tids_ptr->push_back(tid);
             call_tids_map_.insert(std::make_pair(hash_code, tids_ptr));
         } else {
@@ -176,10 +176,11 @@ bool Channel::GetAsyncCall(const string& method_name, Message* response) {
     {
         ReadLockGuard rguard(tids_map_rwlock_);
         ret_iter = call_tids_map_.find(method_code);
-        if (call_tids_map_.end() == ret_iter || (ret_iter->second).size() == 0) {
+        if (call_tids_map_.end() == ret_iter || ret_iter->second->size() == 0) {
             return false;
         }
-        cur_tid = (ret_iter->second).pop_front();
+        cur_tid = ret_iter->second->front();
+        ret_iter->second->pop_front();
     }
     pthread_join(cur_tid, NULL);
     Message* response_ptr = NULL;
