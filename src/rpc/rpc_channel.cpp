@@ -61,8 +61,7 @@ void Channel::CallMethod(const MethodDescriptor* method,
         return;
     }
 
-
-    RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, NULL, this);
+    RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, response, this);
     if (is_channel_async_call_) {
         AsyncRpcCall(rpc_params_ptr);
     } else {
@@ -75,6 +74,9 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
     const string& method_name = rpc_params->method_name;
     const Message* request = rpc_params->p_request;
     Message* response = rpc_params->p_response;
+    if (NULL == response) {
+        response->New();
+    }
 
     string send_str;
     if (!request->SerializeToString(&send_str)) {

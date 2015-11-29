@@ -43,13 +43,9 @@ class RpcClient {
 
         Channel* GetRpcChannel();
 
-        // Please use the ServerCall to call the rpc function!
-        void* ServerCall();
-
     private:
         Channel* rpc_channel_ptr_;
 
-        void* service_call_ptr_;
 
         bool is_async_;
 

@@ -36,19 +36,19 @@ class RpcClientImp : public RpcClient {
         EchoService_Stub& RpcCall();
 
     private:
-        EchoService_Stub* service_call_ptr;
+        EchoService_Stub* service_call_ptr_;
 };
 
 RpcClientImp::RpcClientImp() {
     InitClient("127.0.0.1", "9999");
-    service_call_ptr = new EchoService_Stub(GetRpcChannel());
+    service_call_ptr_ = new EchoService_Stub(GetRpcChannel());
 }
 
 RpcClientImp::~RpcClientImp() {
 }
 
 EchoService_Stub& RpcClientImp::RpcCall() {
-    return (*service_call_ptr);
+    return (*service_call_ptr_);
 }
 
 void SysncCall() {
@@ -71,10 +71,10 @@ void AsyscCall() {
 
     RpcClientImp rpc_client;
     rpc_client.OpenRpcAsyncMode();
-    rpc_client.RpcCall().Echo(NULL, &echo_request, NULL, NULL);
+    EchoResponse echo_response;
+    rpc_client.RpcCall().Echo(NULL, &echo_request, &echo_response, NULL);
 
     sleep(5);
-    EchoResponse echo_response;
     rpc_client.RpcClient::GetAsyncCall("Echo", &echo_response);
     echo_response.PrintDebugString();
     string ret = echo_response.response();
@@ -83,7 +83,7 @@ void AsyscCall() {
 }
 
 int main() {
-
+    AsyscCall();
     return 0;
 }
 
