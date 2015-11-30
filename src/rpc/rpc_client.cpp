@@ -19,14 +19,10 @@
 namespace libevrpc {
 
 RpcClient::RpcClient() :
-    rpc_channel_ptr_(NULL), is_async_(false) {
+    rpc_channel_ptr_(NULL) {
 }
 
 RpcClient::~RpcClient() {
-//    if (NULL != service_call_ptr_) {
-//        delete service_call_ptr_;
-//    }
-
     if (NULL != rpc_channel_ptr_) {
         delete rpc_channel_ptr_;
     }
@@ -34,10 +30,6 @@ RpcClient::~RpcClient() {
 
 bool RpcClient::InitClient(const char* addr, const char* port) {
     rpc_channel_ptr_ = new Channel(addr, port);
-    // async mode?
-    if (is_async_) {
-        rpc_channel_ptr_->OpenRpcAsyncMode();
-    }
     return true;
 }
 
@@ -49,17 +41,16 @@ bool RpcClient::OpenRpcAsyncMode() {
     if (NULL == rpc_channel_ptr_) {
         perror("Maybe YOU DIDNOT call InitClient first! open the async failed!");
         exit(0);
-        return false;
     }
     rpc_channel_ptr_->OpenRpcAsyncMode();
     return true;
 }
 
-bool RpcClient::GetAsyncCall(const std::string& method_name, Message* response) {
+bool RpcClient::GetAsyncResponse(const string& method_name, Message* response) {
     if (NULL == rpc_channel_ptr_) {
         return false;
     }
-    return rpc_channel_ptr_->GetAsyncCall(method_name, response);
+    return rpc_channel_ptr_->GetAsyncResponse(method_name, response);
 }
 
 

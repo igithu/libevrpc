@@ -75,7 +75,7 @@ void AsyscCall() {
     rpc_client.RpcCall().Echo(NULL, &echo_request, &echo_response, NULL);
 
     sleep(5);
-    rpc_client.RpcClient::GetAsyncCall("Echo", &echo_response);
+    rpc_client.RpcClient::GetAsyncResponse("Echo", &echo_response);
     echo_response.PrintDebugString();
     string ret = echo_response.response();
     printf("Async call echo recv msg is %s\n", ret.c_str());

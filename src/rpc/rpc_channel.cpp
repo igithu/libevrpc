@@ -28,19 +28,17 @@ using std::string;
 using std::vector;
 
 Channel::Channel(const char* addr, const char* port) :
-    is_channel_async_call_(false), async_threads_ptr_(NULL) {
+    is_channel_async_call_(false) {
     strcpy(addr_ = (char*)malloc(strlen(addr) + 1), addr);
     strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
+
+    call_limit_ = 100;
 
 }
 
 Channel::~Channel() {
     free(addr_);
     free(port_);
-
-    if (NULL != async_threads_ptr_) {
-        delete async_threads_ptr_;
-    }
 
     if (!thread_ids_vec_.empty()) {
         for (int i = 0; i < thread_ids_vec_.size(); ++i) {
@@ -68,6 +66,11 @@ void Channel::CallMethod(const MethodDescriptor* method,
         RpcCommunication(rpc_params_ptr);
         delete rpc_params_ptr;
     }
+}
+
+bool Channel::OpenRpcAsyncMode() {
+    is_channel_async_call_ = true;
+    return true;
 }
 
 bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
@@ -103,28 +106,18 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
     return true;
 }
 
-bool Channel::OpenRpcAsyncMode(bool is_threadpool) {
-    is_threadpool = false; // shutdown the thread pool
-    is_channel_async_call_ = true;
-    if (is_threadpool) {
-        async_threads_ptr_ = new ThreadPool(5);
-        async_threads_ptr_->Start();
-    }
-    return true;
-}
-
 bool Channel::AsyncRpcCall(RpcCallParams* rpc_params_ptr) {
-    if (NULL == async_threads_ptr_) {
-        // Single thread mode
-        AsyncSingleThreadCall(rpc_params_ptr);
-    } else {
-        // Thread pool mode
-        async_threads_ptr_->Processor(Channel::RpcProcessor, rpc_params_ptr);
-    }
+    AsyncSingleThreadCall(rpc_params_ptr);
     return true;
 }
 
 bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
+    {
+        ReadLockGuard rguard(tids_map_rwlock_);
+        if (call_tids_map_.size() >= call_limit_) {
+            return false;
+        }
+    }
     pthread_t tid;
     pthread_create(&tid, NULL, Channel::RpcProcessor, rpc_params_ptr);
     uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
@@ -143,35 +136,7 @@ bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
     return true;
 }
 
-void* Channel::RpcProcessor(void *arg) {
-    if (NULL == arg) {
-        return NULL;
-    }
-    RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
-    Channel* channel_ptr = rpc_params_ptr->p_channel;
-    if (!channel_ptr->RpcCommunication(rpc_params_ptr)) {
-        return NULL;
-    }
-    Message* response_ptr = rpc_params_ptr->p_response->New();
-    pthread_t cur_tid = pthread_self();
-    if (NULL != response_ptr) {
-        MsgHashMap& ret_map = channel_ptr->call_results_map_;
-//         uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
-        WriteLockGuard wguard(channel_ptr->ret_map_rwlock_);
-        MsgHashMap::iterator ret_iter = ret_map.find(cur_tid);
-        // pthread_t cur_tid = pthread_self();
-        if (ret_map.end() == ret_iter) {
-            ret_map.insert(std::make_pair(cur_tid, response_ptr));
-        } else {
-            // if conflict, replace old one
-            delete ret_iter->second;
-            ret_map[cur_tid] = response_ptr;
-        }
-    }
-    delete rpc_params_ptr;
-}
-
-bool Channel::GetAsyncCall(const string& method_name, Message* response) {
+bool Channel::GetAsyncResponse(const string& method_name, Message* response) {
     uint32_t method_code = BKDRHash(method_name.c_str());
     PthreadHashMap::iterator ret_iter;
     pthread_t cur_tid;
@@ -204,12 +169,35 @@ bool Channel::GetAsyncCall(const string& method_name, Message* response) {
     return true;
 }
 
-void Channel::Close() {
+void Channel::SetCallLimit(int32_t limit) {
+    call_limit_ = limit;
 }
 
-
-
-
+void* Channel::RpcProcessor(void *arg) {
+    if (NULL == arg) {
+        return NULL;
+    }
+    RpcCallParams* rpc_params_ptr = (RpcCallParams*) arg;
+    Channel* channel_ptr = rpc_params_ptr->p_channel;
+    if (!channel_ptr->RpcCommunication(rpc_params_ptr)) {
+        return NULL;
+    }
+    Message* response_ptr = rpc_params_ptr->p_response->New();
+    pthread_t cur_tid = pthread_self();
+    if (NULL != response_ptr) {
+        MsgHashMap& ret_map = channel_ptr->call_results_map_;
+        WriteLockGuard wguard(channel_ptr->ret_map_rwlock_);
+        MsgHashMap::iterator ret_iter = ret_map.find(cur_tid);
+        if (ret_map.end() == ret_iter) {
+            ret_map.insert(std::make_pair(cur_tid, response_ptr));
+        } else {
+            // if conflict, replace old one
+            delete ret_iter->second;
+            ret_map[cur_tid] = response_ptr;
+        }
+    }
+    delete rpc_params_ptr;
+}
 
 }  // end of namespace libevrpc
 

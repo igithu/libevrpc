@@ -50,7 +50,6 @@ struct RpcCallParams {
         method_name(method_name), p_request(request), p_response(response), p_channel(const_cast<Channel*>(channel)) {
         }
 
-
     const std::string method_name;
     const Message* p_request;
     Message* p_response;
@@ -69,17 +68,17 @@ class Channel : public RpcChannel {
                                 Message* response,
                                 Closure* done);
 
-        bool OpenRpcAsyncMode(bool is_threadpool = false);
+        bool OpenRpcAsyncMode();
 
         bool RpcCommunication(RpcCallParams* rpc_params);
 
         bool AsyncRpcCall(RpcCallParams* rpc_params_ptr);
 
+        bool GetAsyncResponse(const std::string& method_name, Message* response);
+
+        void SetCallLimit(int32_t limit);
+
         static void* RpcProcessor(void *arg);
-
-        bool GetAsyncCall(const std::string& method_name, Message* response);
-
-        void Close();
 
     private:
         bool AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr);
@@ -89,8 +88,7 @@ class Channel : public RpcChannel {
         char* port_;
         int32_t connect_fd_;
         bool is_channel_async_call_;
-
-        ThreadPool* async_threads_ptr_;
+        int32_t call_limit_;
 
         std::vector<pthread_t> thread_ids_vec_;
         MsgHashMap call_results_map_;

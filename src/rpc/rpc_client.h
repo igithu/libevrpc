@@ -35,7 +35,7 @@ class RpcClient {
 
         bool OpenRpcAsyncMode();
 
-        bool GetAsyncCall(const std::string& method_name, Message* response);
+        bool GetAsyncResponse(const std::string& method_name, Message* response);
 
     protected:
 
@@ -45,9 +45,6 @@ class RpcClient {
 
     private:
         Channel* rpc_channel_ptr_;
-
-
-        bool is_async_;
 
 };
 
