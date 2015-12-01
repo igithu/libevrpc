@@ -40,18 +40,21 @@ using namespace google::protobuf;
 typedef std::list<pthread_t> TidList;
 typedef std::shared_ptr<TidList> TidListPtr;
 typedef std::unordered_map<uint32_t, TidListPtr> PthreadHashMap;
-typedef std::unordered_map<pthread_t, Message*> MsgHashMap;
+typedef std::unordered_map<pthread_t, std::string> MsgHashMap;
 
 
 class Channel;
 
 struct RpcCallParams {
-    RpcCallParams(const string& method_name, const Message* request, Message* response, Channel* channel) :
-        method_name(method_name), p_request(request), p_response(response), p_channel(const_cast<Channel*>(channel)) {
+    RpcCallParams(const string& method_full_name, const string& method_client_name, const Message* request, Message* response, Channel* channel) :
+        method_full_name(method_full_name), method_client_name(method_client_name), p_request(request), p_response(response), p_channel(const_cast<Channel*>(channel)) {
         }
 
-    const std::string method_name;
+    const std::string method_full_name;
+    const std::string method_client_name;
     const Message* p_request;
+
+    std::string response_str;
     Message* p_response;
     Channel* p_channel;
 };
@@ -79,9 +82,6 @@ class Channel : public RpcChannel {
         void SetCallLimit(int32_t limit);
 
         static void* RpcProcessor(void *arg);
-
-    private:
-        bool AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr);
 
     private:
         char* addr_;

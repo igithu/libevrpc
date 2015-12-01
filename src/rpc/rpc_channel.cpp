@@ -59,11 +59,15 @@ void Channel::CallMethod(const MethodDescriptor* method,
         return;
     }
 
-    RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), request, response, this);
+    RpcCallParams* rpc_params_ptr = new RpcCallParams(method->full_name(), method->name(), request, response, this);
     if (is_channel_async_call_) {
         AsyncRpcCall(rpc_params_ptr);
     } else {
         RpcCommunication(rpc_params_ptr);
+        if (!response->ParseFromString(rpc_params_ptr->response_str)) {
+            perror("SerializeToString response error in RpcChannel!");
+            // TODO
+        }
         delete rpc_params_ptr;
     }
 }
@@ -74,8 +78,9 @@ bool Channel::OpenRpcAsyncMode() {
 }
 
 bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
-    const string& method_name = rpc_params->method_name;
+    const string& method_name = rpc_params->method_full_name;
     const Message* request = rpc_params->p_request;
+    string& recv_str = rpc_params->response_str;
     Message* response = rpc_params->p_response;
     if (NULL == response) {
         response->New();
@@ -91,27 +96,15 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
         return false;
     }
 
-    string recv_str;
     int32_t ret_id = RpcRecv(connect_fd_, recv_str, true);
     if (ERROR_RECV == ret_id) {
         perror("Recv data error in rpc channel");
         return false;
     }
-
-    if (!response->ParseFromString(recv_str)) {
-        perror("SerializeToString response error in RpcChannel!");
-        // TODO
-    }
-
     return true;
 }
 
 bool Channel::AsyncRpcCall(RpcCallParams* rpc_params_ptr) {
-    AsyncSingleThreadCall(rpc_params_ptr);
-    return true;
-}
-
-bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
     {
         ReadLockGuard rguard(tids_map_rwlock_);
         if (call_tids_map_.size() >= call_limit_) {
@@ -120,7 +113,7 @@ bool Channel::AsyncSingleThreadCall(RpcCallParams* rpc_params_ptr) {
     }
     pthread_t tid;
     pthread_create(&tid, NULL, Channel::RpcProcessor, rpc_params_ptr);
-    uint32_t hash_code = BKDRHash(rpc_params_ptr->method_name.c_str());
+    uint32_t hash_code = BKDRHash(rpc_params_ptr->method_client_name.c_str());
     {
         WriteLockGuard wguard(tids_map_rwlock_);
         PthreadHashMap::iterator ret_iter = call_tids_map_.find(hash_code);
@@ -144,28 +137,22 @@ bool Channel::GetAsyncResponse(const string& method_name, Message* response) {
         ReadLockGuard rguard(tids_map_rwlock_);
         ret_iter = call_tids_map_.find(method_code);
         if (call_tids_map_.end() == ret_iter || ret_iter->second->size() == 0) {
+            perror("Get the response list failed");
             return false;
         }
         cur_tid = ret_iter->second->front();
         ret_iter->second->pop_front();
     }
     pthread_join(cur_tid, NULL);
-    Message* response_ptr = NULL;
     {
         WriteLockGuard wguard(ret_map_rwlock_);
         MsgHashMap::iterator msg_iter = call_results_map_.find(cur_tid);
         if (call_results_map_.end() == msg_iter) {
             return false;
         }
-        response_ptr = msg_iter->second;
+        response->ParseFromString(msg_iter->second);
         call_results_map_.erase(msg_iter);
     }
-    if (NULL == response_ptr) {
-        return false;
-    }
-    response->CopyFrom(*response_ptr);
-    delete response_ptr;
-
     return true;
 }
 
@@ -182,18 +169,17 @@ void* Channel::RpcProcessor(void *arg) {
     if (!channel_ptr->RpcCommunication(rpc_params_ptr)) {
         return NULL;
     }
-    Message* response_ptr = rpc_params_ptr->p_response->New();
+    string& response_str = rpc_params_ptr->response_str;
     pthread_t cur_tid = pthread_self();
-    if (NULL != response_ptr) {
-        MsgHashMap& ret_map = channel_ptr->call_results_map_;
+    MsgHashMap& ret_map = channel_ptr->call_results_map_;
+    {
         WriteLockGuard wguard(channel_ptr->ret_map_rwlock_);
         MsgHashMap::iterator ret_iter = ret_map.find(cur_tid);
         if (ret_map.end() == ret_iter) {
-            ret_map.insert(std::make_pair(cur_tid, response_ptr));
+            ret_map.insert(std::make_pair(cur_tid, std::move(response_str)));
         } else {
             // if conflict, replace old one
-            delete ret_iter->second;
-            ret_map[cur_tid] = response_ptr;
+            ret_map[cur_tid] = std::move(response_str);
         }
     }
     delete rpc_params_ptr;
