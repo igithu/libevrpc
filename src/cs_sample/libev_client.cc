@@ -29,10 +29,6 @@ class RpcClientImp : public RpcClient {
 
         ~RpcClientImp();
 
-        // void* GenerateServerCall(const RpcChannel* service_call_ptr);
-
-        // bool EchoRpcCallExample(const EchoRequest& req, EchoResponse& resp);
-
         EchoService_Stub& RpcCall();
 
     private:
@@ -83,7 +79,8 @@ void AsyscCall() {
 }
 
 int main() {
-    AsyscCall();
+    SysncCall();
+//    AsyscCall();
     return 0;
 }
 

@@ -46,8 +46,17 @@ typedef std::unordered_map<pthread_t, std::string> MsgHashMap;
 class Channel;
 
 struct RpcCallParams {
-    RpcCallParams(const string& method_full_name, const string& method_client_name, const Message* request, Message* response, Channel* channel) :
-        method_full_name(method_full_name), method_client_name(method_client_name), p_request(request), p_response(response), p_channel(const_cast<Channel*>(channel)) {
+    RpcCallParams(
+            const string& method_full_name,
+            const string& method_client_name,
+            const Message* request,
+            Message* response,
+            Channel* channel) :
+        method_full_name(method_full_name),
+        method_client_name(method_client_name),
+        p_request(request),
+        p_response(response),
+        p_channel(const_cast<Channel*>(channel)) {
         }
 
     const std::string method_full_name;
