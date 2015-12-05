@@ -20,29 +20,29 @@
 
 namespace libevrpc {
 
-volatile ATOMIC_BOOL ThreadPool::running_(true);
+volatile ATOMIC_BOOL LibevThreadPool::running_(true);
 
 
-ThreadPool::ThreadPool() :
+LibevThreadPool::LibevThreadPool() :
    nthread_num_(10),
    max_nthread_num_(50) {
        Initialize();
 }
 
 
-ThreadPool::ThreadPool(int nthread) : 
+LibevThreadPool::LibevThreadPool(int nthread) : 
     nthread_num_(nthread),
     max_nthread_num_(50) {
         Initialize();
 }
 
-ThreadPool::~ThreadPool() {
+LibevThreadPool::~LibevThreadPool() {
     Destroy();
     free(thread_ids_);
     thread_ids_ = NULL;
 }
 
-bool ThreadPool::Initialize() {
+bool LibevThreadPool::Initialize() {
     // init the task list
     thread_ids_ = (pthread_t *) malloc(nthread_num_ * sizeof(pthread_t));
     task_list_.task_head = (Task*) malloc(sizeof(Task));
@@ -54,7 +54,7 @@ bool ThreadPool::Initialize() {
 }
 
 
-bool ThreadPool::Start() {
+bool LibevThreadPool::Start() {
     // start all threads in the pool
     for (int i = 0; i < nthread_num_; ++i) {
         pthread_create(&thread_ids_[i], NULL, WorkerThread, this);
@@ -62,7 +62,7 @@ bool ThreadPool::Start() {
     return true;
 }
 
-bool ThreadPool::Wait() {
+bool LibevThreadPool::Wait() {
     sleep(8);
     if (NULL != thread_ids_) {
         for (int i = 0; i < nthread_num_; ++i) {
@@ -74,7 +74,7 @@ bool ThreadPool::Wait() {
     }
 }
 
-bool ThreadPool::Destroy() {
+bool LibevThreadPool::Destroy() {
     running_ = false;
     ConditionBroadCast(cond_);
 
@@ -93,7 +93,7 @@ bool ThreadPool::Destroy() {
 
 }
 
-bool ThreadPool::Processor(void *(*process) (void *arg), void *arg) {
+bool LibevThreadPool::Processor(void *(*process) (void *arg), void *arg) {
    Task* task_ptr = (Task*)malloc(sizeof(Task)); 
    task_ptr->process = process;
    task_ptr->param = arg;
@@ -113,8 +113,8 @@ bool ThreadPool::Processor(void *(*process) (void *arg), void *arg) {
    return true;
 }
 
-void *ThreadPool::WorkerThread(void *arg) {
-    ThreadPool* pool = reinterpret_cast<ThreadPool*>(arg);
+void *LibevThreadPool::WorkerThread(void *arg) {
+    LibevThreadPool* pool = reinterpret_cast<LibevThreadPool*>(arg);
     TaskList& task_list = pool->task_list_;
     while (running_) {
         Task* task_proc = NULL;

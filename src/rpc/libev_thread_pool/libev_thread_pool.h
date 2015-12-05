@@ -46,14 +46,14 @@ struct TaskList {
 };
 
 
-class ThreadPool {
+class LibevThreadPool {
     public:
         // default ctor
-        ThreadPool();
+        LibevThreadPool();
 
-        ThreadPool(int nthread);
+        LibevThreadPool(int nthread);
 
-        virtual ~ThreadPool();
+        virtual ~LibevThreadPool();
 
         bool Start();
 
