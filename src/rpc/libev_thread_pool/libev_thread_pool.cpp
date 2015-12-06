@@ -113,6 +113,10 @@ bool LibevThreadPool::Processor(void *(*process) (void *arg), void *arg) {
    return true;
 }
 
+bool LibevThreadPool::DispatchRpcCall(void *(*process) (void *arg), void *arg) {
+    return true;
+}
+
 void *LibevThreadPool::WorkerThread(void *arg) {
     LibevThreadPool* pool = reinterpret_cast<LibevThreadPool*>(arg);
     TaskList& task_list = pool->task_list_;

@@ -45,6 +45,21 @@ struct TaskList {
     struct Task *task_head;
 };
 
+typedef struct RequestQueueItem RQ_ITEM;
+struct RequestQueueItem {
+    // callback funtion
+    void *(*process)(void * arg);
+    void *param;
+    struct REQ_ITEM *prev;
+    struct REQ_ITEM *next;
+};
+
+typedef struct RequestQueue RQ;
+typedef struct RequestQueue {
+    RQ_ITEM* head;
+    RQ_ITEM* tail;
+    PUBLIC_UTIL::Mutex q_mutex;
+};
 
 class LibevThreadPool {
     public:
@@ -61,6 +76,8 @@ class LibevThreadPool {
 
         // nonblock call the processor and return shortly
         bool Processor(void *(*process) (void *arg), void *arg);
+
+        bool DispatchRpcCall(void *(*process) (void *arg), void *arg);
 
     private:
         bool Initialize();
