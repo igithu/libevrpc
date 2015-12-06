@@ -45,6 +45,9 @@ struct TaskList {
     struct Task *task_head;
 };
 
+/*
+ * rpc call info item
+ */
 typedef struct RequestQueueItem RQ_ITEM;
 struct RequestQueueItem {
     // callback funtion
@@ -54,12 +57,27 @@ struct RequestQueueItem {
     struct REQ_ITEM *next;
 };
 
+/*
+ * rpc call queue
+ */
 typedef struct RequestQueue RQ;
-typedef struct RequestQueue {
+struct RequestQueue {
     RQ_ITEM* head;
     RQ_ITEM* tail;
     PUBLIC_UTIL::Mutex q_mutex;
 };
+
+/*
+ * thread with libev info
+ */
+typedef struct {
+    pthread_t thread_id;
+    struct ev_loop* epoller_;
+    struct ev_io socket_watcher;
+    int32_t notify_receive_fd;
+    int32_t notify_send_fd;
+    RQ* request_queue;
+} LIBEV_THREAD;
 
 class LibevThreadPool {
     public:
@@ -82,11 +100,19 @@ class LibevThreadPool {
     private:
         bool Initialize();
 
+        RQ_ITEM* RQNew();
+
         static void *WorkerThread(void *arg);
 
         bool Destroy();
 
     private:
+        int32_t current_thread_;
+        int32_t num_threads_;
+
+        LIBEV_THREAD* libev_threads_;
+        CQ*  cq_freelist_
+
         pthread_t *thread_ids_;
 
         int32_t nthread_num_;

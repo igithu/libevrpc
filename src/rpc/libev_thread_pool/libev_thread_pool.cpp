@@ -53,6 +53,9 @@ bool LibevThreadPool::Initialize() {
     return true;
 }
 
+RQ_ITEM* LibevThreadPool::RQNew() {
+    return NULL;
+}
 
 bool LibevThreadPool::Start() {
     // start all threads in the pool
@@ -114,6 +117,13 @@ bool LibevThreadPool::Processor(void *(*process) (void *arg), void *arg) {
 }
 
 bool LibevThreadPool::DispatchRpcCall(void *(*process) (void *arg), void *arg) {
+    RQ_ITEM* rq_item = RQNew();
+    if (NULL == rq_item) {
+        return false;
+    }
+
+    int32_t cur_tid = (current_thread_ + 1) % num_threads_;
+    LIBEV_THREAD* cur_thread = 
     return true;
 }
 
