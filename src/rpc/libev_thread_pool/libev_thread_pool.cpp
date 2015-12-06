@@ -57,6 +57,10 @@ RQ_ITEM* LibevThreadPool::RQNew() {
     return NULL;
 }
 
+bool LibevThreadPool::RQPush(RQ* req_queue, RQ_ITEM* req_item) {
+    return truel
+}
+
 bool LibevThreadPool::Start() {
     // start all threads in the pool
     for (int i = 0; i < nthread_num_; ++i) {
@@ -116,14 +120,34 @@ bool LibevThreadPool::Processor(void *(*process) (void *arg), void *arg) {
    return true;
 }
 
-bool LibevThreadPool::DispatchRpcCall(void *(*process) (void *arg), void *arg) {
+bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) {
+    if (NULL == libev_threads_) {
+        perror("Dispatch rpc call failed! libev_threads ptr is null.");
+        return false;
+    }
     RQ_ITEM* rq_item = RQNew();
     if (NULL == rq_item) {
+        perror("Get request item failed!");
         return false;
     }
 
     int32_t cur_tid = (current_thread_ + 1) % num_threads_;
-    LIBEV_THREAD* cur_thread = 
+    LIBEV_THREAD* cur_thread = libev_threads_ + cur_tid;
+    current_thread_ = cur_tid;
+
+    /*
+     * set req item data
+     */
+    rq_item->processor = rpc_call;
+    rq_item->param = arg;
+    if (!RQPush(cur_thread->request_queue, rq_item)) {
+        return false
+    }
+
+    char buf[1] = {'c'};
+    if (write(cur_thread->notify_send_fd, buf, 1) != 1) {
+        perror("Write to thread notify pipe failed!");
+    }
     return true;
 }
 

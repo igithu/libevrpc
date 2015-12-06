@@ -51,10 +51,10 @@ struct TaskList {
 typedef struct RequestQueueItem RQ_ITEM;
 struct RequestQueueItem {
     // callback funtion
-    void *(*process)(void * arg);
+    void *(*processor)(void * arg);
     void *param;
-    struct REQ_ITEM *prev;
-    struct REQ_ITEM *next;
+    struct RQ_ITEM *prev;
+    struct RQ_ITEM *next;
 };
 
 /*
@@ -101,6 +101,8 @@ class LibevThreadPool {
         bool Initialize();
 
         RQ_ITEM* RQNew();
+
+        bool RQPush(RQ* req_queue, RQ_ITEM* req_item);
 
         static void *WorkerThread(void *arg);
 

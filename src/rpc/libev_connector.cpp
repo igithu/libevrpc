@@ -50,14 +50,18 @@ bool LibevConnector::Initialize(const char *host, const char *port) {
         return false;
     }
 
-    // set callback AcceptCb, Note the function AcceptCb must be static function
+    /*
+     * set callback AcceptCb, Note the function AcceptCb must be static function
+     */
     ev_io_init(&socket_watcher_, LibevConnector::AcceptCb, listenfd, EV_READ);
     ev_io_start(epoller_, &socket_watcher_);
 
     return true;
 }
 
-// start run loop
+/*
+ * start run loop
+ */
 void LibevConnector::LibevLoop() {
     if (NULL == epoller_) {
         perror("The epoller ptr is null!\n");
@@ -69,7 +73,9 @@ void LibevConnector::LibevLoop() {
     }
 }
 
-// accept the new connection
+/*
+ * accept the new connection
+ */
 void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (NULL == loop) {
         perror("Ev loop ptr is null!\n");
@@ -92,7 +98,9 @@ void LibevConnector::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
     ev_io_start(loop, client_eio);
 }
 
-// handle the connection and push the connection fd to thread pool waiting list
+/*
+ * handle the connection and push the connection fd to thread pool waiting list
+ */
 void LibevConnector::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (EV_ERROR & revents) {
         perror("EV_ERROR in AcceptCb callback!\n");

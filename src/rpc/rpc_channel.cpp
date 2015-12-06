@@ -178,7 +178,9 @@ void* Channel::RpcProcessor(void *arg) {
         if (ret_map.end() == ret_iter) {
             ret_map.insert(std::make_pair(cur_tid, std::move(response_str)));
         } else {
-            // if conflict, replace old one
+            /*
+             * if conflict, replace old one
+             */
             ret_map[cur_tid] = std::move(response_str);
         }
     }

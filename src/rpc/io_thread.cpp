@@ -43,7 +43,9 @@ void IOThread::Run() {
     }
 
     libev_connector_ptr->Initialize(addr_, port_);
-    // call loop and block here
+    /*
+     * call loop and block here
+     */
     libev_connector_ptr->LibevLoop();
 }
 
