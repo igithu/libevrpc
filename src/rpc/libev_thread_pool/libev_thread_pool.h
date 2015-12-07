@@ -100,6 +100,8 @@ class LibevThreadPool {
     private:
         bool Initialize();
 
+        bool LibevThreadInitialization();
+
         RQ_ITEM* RQNew();
 
         bool RQPush(RQ* req_queue, RQ_ITEM* req_item);
@@ -114,6 +116,8 @@ class LibevThreadPool {
 
         LIBEV_THREAD* libev_threads_;
         CQ*  cq_freelist_
+
+        PUBLIC_UTIL::Mutex cq_freelist_mutex_;
 
         pthread_t *thread_ids_;
 

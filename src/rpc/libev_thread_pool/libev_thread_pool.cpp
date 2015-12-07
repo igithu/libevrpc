@@ -24,13 +24,14 @@ volatile ATOMIC_BOOL LibevThreadPool::running_(true);
 
 
 LibevThreadPool::LibevThreadPool() :
-   nthread_num_(10),
-   max_nthread_num_(50) {
+    current_thread_(-1),
+    nthread_num_(10),
+    max_nthread_num_(50) {
        Initialize();
 }
 
 
-LibevThreadPool::LibevThreadPool(int nthread) : 
+LibevThreadPool::LibevThreadPool(int nthread) :
     nthread_num_(nthread),
     max_nthread_num_(50) {
         Initialize();
@@ -50,6 +51,31 @@ bool LibevThreadPool::Initialize() {
 
     task_list_.task_head->next = task_list_.task_head;
     task_list_.task_head->prev = task_list_.task_head;
+    return true;
+}
+
+bool LibevThreadInitialization(int num_threads) {
+    num_threads_ = num_threads;
+    libev_threads_ = calloc(num_threads_, sizeof(LIBEV_THREAD));
+
+    cq_freelist_ = NULL;
+
+    if (NULL == libev_threads_) {
+        return false;
+    }
+
+    for (int32_t i = 0; i < num_threads_; ++i) {
+        int32_t fds[2];
+        if (pipe(fds)) {
+            perror("Create notify pipe failed!");
+            exit(1);
+        }
+        libev_threads_[i].notify_receive_fd = fds[0];
+        libev_threads_[i].notify_send_fd = fds[1];
+        // TODO : libev init 
+    }
+
+
     return true;
 }
 
