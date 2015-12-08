@@ -70,11 +70,32 @@ bool LibevThreadInitialization(int num_threads) {
             perror("Create notify pipe failed!");
             exit(1);
         }
-        libev_threads_[i].notify_receive_fd = fds[0];
-        libev_threads_[i].notify_send_fd = fds[1];
-        // TODO : libev init 
-    }
+        /*
+         * start to init the libev info in every thread
+         */
+        LIBEV_THREAD* cur_thread = libev_threads_[i];
+        cur_thread->notify_receive_fd = fds[0];
+        cur_thread->notify_send_fd = fds[1];
 
+        cur_thread->epoller = ev_loop_new(0);
+        if (NULL == cur_thread->epoller) {
+            perror("Ev loop new failed!");
+            exit(-1);
+        }
+        ev_io_init(&cur_thread->libev_watcher, LibevProcessor, cur_thread->notify_receive_fd, EV_READ | EV_PERSIST);
+        ev_io_start(cur_thread->epoller, &cur_thread->libev_watcher);
+
+        cur_thread->new_request_queue = malloc(sizeof(RQ));
+        if (NULL == cur_thread->new_request_queue) {
+            perror("Failed to allocate memory for request queue");
+            exit(-1);
+        }
+        {
+            MutexLockGuard lock(cur_thread->new_request_queue->q_mutex);
+            cur_thread->cur_thread->head = NULL;
+            cur_thread->cur_thread->tail = NULL;
+        }
+    }
 
     return true;
 }

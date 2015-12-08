@@ -72,11 +72,11 @@ struct RequestQueue {
  */
 typedef struct {
     pthread_t thread_id;
-    struct ev_loop* epoller_;
-    struct ev_io socket_watcher;
+    struct ev_loop* epoller;
+    struct ev_io libev_watcher;
     int32_t notify_receive_fd;
     int32_t notify_send_fd;
-    RQ* request_queue;
+    RQ* new_request_queue;
 } LIBEV_THREAD;
 
 class LibevThreadPool {
