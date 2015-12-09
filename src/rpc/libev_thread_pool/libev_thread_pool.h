@@ -1,4 +1,4 @@
-/***************************************************************************
+/***************************************************************************A
  * 
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
  * 
@@ -106,7 +106,11 @@ class LibevThreadPool {
 
         bool RQPush(RQ* req_queue, RQ_ITEM* req_item);
 
+        static RQ_ITEM* RQPop(RQ* req_queue);
+
         static void *WorkerThread(void *arg);
+
+        static void LibevProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents);
 
         bool Destroy();
 

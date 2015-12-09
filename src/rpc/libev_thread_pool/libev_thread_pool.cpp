@@ -108,6 +108,22 @@ bool LibevThreadPool::RQPush(RQ* req_queue, RQ_ITEM* req_item) {
     return truel
 }
 
+
+RQ_ITEM* LibevThreadPool::RQPop(RQ* req_queue) {
+    RQ_ITEM* rq_item = NULL;
+    {
+        MutexLockGuard lock(req_queue->q_mutex);
+        rq_item = request_queue->head;
+        if (NULL != rq_item) {
+            req_queue->head = rq_item->next;
+            if (NULL == req_queue->head) {
+                req_queue->tail = NULL;
+            }
+        }
+    }
+    return rq_item;
+}
+
 bool LibevThreadPool::Start() {
     // start all threads in the pool
     for (int i = 0; i < nthread_num_; ++i) {
@@ -225,6 +241,24 @@ void *LibevThreadPool::WorkerThread(void *arg) {
     }
 
     return NULL;
+}
+
+void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents) {
+    LIBEV_THREAD *me = watcher->data;
+    if (NULL == me) {
+        perror("LIBEV_THREAD data is NULL!");
+        return;
+    }
+
+    char buf[1];
+    if (read(watcher->fd, buf, 1) != 1) {
+        perror("Can't read from libevent pipe!");
+    }
+    switch (buf[0]) {
+        case 'c':
+            RQ_ITEM* item = RQPop(me->new_request_queue);
+            (*(item->process))(item->param);
+    }
 }
 
 
