@@ -70,6 +70,7 @@ struct RequestQueue {
 /*
  * thread with libev info
  */
+class LibevThreadPool;
 typedef struct {
     pthread_t thread_id;
     struct ev_loop* epoller;
@@ -77,6 +78,8 @@ typedef struct {
     int32_t notify_receive_fd;
     int32_t notify_send_fd;
     RQ* new_request_queue;
+    // point to the current ptr
+    LibevThreadPool* lt_pool;
 } LIBEV_THREAD;
 
 class LibevThreadPool {
@@ -111,6 +114,8 @@ class LibevThreadPool {
         static void *WorkerThread(void *arg);
 
         static void LibevProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents);
+
+        static void *LibevWorker(void *arg);
 
         bool Destroy();
 

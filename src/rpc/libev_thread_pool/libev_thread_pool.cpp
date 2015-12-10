@@ -82,7 +82,8 @@ bool LibevThreadInitialization(int num_threads) {
             perror("Ev loop new failed!");
             exit(-1);
         }
-        ev_io_init(&cur_thread->libev_watcher, LibevProcessor, cur_thread->notify_receive_fd, EV_READ | EV_PERSIST);
+        cur_thread->lt_pool = this;
+        ev_io_init(&cur_thread->libev_watcher, LibevThreadPool::LibevProcessor, cur_thread->notify_receive_fd, EV_READ | EV_PERSIST);
         ev_io_start(cur_thread->epoller, &cur_thread->libev_watcher);
 
         cur_thread->new_request_queue = malloc(sizeof(RQ));
@@ -97,15 +98,26 @@ bool LibevThreadInitialization(int num_threads) {
         }
     }
 
+    for (int i = 0; i < num_threads_; ++i) {
+        pthread_create(&(libev_threads_[i]->thread_id), NULL, LibevThreadPool::LibevWorker, libev_threads_[i]);
+    }
+
     return true;
 }
 
+void *LibevThreadPool::LibevWorker(void *arg) {
+    LIBEV_THREAD* me = arg;
+
+    ev_loop(me->epoller, 0);
+}
+
 RQ_ITEM* LibevThreadPool::RQNew() {
+
     return NULL;
 }
 
 bool LibevThreadPool::RQPush(RQ* req_queue, RQ_ITEM* req_item) {
-    return truel
+    return true;
 }
 
 
@@ -190,8 +202,7 @@ bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) 
     }
     RQ_ITEM* rq_item = RQNew();
     if (NULL == rq_item) {
-        perror("Get request item failed!");
-        return false;
+
     }
 
     int32_t cur_tid = (current_thread_ + 1) % num_threads_;
@@ -254,9 +265,10 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
     if (read(watcher->fd, buf, 1) != 1) {
         perror("Can't read from libevent pipe!");
     }
+    LibevThreadPool* lt_pool = me->lt_pool;
     switch (buf[0]) {
         case 'c':
-            RQ_ITEM* item = RQPop(me->new_request_queue);
+            RQ_ITEM* item = lt_pool->RQPop(me->new_request_queue);
             (*(item->process))(item->param);
     }
 }
