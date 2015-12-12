@@ -58,7 +58,7 @@ bool LibevThreadInitialization(int num_threads) {
     num_threads_ = num_threads;
     libev_threads_ = calloc(num_threads_, sizeof(LIBEV_THREAD));
 
-    cq_freelist_ = NULL;
+    rqi_freelist_ = NULL;
 
     if (NULL == libev_threads_) {
         return false;
@@ -111,17 +111,35 @@ void *LibevThreadPool::LibevWorker(void *arg) {
     ev_loop(me->epoller, 0);
 }
 
-RQ_ITEM* LibevThreadPool::RQNew() {
+RQ_ITEM* LibevThreadPool::RQItemNew() {
+    RQ_ITEM *req_item = NULL;
+    {
+        MutexLockGuard lock(rqi_freelist_mutex_);
+        if (NULL != rqi_freelist_) {
+            req_item = rqi_freelist_;
+            rqi_freelist_ = rq_item->next;
+        }
+    }
 
+    if (NULL == rq_item) {
+        rq_item = malloc(sizeof(RQ_ITEM) * item_per_alloc_);
+        if (NULL == rq_item) {
+            perror("Alloc the item mem failed!");
+            return NULL;
+        }
+        for (int i = 0; i < item_per_alloc_; ++i) {
+            rq_item[i - 1].next = &rq_item[i];
+        }
+        {
+            MutexLockGuard lock(rqi_freelist_mutex_);
+            rq_item[item_per_alloc_ - 1].next = rqi_freelist_;
+            rqi_freelist_ = rq_item[1];
+        }
+    }
     return NULL;
 }
 
-bool LibevThreadPool::RQPush(RQ* req_queue, RQ_ITEM* req_item) {
-    return true;
-}
-
-
-RQ_ITEM* LibevThreadPool::RQPop(RQ* req_queue) {
+RQ_ITEM* LibevThreadPool::RQItemPop(RQ* req_queue) {
     RQ_ITEM* rq_item = NULL;
     {
         MutexLockGuard lock(req_queue->q_mutex);
@@ -134,6 +152,27 @@ RQ_ITEM* LibevThreadPool::RQPop(RQ* req_queue) {
         }
     }
     return rq_item;
+}
+
+bool LibevThreadPool::RQItemPush(RQ* req_queue, RQ_ITEM* req_item) {
+    rq_item->next = NULL;
+    {
+        MutexLockGuard lock(req_queue->q_mutex);
+        if (NULL == req_queue->tail) {
+            req_queue->head = rq_item;
+        } else {
+            req_queue->tail->next = rq_item;
+        }
+        req_queue->tail = rq_item;
+    }
+    return true;
+}
+
+bool LibevThreadPool::RQItemFree(RQ_ITEM* req_item) {
+    MutexLockGuard lock(rqi_freelist_mutex_);
+    req_item->next = rqi_freelist_;
+    rqi_freelist_ = req_item;
+    return true;
 }
 
 bool LibevThreadPool::Start() {
@@ -200,7 +239,8 @@ bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) 
         perror("Dispatch rpc call failed! libev_threads ptr is null.");
         return false;
     }
-    RQ_ITEM* rq_item = RQNew();
+
+    RQ_ITEM* rq_item = RQItemNew();
     if (NULL == rq_item) {
 
     }
@@ -268,7 +308,7 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
     LibevThreadPool* lt_pool = me->lt_pool;
     switch (buf[0]) {
         case 'c':
-            RQ_ITEM* item = lt_pool->RQPop(me->new_request_queue);
+            RQ_ITEM* item = lt_pool->RQItemPop(me->new_request_queue);
             (*(item->process))(item->param);
     }
 }

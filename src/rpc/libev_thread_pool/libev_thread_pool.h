@@ -105,11 +105,13 @@ class LibevThreadPool {
 
         bool LibevThreadInitialization();
 
-        RQ_ITEM* RQNew();
+        RQ_ITEM* RQItemNew();
 
-        bool RQPush(RQ* req_queue, RQ_ITEM* req_item);
+        RQ_ITEM* RQItemPop(RQ* req_queue);
 
-        static RQ_ITEM* RQPop(RQ* req_queue);
+        bool RQItemPush(RQ* req_queue, RQ_ITEM* req_item);
+
+        bool RQItemFree(RQ_ITEM* req_item);
 
         static void *WorkerThread(void *arg);
 
@@ -124,9 +126,13 @@ class LibevThreadPool {
         int32_t num_threads_;
 
         LIBEV_THREAD* libev_threads_;
-        CQ*  cq_freelist_
+        RQ_ITEM*  rqi_freelist_
 
-        PUBLIC_UTIL::Mutex cq_freelist_mutex_;
+        PUBLIC_UTIL::Mutex rqi_freelist_mutex_;
+
+        static const int32_t item_per_alloc_;
+
+        /----------------------------
 
         pthread_t *thread_ids_;
 
