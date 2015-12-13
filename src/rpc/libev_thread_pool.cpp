@@ -14,23 +14,26 @@
  *  
  **/
 
-#include "thread_pool.h"
+#include "libev_thread_pool.h"
 
-#include "pthread_mutex.h"
+#include<stdlib.h>
 
 namespace libevrpc {
+
+using namespace PUBLIC_UTIL;
 
 int32_t LibevThreadPool::item_per_alloc_ = 64;
 
 LibevThreadPool::LibevThreadPool() :
-    current_thread_(-1) {
+    current_thread_(-1),
+    num_threads_(10) {
 }
 
 LibevThreadPool::~LibevThreadPool() {
     Destroy();
 }
 
-bool LibevThreadInitialization(int num_threads) {
+bool LibevThreadPool::LibevThreadInitialization(int num_threads) {
     num_threads_ = num_threads;
     libev_threads_ = calloc(num_threads_, sizeof(LIBEV_THREAD));
 
@@ -49,7 +52,7 @@ bool LibevThreadInitialization(int num_threads) {
         /*
          * start to init the libev info in every thread
          */
-        LIBEV_THREAD* cur_thread = libev_threads_[i];
+        LIBEV_THREAD* cur_thread = &libev_threads_[i];
         cur_thread->notify_receive_fd = fds[0];
         cur_thread->notify_send_fd = fds[1];
 
@@ -59,7 +62,11 @@ bool LibevThreadInitialization(int num_threads) {
             exit(-1);
         }
         cur_thread->lt_pool = this;
-        ev_io_init(&cur_thread->libev_watcher, LibevThreadPool::LibevProcessor, cur_thread->notify_receive_fd, EV_READ | EV_PERSIST);
+        ev_io_init(
+                &cur_thread->libev_watcher,
+                LibevThreadPool::LibevProcessor,
+                cur_thread->notify_receive_fd,
+                EV_READ | EV_PERSIST);
         ev_io_start(cur_thread->epoller, &cur_thread->libev_watcher);
 
         cur_thread->new_request_queue = malloc(sizeof(RQ));
@@ -152,7 +159,7 @@ bool LibevThreadPool::RQItemFree(RQ_ITEM* req_item) {
 }
 
 bool LibevThreadPool::Start() {
-    // start all threads in the pool
+    LibevThreadInitialization(20);
     return true;
 }
 

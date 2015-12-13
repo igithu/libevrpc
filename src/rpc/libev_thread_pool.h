@@ -24,13 +24,13 @@
 //#include <pthread.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdint.h>
 
-#include "atomic.h"
-#include "pthread_cond.h"
+#include <ev.h>
+
+#include "pthread_mutex.h"
 
 namespace libevrpc {
-
-using namespace PUBLIC_UTIL;
 
 /*
  * rpc call info item
@@ -40,8 +40,8 @@ struct RequestQueueItem {
     // callback funtion
     void *(*processor)(void * arg);
     void *param;
-    struct RQ_ITEM *prev;
-    struct RQ_ITEM *next;
+    RQ_ITEM *prev;
+    RQ_ITEM *next;
 };
 
 /*
@@ -84,7 +84,7 @@ class LibevThreadPool {
         bool DispatchRpcCall(void *(*process) (void *arg), void *arg);
 
     private:
-        bool LibevThreadInitialization();
+        bool LibevThreadInitialization(int num_threads);
 
         /*
          * request itesm op
@@ -110,11 +110,11 @@ class LibevThreadPool {
         int32_t num_threads_;
 
         LIBEV_THREAD* libev_threads_;
-        RQ_ITEM*  rqi_freelist_
+        RQ_ITEM*  rqi_freelist_;
 
         PUBLIC_UTIL::Mutex rqi_freelist_mutex_;
 
-        static const int32_t item_per_alloc_;
+        static int32_t item_per_alloc_;
 };
 
 
