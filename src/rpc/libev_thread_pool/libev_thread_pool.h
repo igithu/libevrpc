@@ -32,19 +32,6 @@ namespace libevrpc {
 
 using namespace PUBLIC_UTIL;
 
-struct Task {
-    // callback funtion
-    void *(*process)(void * arg);
-    void *param;
-    struct Task *prev;
-    struct Task *next;
-};
-
-struct TaskList {
-    int32_t task_num;
-    struct Task *task_head;
-};
-
 /*
  * rpc call info item
  */
@@ -78,16 +65,12 @@ typedef struct {
     int32_t notify_receive_fd;
     int32_t notify_send_fd;
     RQ* new_request_queue;
-    // point to the current ptr
     LibevThreadPool* lt_pool;
 } LIBEV_THREAD;
 
 class LibevThreadPool {
     public:
-        // default ctor
         LibevThreadPool();
-
-        LibevThreadPool(int nthread);
 
         virtual ~LibevThreadPool();
 
@@ -95,33 +78,34 @@ class LibevThreadPool {
 
         bool Wait();
 
-        // nonblock call the processor and return shortly
-        bool Processor(void *(*process) (void *arg), void *arg);
-
+        /*
+         * nonblock call the processor and return shortly
+         */
         bool DispatchRpcCall(void *(*process) (void *arg), void *arg);
 
     private:
-        bool Initialize();
-
         bool LibevThreadInitialization();
 
+        /*
+         * request itesm op
+         */
         RQ_ITEM* RQItemNew();
-
         RQ_ITEM* RQItemPop(RQ* req_queue);
-
         bool RQItemPush(RQ* req_queue, RQ_ITEM* req_item);
-
         bool RQItemFree(RQ_ITEM* req_item);
 
-        static void *WorkerThread(void *arg);
-
+        /*
+         * static fuction
+         */
         static void LibevProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents);
-
         static void *LibevWorker(void *arg);
 
         bool Destroy();
 
     private:
+        /*
+         * threads
+         */
         int32_t current_thread_;
         int32_t num_threads_;
 
@@ -131,18 +115,6 @@ class LibevThreadPool {
         PUBLIC_UTIL::Mutex rqi_freelist_mutex_;
 
         static const int32_t item_per_alloc_;
-
-        /----------------------------
-
-        pthread_t *thread_ids_;
-
-        int32_t nthread_num_;
-        int32_t max_nthread_num_;
-        static volatile ATOMIC_BOOL running_;
-
-        PUBLIC_UTIL::Mutex task_mutex_;
-        Condition cond_;
-        TaskList task_list_;
 };
 
 
