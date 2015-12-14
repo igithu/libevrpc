@@ -14,7 +14,9 @@
  *
  **/
 
-#include <../libev_thread_pool.h>
+#include "../libev_thread_pool.h"
+
+using namespace libevrpc;
 
 int main() {
     LibevThreadPool ltp;
