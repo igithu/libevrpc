@@ -16,13 +16,14 @@
 
 #include "libev_thread_pool.h"
 
-#include<stdlib.h>
+#include <stdlib.h>
 
 namespace libevrpc {
 
 using namespace PUBLIC_UTIL;
 
 int32_t LibevThreadPool::item_per_alloc_ = 64;
+// atomic_bool LibevThreadPool::running_ = true;
 
 LibevThreadPool::LibevThreadPool() :
     current_thread_(-1),
@@ -92,7 +93,10 @@ bool LibevThreadPool::LibevThreadInitialization(int num_threads) {
 void *LibevThreadPool::LibevWorker(void *arg) {
     LIBEV_THREAD* me = (LIBEV_THREAD*)arg;
 
-    ev_loop(me->epoller, 0);
+    ev_run(me->epoller, 0);
+//    while(running_) {
+//        ev_loop(me->epoller, 0);
+//    }
 }
 
 RQ_ITEM* LibevThreadPool::RQItemNew() {
@@ -165,9 +169,19 @@ bool LibevThreadPool::Start() {
 }
 
 bool LibevThreadPool::Wait() {
+    for (int32_t i = 0; i < num_threads_; ++i) {
+        pthread_t tid = (libev_threads_ + i)->thread_id;
+        pthread_join(tid, 0);
+    }
 }
 
 bool LibevThreadPool::Destroy() {
+    for (int32_t i = 0; i < num_threads_; ++i) {
+        LIBEV_THREAD* lt = libev_threads_ + i;
+        ev_io_stop(lt->epoller, &(lt->libev_watcher));
+        ev_break (lt->epoller, EVBREAK_ALL);
+        ev_loop_destroy(lt->epoller);
+    }
     Wait();
     return true;
 
@@ -181,7 +195,7 @@ bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) 
 
     RQ_ITEM* rq_item = RQItemNew();
     if (NULL == rq_item) {
-
+        return false;
     }
 
     int32_t cur_tid = (current_thread_ + 1) % num_threads_;

@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
+// #include <atomic.h>
 
 #include <ev.h>
 
@@ -115,6 +116,7 @@ class LibevThreadPool {
         PUBLIC_UTIL::Mutex rqi_freelist_mutex_;
 
         static int32_t item_per_alloc_;
+        //static atomic_bool running_;
 };
 
 
