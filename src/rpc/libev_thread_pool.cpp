@@ -27,7 +27,9 @@ int32_t LibevThreadPool::item_per_alloc_ = 64;
 
 LibevThreadPool::LibevThreadPool() :
     current_thread_(-1),
-    num_threads_(10) {
+    num_threads_(10),
+    libev_threads_(NULL),
+    rqi_freelist_(NULL) {
 }
 
 LibevThreadPool::~LibevThreadPool() {
