@@ -14,13 +14,31 @@
  *
  **/
 
+#include <string>
+
 #include "../libev_thread_pool.h"
 
 using namespace libevrpc;
+using std::string;
+
+typedef struct {
+    string cc;
+} TS;
+
+void* RpcCallTest(void *arg) {
+    TS* ts = (TS*)arg;
+    if (NULL != ts) {
+        printf("Test ts %s\n", ts->cc.c_str());
+    }
+}
 
 int main() {
     LibevThreadPool ltp;
     ltp.Start();
+    TS ts;
+    ts.cc = "call 1";
+    ltp.DispatchRpcCall(RpcCallTest, &ts);
+    sleep(6);
 
     return 0;
 }

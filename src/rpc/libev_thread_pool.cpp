@@ -65,11 +65,12 @@ bool LibevThreadPool::LibevThreadInitialization(int num_threads) {
             exit(-1);
         }
         cur_thread->lt_pool = this;
+        cur_thread->libev_watcher.data = cur_thread;
         ev_io_init(
                 &cur_thread->libev_watcher,
                 LibevThreadPool::LibevProcessor,
                 cur_thread->notify_receive_fd,
-                EV_READ);
+                EV_READ | EV_WRITE);
         ev_io_start(cur_thread->epoller, &cur_thread->libev_watcher);
 
         cur_thread->new_request_queue = (RQ*)malloc(sizeof(RQ));
@@ -77,11 +78,8 @@ bool LibevThreadPool::LibevThreadInitialization(int num_threads) {
             perror("Failed to allocate memory for request queue");
             exit(-1);
         }
-        {
-            MutexLockGuard lock(cur_thread->new_request_queue->q_mutex);
-            cur_thread->new_request_queue->head = NULL;
-            cur_thread->new_request_queue->tail = NULL;
-        }
+        cur_thread->new_request_queue->head = NULL;
+        cur_thread->new_request_queue->tail = NULL;
     }
 
     for (int i = 0; i < num_threads_; ++i) {
@@ -126,7 +124,7 @@ RQ_ITEM* LibevThreadPool::RQItemNew() {
             rqi_freelist_ = &rq_item[1];
         }
     }
-    return NULL;
+    return rq_item;
 }
 
 RQ_ITEM* LibevThreadPool::RQItemPop(RQ* req_queue) {
@@ -166,7 +164,7 @@ bool LibevThreadPool::RQItemFree(RQ_ITEM* rq_item) {
 }
 
 bool LibevThreadPool::Start() {
-    LibevThreadInitialization(20);
+    LibevThreadInitialization(1);
     return true;
 }
 
@@ -197,6 +195,7 @@ bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) 
 
     RQ_ITEM* rq_item = RQItemNew();
     if (NULL == rq_item) {
+        perror("New RQ Item failed!");
         return false;
     }
 
@@ -210,6 +209,7 @@ bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) 
     rq_item->processor = rpc_call;
     rq_item->param = arg;
     if (!RQItemPush(cur_thread->new_request_queue, rq_item)) {
+        perror("Push RQ Item failed!");
         return false;
     }
 
@@ -224,6 +224,7 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
     LIBEV_THREAD *me = (LIBEV_THREAD*)(watcher->data);
     if (NULL == me) {
         perror("LIBEV_THREAD data is NULL!");
+        exit(-1);
         return;
     }
 
