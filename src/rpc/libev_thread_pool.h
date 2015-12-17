@@ -48,11 +48,13 @@ struct RequestQueueItem {
 /*
  * rpc call queue
  */
-typedef struct RequestQueue RQ;
-struct RequestQueue {
-    RQ_ITEM* head;
-    RQ_ITEM* tail;
-    PUBLIC_UTIL::Mutex q_mutex;
+class RequestQueue;
+typedef RequestQueue RQ;
+class RequestQueue {
+    public:
+        RQ_ITEM* head;
+        RQ_ITEM* tail;
+        PUBLIC_UTIL::Mutex q_mutex;
 };
 
 /*

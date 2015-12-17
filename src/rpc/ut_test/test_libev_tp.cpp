@@ -38,7 +38,7 @@ int main() {
     TS ts;
     ts.cc = "call 1";
     ltp.DispatchRpcCall(RpcCallTest, &ts);
-    sleep(6);
+    sleep(2);
 
     return 0;
 }

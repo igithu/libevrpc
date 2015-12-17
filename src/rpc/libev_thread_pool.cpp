@@ -73,7 +73,7 @@ bool LibevThreadPool::LibevThreadInitialization(int num_threads) {
                 EV_READ | EV_WRITE);
         ev_io_start(cur_thread->epoller, &cur_thread->libev_watcher);
 
-        cur_thread->new_request_queue = (RQ*)malloc(sizeof(RQ));
+        cur_thread->new_request_queue = new RQ();;
         if (NULL == cur_thread->new_request_queue) {
             perror("Failed to allocate memory for request queue");
             exit(-1);
@@ -181,6 +181,12 @@ bool LibevThreadPool::Destroy() {
         ev_io_stop(lt->epoller, &(lt->libev_watcher));
         ev_break (lt->epoller, EVBREAK_ALL);
         ev_loop_destroy(lt->epoller);
+        delete lt->new_request_queue;
+    }
+    for (RQ_ITEM* cur_rqi = rqi_freelist_; cur_rqi != NULL;) {
+        RQ_ITEM* next_rqi = cur_rqi->next;
+        free(cur_rqi);
+        cur_rqi = next_rqi;
     }
     Wait();
     return true;
@@ -237,6 +243,8 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
         case 'c':
             RQ_ITEM* item = lt_pool->RQItemPop(me->new_request_queue);
             (*(item->processor))(item->param);
+            lt_pool->RQItemFree(item);
+            break;
     }
 }
 
