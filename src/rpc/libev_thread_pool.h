@@ -87,7 +87,7 @@ class LibevThreadPool {
         bool DispatchRpcCall(void *(*process) (void *arg), void *arg);
 
     private:
-        bool LibevThreadInitialization(int num_threads);
+        bool LibevThreadInitialization(int32_t num_threads);
 
         /*
          * request itesm op

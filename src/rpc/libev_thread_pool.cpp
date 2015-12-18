@@ -36,7 +36,7 @@ LibevThreadPool::~LibevThreadPool() {
     Destroy();
 }
 
-bool LibevThreadPool::LibevThreadInitialization(int num_threads) {
+bool LibevThreadPool::LibevThreadInitialization(int32_t num_threads) {
     num_threads_ = num_threads;
     libev_threads_ = (LIBEV_THREAD*)calloc(num_threads_, sizeof(LIBEV_THREAD));
 
@@ -94,9 +94,7 @@ void *LibevThreadPool::LibevWorker(void *arg) {
     LIBEV_THREAD* me = (LIBEV_THREAD*)arg;
 
     ev_run(me->epoller, 0);
-//    while(running_) {
-//        ev_loop(me->epoller, 0);
-//    }
+    ev_loop_destroy(me->epoller);
 }
 
 RQ_ITEM* LibevThreadPool::RQItemNew() {
@@ -164,7 +162,7 @@ bool LibevThreadPool::RQItemFree(RQ_ITEM* rq_item) {
 }
 
 bool LibevThreadPool::Start() {
-    LibevThreadInitialization(1);
+    LibevThreadInitialization(3);
     return true;
 }
 
@@ -176,19 +174,28 @@ bool LibevThreadPool::Wait() {
 }
 
 bool LibevThreadPool::Destroy() {
+    /*
+     * notify all thread exit
+     */
+    char buf[1] = {'q'};
+    for (int32_t i = 0; i < num_threads_; ++i) {
+        if (write((libev_threads_ + i)->notify_send_fd, buf, 1) != 1) {
+            perror("Destroy, Write to thread notify pipe failed!");
+        }
+    }
+    /*
+     * release all ptr
+     */
+    Wait();
     for (int32_t i = 0; i < num_threads_; ++i) {
         LIBEV_THREAD* lt = libev_threads_ + i;
-        ev_io_stop(lt->epoller, &(lt->libev_watcher));
-        ev_break (lt->epoller, EVBREAK_ALL);
-        ev_loop_destroy(lt->epoller);
         delete lt->new_request_queue;
     }
-    for (RQ_ITEM* cur_rqi = rqi_freelist_; cur_rqi != NULL;) {
+    for (RQ_ITEM* cur_rqi = rqi_freelist_; cur_rqi != rqi_freelist_;) {
         RQ_ITEM* next_rqi = cur_rqi->next;
         free(cur_rqi);
         cur_rqi = next_rqi;
     }
-    Wait();
     return true;
 
 }
@@ -238,13 +245,19 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
     if (read(watcher->fd, buf, 1) != 1) {
         perror("Can't read from libevent pipe!");
     }
-    LibevThreadPool* lt_pool = me->lt_pool;
+    LibevThreadPool* ltp = me->lt_pool;
     switch (buf[0]) {
-        case 'c':
-            RQ_ITEM* item = lt_pool->RQItemPop(me->new_request_queue);
+        case 'c': {
+            RQ_ITEM* item = ltp->RQItemPop(me->new_request_queue);
             (*(item->processor))(item->param);
-            lt_pool->RQItemFree(item);
+            ltp->RQItemFree(item);
             break;
+        }
+        case 'q': {
+            ev_io_stop(me->epoller, &(me->libev_watcher));
+            ev_break (me->epoller, EVBREAK_ALL);
+            break;
+        }
     }
 }
 

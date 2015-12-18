@@ -38,7 +38,18 @@ int main() {
     TS ts;
     ts.cc = "call 1";
     ltp.DispatchRpcCall(RpcCallTest, &ts);
-    sleep(2);
+
+    TS ts2;
+    ts2.cc = "call ****2";
+    ltp.DispatchRpcCall(RpcCallTest, &ts2);
+
+    TS ts3;
+    ts3.cc = "call ****3";
+    ltp.DispatchRpcCall(RpcCallTest, &ts3);
+
+    TS ts4;
+    ts4.cc = "call ****4";
+    ltp.DispatchRpcCall(RpcCallTest, &ts4);
 
     return 0;
 }
