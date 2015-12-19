@@ -3,14 +3,14 @@ AUTOMAKE_OPTIONS=foreign subdir-objects
 top_dir = ${top_srcdir}/..
 rpc_rootdir = ${top_srcdir}/src/rpc
 third_dir = ${top_dir}/third-64
-pub_dir = ${top_dir}/pub_util
+#pub_dir = ${top_dir}/pub_util
 
 AM_CPPFLAGS = -I${third_dir}/gperftools/include/ \
 			  -I${third_dir}/protobuf/include/ \
 			  -I${third_dir}/libev/include/ \
 			  -I${third_dir}/boost/include/ \
-			  -I${third_dir}/glog/include/ \
-			  -I${pub_dir}
+			  -I${third_dir}/glog/include/
+# -I${pub_dir}
 
 #AM_LDFLAGS = -lz -lrt
 AM_LDFLAGS = -lz -lstdc++
@@ -27,14 +27,18 @@ RPC_SRC = ${rpc_rootdir}/rpc_server.h \
 		  ${rpc_rootdir}/libev_connector.cpp \
 		  ${rpc_rootdir}/io_thread.h \
 		  ${rpc_rootdir}/io_thread.cpp \
-		  ${rpc_rootdir}/thread_pool.h \
-		  ${rpc_rootdir}/thread_pool.cpp \
+		  ${rpc_rootdir}/libev_thread_pool.h \
+		  ${rpc_rootdir}/libev_thread_pool.cpp \
 		  ${rpc_rootdir}/rpc_client.h \
 		  ${rpc_rootdir}/rpc_client.cpp \
 		  ${rpc_rootdir}/rpc_channel.h \
 		  ${rpc_rootdir}/rpc_channel.cpp \
 		  ${rpc_rootdir}/rpc_util.h \
 		  ${rpc_rootdir}/rpc_util.cpp \
+		  ${rpc_rootdir}/thread.h \
+		  ${rpc_rootdir}/pthread_mutex.h \
+		  ${rpc_rootdir}/pthread_rwlock.h \
+		  ${rpc_rootdir}/disallow_copy_and_assign.h \
 		  ${rpc_rootdir}/rpc_communication.h \
 		  ${rpc_rootdir}/rpc_communication.cpp
 

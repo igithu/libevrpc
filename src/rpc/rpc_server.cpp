@@ -119,20 +119,20 @@ bool RpcServer::Start(const char* addr,
 
     libev_connector_ptr_ = new LibevConnector();
     io_thread_ptr_ = new IOThread(addr, port);
-    worker_threads_ptr_ = new ThreadPool(thread_num);
+    worker_threads_ptr_ = new LibevThreadPool;
 
     io_thread_ptr_->Start();
-    worker_threads_ptr_->Start();
+    worker_threads_ptr_->Start(20);
 
     // if start readerpool or writerpool
     if (0 != reader_num) {
-        reader_threads_ptr_ = new ThreadPool(reader_num);
-        reader_threads_ptr_->Start();
+        reader_threads_ptr_ = new LibevThreadPool();
+        reader_threads_ptr_->Start(reader_num);
     }
 
     if (0 != writer_num) {
-        writer_threads_ptr_ = new ThreadPool(writer_num);
-        writer_threads_ptr_->Start();
+        writer_threads_ptr_ = new LibevThreadPool();
+        writer_threads_ptr_->Start(writer_num);
     }
 }
 
@@ -175,9 +175,9 @@ bool RpcServer::RpcCall(int32_t event_fd) {
     // push the task to thread pool
 
     if (NULL != reader_threads_ptr_) {
-        reader_threads_ptr_->Processor(RpcServer::RpcReader, cb_params_ptr);
+        reader_threads_ptr_->DispatchRpcCall(RpcServer::RpcReader, cb_params_ptr);
     } else {
-        worker_threads_ptr_->Processor(RpcServer::RpcProcessor, cb_params_ptr);
+        worker_threads_ptr_->DispatchRpcCall(RpcServer::RpcProcessor, cb_params_ptr);
     }
     return true;
 }
@@ -260,7 +260,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     } else {
         /*The writer pool is started, push the task to writer pool */
         cb_params_ptr->response_ptr = response;
-        rpc_serv_ptr->writer_threads_ptr_->Processor(
+        rpc_serv_ptr->writer_threads_ptr_->DispatchRpcCall(
             RpcServer::RpcWriter, cb_params_ptr);
     }
 
@@ -282,7 +282,7 @@ void* RpcServer::RpcReader(void *arg) {
     cb_params_ptr->call_id = RpcRecv(event_fd, cb_params_ptr->recv_info, false);
 
     // push the task into processor
-    rpc_serv_ptr->worker_threads_ptr_->Processor(
+    rpc_serv_ptr->worker_threads_ptr_->DispatchRpcCall(
             RpcServer::RpcProcessor, cb_params_ptr);
 }
 

@@ -24,6 +24,7 @@
 
 namespace libevrpc {
 
+using namespace PUBLIC_UTIL;
 using std::string;
 using std::vector;
 

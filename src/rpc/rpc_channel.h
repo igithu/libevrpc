@@ -31,7 +31,6 @@
 #include <google/protobuf/message.h>
 
 #include "pthread_rwlock.h"
-#include "thread_pool.h"
 
 namespace libevrpc {
 

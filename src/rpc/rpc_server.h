@@ -28,7 +28,7 @@
 #include "libev_connector.h"
 #include "pthread_mutex.h"
 #include "io_thread.h"
-#include "thread_pool.h"
+#include "libev_thread_pool.h"
 
 
 namespace libevrpc {
@@ -104,11 +104,11 @@ class RpcServer {
 
         IOThread* io_thread_ptr_;
 
-        ThreadPool* worker_threads_ptr_;
+        LibevThreadPool* worker_threads_ptr_;
 
-        ThreadPool* reader_threads_ptr_;
+        LibevThreadPool* reader_threads_ptr_;
 
-        ThreadPool* writer_threads_ptr_;
+        LibevThreadPool* writer_threads_ptr_;
 
         struct CallBackParams {
             CallBackParams() :

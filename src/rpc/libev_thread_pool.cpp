@@ -161,9 +161,8 @@ bool LibevThreadPool::RQItemFree(RQ_ITEM* rq_item) {
     return true;
 }
 
-bool LibevThreadPool::Start() {
-    LibevThreadInitialization(3);
-    return true;
+bool LibevThreadPool::Start(int32_t num_threads) {
+    return LibevThreadInitialization(num_threads);
 }
 
 bool LibevThreadPool::Wait() {

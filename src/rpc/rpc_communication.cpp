@@ -215,9 +215,9 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen, bool non_block) 
         return -1;
     }
 
-    if (non_block) {
-        SetNonBlock(new_fd);
-    }
+ //   if (non_block) {
+ //       SetNonBlock(new_fd);
+ //   }
     return new_fd;
 }
 
@@ -229,8 +229,10 @@ int32_t RpcRecv(int32_t fd, std::string& recv_info_str, bool need_closed) {
     do {
         memset(recv_buf, 0, sizeof(recv_buf));
         int32_t buf_len = recv(fd, recv_buf, MetaSize, 0);
-        if (buf_len < 0) {
-            perror("Call RpcRecv error!\n");
+        if (-1 == buf_len && EAGAIN != errno) {
+            continue;
+        } else if (buf_len < 0) {
+            fprintf(stderr, "Call RpcSend func error!, buf len is %d, errno id %s.\n", buf_len, strerror(errno));
             transfer_id = ERROR_RECV;
             break;
         } else if (0 == buf_len) {
