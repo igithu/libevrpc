@@ -7,9 +7,7 @@ third_dir = ${top_dir}/third-64
 
 AM_CPPFLAGS = -I${third_dir}/gperftools/include/ \
 			  -I${third_dir}/protobuf/include/ \
-			  -I${third_dir}/libev/include/ \
-			  -I${third_dir}/boost/include/ \
-			  -I${third_dir}/glog/include/
+			  -I${third_dir}/libev/include/
 # -I${pub_dir}
 
 #AM_LDFLAGS = -lz -lrt
@@ -17,9 +15,7 @@ AM_LDFLAGS = -lz -lstdc++
 
 LDADD = ${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
 		${third_dir}/protobuf/lib/*.a \
-		${third_dir}/libev/lib/*.a \
-		${third_dir}/boost/lib/*.a \
-		${third_dir}/glog/lib/*.a
+		${third_dir}/libev/lib/*.a
 
 RPC_SRC = ${rpc_rootdir}/rpc_server.h \
 		  ${rpc_rootdir}/rpc_server.cpp \
