@@ -68,9 +68,9 @@ void LibevConnector::LibevLoop() {
         return;
     }
 
-    while (true) {
-        ev_loop(epoller_, 0);
-    }
+    ev_run(epoller_, 0);
+    ev_loop_destroy(epoller_);
+    epoller_ = NULL;
 }
 
 /*
