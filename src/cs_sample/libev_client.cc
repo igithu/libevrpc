@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 #include "proto/rpc_sample.pb.h"
-#include "rpc/rpc_client.h"
+#include "rpc_client/rpc_client.h"
 
 using namespace libevrpc;
 using namespace google::protobuf;

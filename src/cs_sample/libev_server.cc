@@ -17,7 +17,7 @@
 
 
 #include "proto/rpc_sample.pb.h"
-#include "rpc/rpc_server.h"
+#include "rpc_server/rpc_server.h"
 
 using namespace libevrpc;
 using namespace echo;

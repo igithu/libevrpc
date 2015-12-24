@@ -30,6 +30,6 @@ RPC_SRC = ${client_rootdir}/rpc_client.h \
 
 noinst_LIBRARIES = librpc_client.a
 
-librpc_a_SOURCES = ${RPC_SRC}
+librpc_client_a_SOURCES = ${RPC_SRC}
 
 #SUBDIRS = test

@@ -15,8 +15,8 @@ AM_CPPFLAGS = -I${top_srcdir}/src \
 AM_LDFLAGS = -lpthread -lz -lm
 
 
-LDADD = $(top_builddir)/src/rpc/librpc_client.a \
-		$(top_builddir)/src/rpc/librpc_server.a \
+LDADD = $(top_builddir)/src/rpc_client/librpc_client.a \
+		$(top_builddir)/src/rpc_server/librpc_server.a \
 		$(top_builddir)/src/cs_sample/proto/libproto.a \
 		${third_dir}/protobuf/lib/*.a \
 		${third_dir}/libev/lib/*.a

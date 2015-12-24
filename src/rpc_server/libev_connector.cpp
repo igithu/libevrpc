@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "rpc_communication.h"
+#include "util/rpc_communication.h"
 #include "rpc_server.h"
 
 namespace libevrpc {

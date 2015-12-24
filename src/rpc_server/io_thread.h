@@ -20,7 +20,7 @@
 #ifndef  __IO_THREAD_H_
 #define  __IO_THREAD_H_
 
-#include "thread.h"
+#include "util/thread.h"
 
 namespace libevrpc {
 

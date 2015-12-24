@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "rpc_util.h"
-#include "rpc_communication.h"
+#include "util/rpc_util.h"
+#include "util/rpc_communication.h"
 
 namespace libevrpc {
 

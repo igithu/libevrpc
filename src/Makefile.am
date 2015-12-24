@@ -1,2 +1,2 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS=rpc cs_sample rpc_client rpc_server
+SUBDIRS=rpc_client rpc_server cs_sample
