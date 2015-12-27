@@ -87,6 +87,11 @@ class Channel : public RpcChannel {
 
         bool GetAsyncResponse(const std::string& method_name, Message* response);
 
+        /*
+         * try_time for timeout
+         */
+        void SetConnectionInfo(int32_t timeout, int32_t try_time = 1);
+
         void SetCallLimit(int32_t limit);
 
         static void* RpcProcessor(void *arg);
@@ -95,8 +100,15 @@ class Channel : public RpcChannel {
         char* addr_;
         char* port_;
         int32_t connect_fd_;
+
         bool is_channel_async_call_;
         int32_t call_limit_;
+
+        int32_t tcp_conn_timeout_;
+        /*
+         * only for time out
+         */
+        int32_t try_time_;
 
         std::vector<pthread_t> thread_ids_vec_;
         MsgHashMap call_results_map_;

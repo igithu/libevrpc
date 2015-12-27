@@ -46,6 +46,5 @@ AC_CONFIG_FILES([Makefile
                  src/cs_sample/Makefile
                  src/cs_sample/proto/Makefile
                  src/rpc_client/Makefile
-                 src/rpc_server/Makefile
-                 src/util/Makefile])
+                 src/rpc_server/Makefile])
 AC_OUTPUT

@@ -33,15 +33,19 @@ namespace libevrpc {
 
 using std::string;
 
-bool SetNonBlock(int32_t sock) {
+bool NonBlockMode(int32_t sock, bool mode) {
     int32_t opts = fcntl(sock, F_GETFL);
 
     if (opts < 0) {
-        perror("Set non block failed!\n");
+        perror("Get Flag sock mode failed!\n");
         return false;
     }
 
-    opts = opts | O_NONBLOCK;
+    if (mode) {
+        opts = opts | O_NONBLOCK;
+    } else {
+        opts = opts | ~O_NONBLOCK;
+    }
     if (fcntl(sock, F_SETFL, opts) < 0) {
         perror("Call fcntl failed!\n");
         return false;
@@ -58,8 +62,6 @@ int32_t Socket(int32_t family, int32_t type, int32_t protocol) {
 
     return fd;
 }
-
-
 
 int32_t TcpListen(const char *host, const char *port, bool non_block, int32_t family) {
     struct addrinfo hints, *res = NULL, *ressave = NULL;
@@ -91,9 +93,6 @@ int32_t TcpListen(const char *host, const char *port, bool non_block, int32_t fa
             continue;
         }
 
-        if (non_block) {
-            SetNonBlock(listenfd);
-        }
         if (bind(listenfd, res->ai_addr, res->ai_addrlen) == 0) {
             break;
         }
@@ -119,7 +118,7 @@ int32_t TcpListen(const char *host, const char *port, bool non_block, int32_t fa
 
 }
 
-int32_t TcpConnect(const char *host, const char *port, int32_t family) {
+int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, int32_t family) {
     struct addrinfo hints, *res = NULL, *ressave = NULL;
 
     bzero(&hints, sizeof(struct addrinfo));
@@ -144,9 +143,26 @@ int32_t TcpConnect(const char *host, const char *port, int32_t family) {
             continue;
         }
 
-        if (connect(sockfd, res->ai_addr, res->ai_addrlen) == 0) {
-            break;
+        NonBlockMode(sockfd, true);
+
+        if (connect(sockfd, res->ai_addr, res->ai_addrlen) == 0 &&
+            errno == EINPROGRESS) {
+            fd_set fs;
+            FD_ZERO(&fs);
+            FD_SET(sockfd, &fs);
+            struct timeval overtime;
+            overtime.tv_sec = conn_overtime / 1000;
+            overtime.tv_usec = conn_overtime % 1000;
+            int ret = select(sockfd + 1, NULL, &fs, NULL, &overtime);
+            if (0 == ret) {
+                fprintf(stderr, "Connect server time out, over time is %d\n", conn_overtime);
+                sockfd = TCP_CONN_TIMEOUT;
+                break;
+            } else if (-1 != ret) {
+                break;
+            }
         }
+
         close(sockfd);  /* ignore this one */
     } while ((res = res->ai_next) != NULL);
 

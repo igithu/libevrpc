@@ -29,12 +29,9 @@ using std::string;
 using std::vector;
 
 Channel::Channel(const char* addr, const char* port) :
-    is_channel_async_call_(false) {
+    is_channel_async_call_(false), call_limit_(100), tcp_conn_timeout_(1000), try_time_(1) {
     strcpy(addr_ = (char*)malloc(strlen(addr) + 1), addr);
     strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
-
-    call_limit_ = 100;
-
 }
 
 Channel::~Channel() {
@@ -54,7 +51,15 @@ void Channel::CallMethod(const MethodDescriptor* method,
                          Message* response,
                          Closure* done) {
 
-    connect_fd_ = TcpConnect(addr_, port_);
+    int32_t try_times = try_time_;
+    do {
+        connect_fd_ = TcpConnect(addr_, port_, tcp_conn_timeout_);
+        if (TCP_CONN_TIMEOUT != connect_fd_) {
+            break;
+        }
+        --try_times;
+    } while (try_times <= 0);
+
     if (connect_fd_ < 0) {
         perror("Rpc connect server failed!");
         return;
@@ -155,6 +160,11 @@ bool Channel::GetAsyncResponse(const string& method_name, Message* response) {
         call_results_map_.erase(msg_iter);
     }
     return true;
+}
+
+void Channel::SetConnectionInfo(int32_t timeout, int32_t try_time) {
+    tcp_conn_timeout_ = timeout;
+    try_time_ = try_time;
 }
 
 void Channel::SetCallLimit(int32_t limit) {

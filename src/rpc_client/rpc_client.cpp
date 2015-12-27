@@ -30,6 +30,7 @@ RpcClient::~RpcClient() {
 
 bool RpcClient::InitClient(const char* addr, const char* port) {
     rpc_channel_ptr_ = new Channel(addr, port);
+    SetRpcConnectionInfo(1000, 1);
     return true;
 }
 
@@ -51,6 +52,14 @@ bool RpcClient::GetAsyncResponse(const string& method_name, Message* response) {
         return false;
     }
     return rpc_channel_ptr_->GetAsyncResponse(method_name, response);
+}
+
+bool RpcClient::SetRpcConnectionInfo(int32_t rpc_timeout, int32_t try_time) {
+    if (NULL == rpc_channel_ptr_) {
+        return false;
+    }
+    rpc_channel_ptr_->SetConnectionInfo(rpc_timeout, try_time);
+    return true;
 }
 
 
