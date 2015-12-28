@@ -145,8 +145,11 @@ int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, in
 
         NonBlockMode(sockfd, true);
 
-        if (connect(sockfd, res->ai_addr, res->ai_addrlen) == 0 &&
-            errno == EINPROGRESS) {
+        int32_t conn_ret = connect(sockfd, res->ai_addr, res->ai_addrlen);
+        /*
+         * 0: connect successfully, conn_ret < 0 and EINPROGRESS: connecting
+         */
+        if (0 == conn_ret|| (conn_ret < 0 && errno == EINPROGRESS)) {
             fd_set fs;
             FD_ZERO(&fs);
             FD_SET(sockfd, &fs);
@@ -165,6 +168,7 @@ int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, in
 
         close(sockfd);  /* ignore this one */
     } while ((res = res->ai_next) != NULL);
+    NonBlockMode(sockfd, false);
 
     if (NULL == res) {    /* errno set from final connect() */
         fprintf(stderr, "Tcp_connect error! the errno is: %s\n", strerror(errno));
