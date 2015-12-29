@@ -21,8 +21,6 @@ RPC_SRC = ${client_rootdir}/rpc_client.h \
 		  ${client_rootdir}/rpc_channel.cpp
 		  ${util_dir}/rpc_util.h \
 		  ${util_dir}/rpc_util.cpp \
-		  ${util_dir}/thread.h \
-		  ${util_dir}/pthread_mutex.h \
 		  ${util_dir}/pthread_rwlock.h \
 		  ${util_dir}/disallow_copy_and_assign.h \
 		  ${util_dir}/rpc_communication.h \
