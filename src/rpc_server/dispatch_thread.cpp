@@ -25,7 +25,7 @@ DispatchThread::~DispatchThread() {
     }
 }
 
-bool DispatchThread::InitializeService(const char *host, const char *port, DCallBack* d_callback) {
+bool DispatchThread::InitializeService(const char *host, const char *port) {
     int32_t listenfd = TcpListen(host, port);
     if (listenfd < 0) {
         perror("Rpc server listen current port failed\n");
@@ -43,7 +43,7 @@ bool DispatchThread::InitializeService(const char *host, const char *port, DCall
     /*
      * set callback AcceptCb, Note the function AcceptCb must be static function
      */
-    socket_watcher_.data = d_callback;
+    socket_watcher_.data = this;
     ev_io_init(&socket_watcher_, LibevConnector::AcceptCb, listenfd, EV_READ);
     ev_io_start(epoller_, &socket_watcher_);
 
@@ -80,14 +80,28 @@ void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
         return;
     }
 
-    struct ev_io *client_eio = (struct ev_io*)malloc(sizeof(struct ev_io));
+    // struct ev_io *client_eio = (struct ev_io*)malloc(sizeof(struct ev_io));
+    DispatchThread* dt = (DispatchThread*)(watcher->data);
+    struct ev_io *client_eio = dt->NewEIO();
     ev_io_init(client_eio, LibevConnector::ProcessCb, cfd, EV_READ);
     ev_io_start(loop, client_eio);
 }
 
 void DispatchThread::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
-    
 }
+
+ev_io* DispatchThread::NewEIO() {
+}
+
+ev_io* DispatchThread::PopEIO() {
+}
+
+void DispatchThread::PushEIO(ev_io* eio) {
+}
+
+void DispatchThread::FreeEIO(ev_io* eio) {
+}
+
 
 
 

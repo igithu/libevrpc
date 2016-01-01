@@ -39,19 +39,34 @@ class DispatchThread : public Thread {
 
         ~DispatchThread();
 
-        bool InitializeService(const char *host, const char *port, DCallBack* d_callback);
+        bool InitializeService(const char *host, const char *port);
 
         virtual void Run()
 
     private:
+        /*
+         * libev call back
+         */
         static void AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents);
-
         static void ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents);
 
-    private:
-        struct ev_loop *epoller_;
+        /*
+         *
+         */
+        ev_io* NewEIO();
+        ev_io* PopEIO();
+        void PushEIO(ev_io* eio);
+        void FreeEIO(ev_io* eio);
 
+    private:
+        /*
+         *
+         */
+        struct ev_loop *epoller_;
         struct ev_io socket_watcher_;
+        ev_io* eio_freelist_;
+
+        static DCallBack d_callback_;
 };
 
 }
