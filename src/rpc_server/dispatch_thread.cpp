@@ -16,14 +16,17 @@
 
 #include "dispatch_thread.h"
 
-DispatchThread::DispatchThread() {
+DispatchThread::DispatchThread() : epoller_(NULL) {
 }
 
 DispatchThread::~DispatchThread() {
+    if (NULL != epoller_) {
+        delete epoller_;
+    }
 }
 
-bool DispatchThread::InitializeService(const char *host, const char *port) {
-int32_t listenfd = TcpListen(host, port);
+bool DispatchThread::InitializeService(const char *host, const char *port, DCallBack* d_callback) {
+    int32_t listenfd = TcpListen(host, port);
     if (listenfd < 0) {
         perror("Rpc server listen current port failed\n");
         return false;
@@ -40,19 +43,50 @@ int32_t listenfd = TcpListen(host, port);
     /*
      * set callback AcceptCb, Note the function AcceptCb must be static function
      */
+    socket_watcher_.data = d_callback;
     ev_io_init(&socket_watcher_, LibevConnector::AcceptCb, listenfd, EV_READ);
     ev_io_start(epoller_, &socket_watcher_);
 
     return true;
 }
 
+/*
+ * start to run
+ */
 void DispatchThread::Run() {
+    if (NULL == epoller_) {
+        perror("The epoller ptr is null!\n");
+        return;
+    }
+    ev_run(epoller_, 0);
+    ev_loop_destroy(epoller_);
+    epoller_ = NULL:
 }
 
 void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
+    if (NULL == loop) {
+        perror("Ev loop ptr is null!\n");
+        return;
+    }
+
+    if (EV_ERROR & revents) {
+        perror("EV_ERROR in AcceptCb callback!\n");
+        return;
+    }
+    struct sockaddr_in client_addr;
+    socklen_t len = sizeof(struct sockaddr_in);
+    int32_t cfd = Accept(watcher->fd, client_addr, len);
+    if (cfd < 0) {
+        return;
+    }
+
+    struct ev_io *client_eio = (struct ev_io*)malloc(sizeof(struct ev_io));
+    ev_io_init(client_eio, LibevConnector::ProcessCb, cfd, EV_READ);
+    ev_io_start(loop, client_eio);
 }
 
 void DispatchThread::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
+    
 }
 
 

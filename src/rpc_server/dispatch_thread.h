@@ -28,13 +28,18 @@ namespace libevrpc {
 
 using namespace PUBLIC_UTIL;
 
+typedef struct {
+    void *(*callback)(void * arg);
+    void *params
+} DCallBack;
+
 class DispatchThread : public Thread {
     public:
         DispatchThread();
 
         ~DispatchThread();
 
-        bool InitializeService(const char *host, const char *port);
+        bool InitializeService(const char *host, const char *port, DCallBack* d_callback);
 
         virtual void Run()
 
