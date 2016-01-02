@@ -54,8 +54,6 @@ class DispatchThread : public Thread {
          *
          */
         ev_io* NewEIO();
-        ev_io* PopEIO();
-        void PushEIO(ev_io* eio);
         void FreeEIO(ev_io* eio);
 
     private:

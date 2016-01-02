@@ -83,20 +83,27 @@ void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
     // struct ev_io *client_eio = (struct ev_io*)malloc(sizeof(struct ev_io));
     DispatchThread* dt = (DispatchThread*)(watcher->data);
     struct ev_io *client_eio = dt->NewEIO();
+    client_eio = watcher->data;
     ev_io_init(client_eio, LibevConnector::ProcessCb, cfd, EV_READ);
     ev_io_start(loop, client_eio);
 }
 
+/*
+ * handle the connection and callback
+ */
 void DispatchThread::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
+    if (EV_ERROR & revents) {
+        perror("EV_ERROR in AcceptCb callback!\n");
+        return;
+    }
+    DispatchThread* dt = (DispatchThread*)(watcher->data);
+    DCallBack& dcb = dt->d_callback_;
+    dcb.callback(dcb.params);
+    ev_io_stop(loop, watcher);
+    dt->FreeEIO(watcher);
 }
 
 ev_io* DispatchThread::NewEIO() {
-}
-
-ev_io* DispatchThread::PopEIO() {
-}
-
-void DispatchThread::PushEIO(ev_io* eio) {
 }
 
 void DispatchThread::FreeEIO(ev_io* eio) {
