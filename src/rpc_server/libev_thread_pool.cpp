@@ -116,6 +116,7 @@ RQ_ITEM* LibevThreadPool::RQItemNew() {
         for (int i = 0; i < item_per_alloc_; ++i) {
             rq_item[i - 1].next = &rq_item[i];
         }
+        rq_item[item_per_alloc_ - 1].next = NULL;
         {
             MutexLockGuard lock(rqi_freelist_mutex_);
             rq_item[item_per_alloc_ - 1].next = rqi_freelist_;

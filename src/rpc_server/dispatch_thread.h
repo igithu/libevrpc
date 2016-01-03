@@ -28,10 +28,23 @@ namespace libevrpc {
 
 using namespace PUBLIC_UTIL;
 
+/*
+ * callbancl in dispatch_thread
+ */
 typedef struct {
     void *(*callback)(void * arg);
     void *params
 } DCallBack;
+
+/*
+ * ev_io item to link all ev_io
+ */
+typedef struct EIOItem EIO_ITEM;
+struct EIOItem {
+    ev_io eio;
+    EIO_ITEM* prev;
+    EIO_ITEM* next;
+};
 
 class DispatchThread : public Thread {
     public:
@@ -45,21 +58,18 @@ class DispatchThread : public Thread {
 
     private:
         /*
-         * libev call back
+         * libev callback
          */
         static void AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents);
         static void ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents);
 
         /*
-         *
+         * eio new and free
          */
-        ev_io* NewEIO();
-        void FreeEIO(ev_io* eio);
+        EIO_ITEM* NewEIO();
+        void FreeEIO(EIO_ITEM* eio);
 
     private:
-        /*
-         *
-         */
         struct ev_loop *epoller_;
         struct ev_io socket_watcher_;
         ev_io* eio_freelist_;

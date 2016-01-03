@@ -16,7 +16,9 @@
 
 #include "dispatch_thread.h"
 
-DispatchThread::DispatchThread() : epoller_(NULL) {
+int32_t DispatchThread::ei_per_alloc_ = 4;
+
+DispatchThread::DispatchThread() : epoller_(NULL), eio_freelist_(NULL) {
 }
 
 DispatchThread::~DispatchThread() {
@@ -103,10 +105,29 @@ void DispatchThread::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int 
     dt->FreeEIO(watcher);
 }
 
-ev_io* DispatchThread::NewEIO() {
+EIO_ITEM* DispatchThread::NewEIO() {
+    EIO_ITEM* ei = NULL;
+    if (NULL != eio_freelist_) {
+        ei = eio_freelist_;
+        eio_freelist_ = eio_freelist_.next;
+    }
+    if (NULL == ei) {
+         ei = (EIO_ITEM*)malloc(sizeof(EIO_ITEM) * ei_per_alloc_);
+         if (NULL == ei) {
+             perror("Alloc the ei item mem failed!");
+             return NULL;
+         }
+         for (int i = 0; i < EIO_ITEM; ++i) {
+             rq_item[i - 1].next = &rq_item[i];
+         }
+         ei[ei_per_alloc_ - 1].next = NULL;
+         ei[ei_per_alloc_ - 1].next = eio_freelist_;
+         eio_freelist_ = &ei[1];
+    }
+    return ei;
 }
 
-void DispatchThread::FreeEIO(ev_io* eio) {
+void DispatchThread::FreeEIO(EIO_ITEM* eio) {
 }
 
 
