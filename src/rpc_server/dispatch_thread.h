@@ -33,7 +33,7 @@ using namespace PUBLIC_UTIL;
  */
 typedef struct {
     void *(*callback)(void * arg);
-    void *params
+    void *params;
 } DCallBack;
 
 /*
@@ -46,15 +46,16 @@ struct EIOItem {
     EIO_ITEM* next;
 };
 
+typedef void (*RpcCallBack)(int32_t, void *arg);
 class DispatchThread : public Thread {
     public:
         DispatchThread();
 
         ~DispatchThread();
 
-        bool InitializeService(const char *host, const char *port);
+        bool InitializeService(const char *host, const char *port, RpcCallBack* cb, void *arg);
 
-        virtual void Run()
+        virtual void Run();
 
     private:
         /*
@@ -67,14 +68,15 @@ class DispatchThread : public Thread {
          * eio new and free
          */
         EIO_ITEM* NewEIO();
-        void FreeEIO(EIO_ITEM* eio);
+        void FreeEIO(EIO_ITEM* eio_item);
 
     private:
         struct ev_loop *epoller_;
         struct ev_io socket_watcher_;
         ev_io* eio_freelist_;
 
-        static DCallBack d_callback_;
+        RpcCallBack* cb_;
+        void* cb_arg_;
 };
 
 }

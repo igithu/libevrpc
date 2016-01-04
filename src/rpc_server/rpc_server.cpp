@@ -30,7 +30,7 @@ namespace libevrpc {
 
 RpcServer::RpcServer() :
     libev_connector_ptr_(NULL),
-    io_thread_ptr_(NULL),
+    dispatcher_thread_ptr_(NULL),
     worker_threads_ptr_(NULL),
     reader_threads_ptr_(NULL),
     writer_threads_ptr_(NULL) {
@@ -60,8 +60,8 @@ RpcServer::~RpcServer() {
         delete worker_threads_ptr_;
     }
 
-    if (NULL != io_thread_ptr_) {
-        delete io_thread_ptr_;
+    if (NULL != dispatcher_thread_ptr_) {
+        delete dispatcher_thread_ptr_;
     }
 
     if (NULL != libev_connector_ptr_) {
@@ -118,10 +118,12 @@ bool RpcServer::Start(const char* addr,
                       int32_t writer_num) {
 
     libev_connector_ptr_ = new LibevConnector();
-    io_thread_ptr_ = new IOThread(addr, port);
-    worker_threads_ptr_ = new LibevThreadPool;
+    dispatcher_thread_ptr_ = new DispatchThread();
+    dispatcher_thread_ptr_->InitializeService(addr, port, &RpcServer::RpcCall, (void*)this);
 
-    io_thread_ptr_->Start();
+    worker_threads_ptr_ = new LibevThreadPool();
+
+    dispatcher_thread_ptr_->Start();
     worker_threads_ptr_->Start(20);
 
     // if start readerpool or writerpool
@@ -137,14 +139,10 @@ bool RpcServer::Start(const char* addr,
 }
 
 bool RpcServer::Wait() {
-    if (false == io_thread_ptr_->IsAlive()) {
-        //worker_threads_ptr_->Destroy();
-        return false;
-    }
 
-    printf("Start wait for io .....\n");
-    if (NULL != io_thread_ptr_) {
-        io_thread_ptr_->Wait();
+    printf("Start wait for dispatcher_thread .....\n");
+    if (NULL != dispatcher_thread_ptr_) {
+        dispatcher_thread_ptr_->Wait();
     }
 
     printf("Start wait for worker .....\n");
@@ -164,22 +162,22 @@ bool RpcServer::Wait() {
     return true;
 }
 
-bool RpcServer::RpcCall(int32_t event_fd) {
-    if (NULL == worker_threads_ptr_) {
-        return false;
+void RpcServer::RpcCall(int32_t event_fd, void *arg) {
+    RpcServer* rs = (RpcServer*)arg;
+    if (NULL == rs || NULL == rs->worker_threads_ptr_) {
+        return;
     }
 
     CallBackParams* cb_params_ptr = new CallBackParams();
     cb_params_ptr->event_fd = event_fd;
-    cb_params_ptr->rpc_server_ptr = this;
+    cb_params_ptr->rpc_server_ptr = rs;
     // push the task to thread pool
 
-    if (NULL != reader_threads_ptr_) {
-        reader_threads_ptr_->DispatchRpcCall(RpcServer::RpcReader, cb_params_ptr);
+    if (NULL != rs->reader_threads_ptr_) {
+        rs->reader_threads_ptr_->DispatchRpcCall(RpcServer::RpcReader, cb_params_ptr);
     } else {
-        worker_threads_ptr_->DispatchRpcCall(RpcServer::RpcProcessor, cb_params_ptr);
+        rs->worker_threads_ptr_->DispatchRpcCall(RpcServer::RpcProcessor, cb_params_ptr);
     }
-    return true;
 }
 
 LibevConnector* RpcServer::GetLibevConnector() {

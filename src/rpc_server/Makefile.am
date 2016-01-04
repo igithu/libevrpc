@@ -19,6 +19,8 @@ LDADD = ${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
 
 RPC_SRC = ${server_rootdir}/rpc_server.h \
 		  ${server_rootdir}/rpc_server.cpp \
+		  ${server_rootdir}/dispatch_thread.h \
+		  ${server_rootdir}/dispatch_thread.cpp \
 		  ${server_rootdir}/libev_connector.h \
 		  ${server_rootdir}/libev_connector.cpp \
 		  ${server_rootdir}/io_thread.h \

@@ -27,7 +27,13 @@ DispatchThread::~DispatchThread() {
     }
 }
 
-bool DispatchThread::InitializeService(const char *host, const char *port) {
+bool DispatchThread::InitializeService(const char *host, const char *port, RpcCallBack* cb, void *arg) {
+    /*
+     * copy the callback function to mem callback_
+     */
+    cb_ = cb;
+    cb_arg_ = arg;
+
     int32_t listenfd = TcpListen(host, port);
     if (listenfd < 0) {
         perror("Rpc server listen current port failed\n");
@@ -99,8 +105,7 @@ void DispatchThread::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int 
         return;
     }
     DispatchThread* dt = (DispatchThread*)(watcher->data);
-    DCallBack& dcb = dt->d_callback_;
-    dcb.callback(dcb.params);
+    dt->cb_(watcher->fd, dt->cb_arg_);
     ev_io_stop(loop, watcher);
     dt->FreeEIO(watcher);
 }
@@ -127,7 +132,9 @@ EIO_ITEM* DispatchThread::NewEIO() {
     return ei;
 }
 
-void DispatchThread::FreeEIO(EIO_ITEM* eio) {
+void DispatchThread::FreeEIO(EIO_ITEM* eio_item) {
+    eio_item->next = eio_freelist_;
+    eio_freelist_ = eio_item;
 }
 
 
