@@ -16,6 +16,10 @@
 
 #include "dispatch_thread.h"
 
+#include "util/rpc_communication.h"
+
+namespace libevrpc {
+
 int32_t DispatchThread::ei_per_alloc_ = 4;
 
 DispatchThread::DispatchThread() : epoller_(NULL), eio_freelist_(NULL) {
@@ -27,11 +31,11 @@ DispatchThread::~DispatchThread() {
     }
 }
 
-bool DispatchThread::InitializeService(const char *host, const char *port, RpcCallBack* cb, void *arg) {
+bool DispatchThread::InitializeService(const char *host, const char *port, RpcCallBackPtr cb, void *arg) {
     /*
      * copy the callback function to mem callback_
      */
-    cb_ = cb;
+    cb_ptr_ = cb;
     cb_arg_ = arg;
 
     int32_t listenfd = TcpListen(host, port);
@@ -52,7 +56,7 @@ bool DispatchThread::InitializeService(const char *host, const char *port, RpcCa
      * set callback AcceptCb, Note the function AcceptCb must be static function
      */
     socket_watcher_.data = this;
-    ev_io_init(&socket_watcher_, LibevConnector::AcceptCb, listenfd, EV_READ);
+    ev_io_init(&socket_watcher_, DispatchThread::AcceptCb, listenfd, EV_READ);
     ev_io_start(epoller_, &socket_watcher_);
 
     return true;
@@ -68,7 +72,7 @@ void DispatchThread::Run() {
     }
     ev_run(epoller_, 0);
     ev_loop_destroy(epoller_);
-    epoller_ = NULL:
+    epoller_ = NULL;
 }
 
 void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
@@ -90,10 +94,12 @@ void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
 
     // struct ev_io *client_eio = (struct ev_io*)malloc(sizeof(struct ev_io));
     DispatchThread* dt = (DispatchThread*)(watcher->data);
-    struct ev_io *client_eio = dt->NewEIO();
-    client_eio = watcher->data;
-    ev_io_init(client_eio, LibevConnector::ProcessCb, cfd, EV_READ);
-    ev_io_start(loop, client_eio);
+    EIO_ITEM *eio_item = dt->NewEIO();
+    struct ev_io& client_eio = eio_item->eio;
+    client_eio.data = watcher->data;
+    ev_io_init(&client_eio, DispatchThread::ProcessCb, cfd, EV_READ);
+    ev_io_start(loop, &client_eio);
+    PushEIO(eio_uselist_, eio_item);
 }
 
 /*
@@ -105,16 +111,17 @@ void DispatchThread::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int 
         return;
     }
     DispatchThread* dt = (DispatchThread*)(watcher->data);
-    dt->cb_(watcher->fd, dt->cb_arg_);
+    dt->cb_ptr_(watcher->fd, dt->cb_arg_);
     ev_io_stop(loop, watcher);
-    dt->FreeEIO(watcher);
+    EIO_ITEM* ei = PopEIO(eio_uselist_);
+    dt->FreeEIO(ei);
 }
 
 EIO_ITEM* DispatchThread::NewEIO() {
     EIO_ITEM* ei = NULL;
     if (NULL != eio_freelist_) {
         ei = eio_freelist_;
-        eio_freelist_ = eio_freelist_.next;
+        eio_freelist_ = eio_freelist_->next;
     }
     if (NULL == ei) {
          ei = (EIO_ITEM*)malloc(sizeof(EIO_ITEM) * ei_per_alloc_);
@@ -122,8 +129,8 @@ EIO_ITEM* DispatchThread::NewEIO() {
              perror("Alloc the ei item mem failed!");
              return NULL;
          }
-         for (int i = 0; i < EIO_ITEM; ++i) {
-             rq_item[i - 1].next = &rq_item[i];
+         for (int i = 0; i < ei_per_alloc_; ++i) {
+             ei[i - 1].next = &ei[i];
          }
          ei[ei_per_alloc_ - 1].next = NULL;
          ei[ei_per_alloc_ - 1].next = eio_freelist_;
@@ -137,8 +144,14 @@ void DispatchThread::FreeEIO(EIO_ITEM* eio_item) {
     eio_freelist_ = eio_item;
 }
 
+void DispatchThread::PushEIO(EioQueue& wq,  EIO_ITEM* eio_item) {
+}
+
+EIO_ITEM* DispatchThread::PopEIO(EioQueue& eq) {
+}
 
 
+}  // end of namespace libevrpc
 
 
 

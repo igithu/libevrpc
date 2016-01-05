@@ -103,7 +103,7 @@ class RpcServer {
 
         LibevConnector* libev_connector_ptr_;
 
-        DispatchThread*  dispatcher_thread_ptr_
+        DispatchThread*  dispatcher_thread_ptr_;
         LibevThreadPool* worker_threads_ptr_;
         LibevThreadPool* reader_threads_ptr_;
         LibevThreadPool* writer_threads_ptr_;

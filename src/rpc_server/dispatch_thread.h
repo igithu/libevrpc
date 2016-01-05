@@ -21,6 +21,7 @@
 #define __DISPATCH_THREAD_H
 
 #include <ev.h>
+#include <stdint.h>
 
 #include "util/thread.h"
 
@@ -29,7 +30,7 @@ namespace libevrpc {
 using namespace PUBLIC_UTIL;
 
 /*
- * callbancl in dispatch_thread
+ * callback in dispatch_thread
  */
 typedef struct {
     void *(*callback)(void * arg);
@@ -46,14 +47,19 @@ struct EIOItem {
     EIO_ITEM* next;
 };
 
-typedef void (*RpcCallBack)(int32_t, void *arg);
+struct EioQueue {
+    EIO_ITEM* head;
+    EIO_ITEM* tail;
+};
+
+typedef void (*RpcCallBackPtr)(int32_t, void *arg);
 class DispatchThread : public Thread {
     public:
         DispatchThread();
 
         ~DispatchThread();
 
-        bool InitializeService(const char *host, const char *port, RpcCallBack* cb, void *arg);
+        bool InitializeService(const char *host, const char *port, RpcCallBackPtr cb, void *arg);
 
         virtual void Run();
 
@@ -69,17 +75,22 @@ class DispatchThread : public Thread {
          */
         EIO_ITEM* NewEIO();
         void FreeEIO(EIO_ITEM* eio_item);
+        static void PushEIO(EioQueue& eq, EIO_ITEM* eio_item);
+        static EIO_ITEM* PopEIO(EioQueue& eq);
 
     private:
         struct ev_loop *epoller_;
         struct ev_io socket_watcher_;
-        ev_io* eio_freelist_;
+        EIO_ITEM* eio_freelist_;
 
-        RpcCallBack* cb_;
+        RpcCallBackPtr cb_ptr_;
         void* cb_arg_;
+
+        static int32_t ei_per_alloc_;
+        static EioQueue eio_uselist_;
 };
 
-}
+}  // end of namespace libevrpc
 
 
 #endif // __DISPATCH_THREAD_H
