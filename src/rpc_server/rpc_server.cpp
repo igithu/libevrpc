@@ -29,7 +29,6 @@
 namespace libevrpc {
 
 RpcServer::RpcServer() :
-    libev_connector_ptr_(NULL),
     dispatcher_thread_ptr_(NULL),
     worker_threads_ptr_(NULL),
     reader_threads_ptr_(NULL),
@@ -64,9 +63,6 @@ RpcServer::~RpcServer() {
         delete dispatcher_thread_ptr_;
     }
 
-    if (NULL != libev_connector_ptr_) {
-        delete libev_connector_ptr_;
-    }
 }
 
 // initial prameters
@@ -117,7 +113,6 @@ bool RpcServer::Start(const char* addr,
                       int32_t reader_num,
                       int32_t writer_num) {
 
-    libev_connector_ptr_ = new LibevConnector();
     dispatcher_thread_ptr_ = new DispatchThread();
     dispatcher_thread_ptr_->InitializeService(addr, port, &RpcServer::RpcCall, (void*)this);
 
@@ -173,15 +168,11 @@ void RpcServer::RpcCall(int32_t event_fd, void *arg) {
     cb_params_ptr->rpc_server_ptr = rs;
     // push the task to thread pool
 
-    if (NULL != rs->reader_threads_ptr_) {
-        rs->reader_threads_ptr_->DispatchRpcCall(RpcServer::RpcReader, cb_params_ptr);
-    } else {
-        rs->worker_threads_ptr_->DispatchRpcCall(RpcServer::RpcProcessor, cb_params_ptr);
+    bool ret = rs->worker_threads_ptr_->DispatchRpcCall(RpcServer::RpcProcessor, cb_params_ptr);
+    if (!ret) {
+        perror("DispatchRpcCall failed! connection closed.");
+        close(event_fd);
     }
-}
-
-LibevConnector* RpcServer::GetLibevConnector() {
-    return libev_connector_ptr_;
 }
 
 void* RpcServer::RpcProcessor(void *arg) {

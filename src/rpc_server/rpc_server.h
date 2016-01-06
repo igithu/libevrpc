@@ -26,8 +26,6 @@
 
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_mutex.h"
-#include "libev_connector.h"
-//#include "io_thread.h"
 #include "dispatch_thread.h"
 #include "libev_thread_pool.h"
 
@@ -74,8 +72,6 @@ class RpcServer {
 
         bool Wait();
 
-        LibevConnector* GetLibevConnector();
-
         static void RpcCall(int32_t event_fd, void *arg);
 
         static void* RpcProcessor(void *arg);
@@ -100,8 +96,6 @@ class RpcServer {
         PUBLIC_UTIL::Mutex hashmap_mutex_;
 
         HashMap method_hashmap_;
-
-        LibevConnector* libev_connector_ptr_;
 
         DispatchThread*  dispatcher_thread_ptr_;
         LibevThreadPool* worker_threads_ptr_;

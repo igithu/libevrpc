@@ -21,6 +21,7 @@
 namespace libevrpc {
 
 int32_t DispatchThread::ei_per_alloc_ = 4;
+EioQueue DispatchThread::eio_uselist_ = {NULL, NULL};
 
 DispatchThread::DispatchThread() : epoller_(NULL), eio_freelist_(NULL) {
 }
