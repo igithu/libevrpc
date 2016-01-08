@@ -37,7 +37,7 @@ RpcServer::RpcServer() :
 }
 
 RpcServer::~RpcServer() {
-    for (HashMap::iterator iter = method_hashmap_.begin(); 
+    for (HashMap::iterator iter = method_hashmap_.begin();
          iter != method_hashmap_.end();
          ++iter) {
         RpcMethod* rpc_method_ptr = iter->second;
@@ -166,7 +166,6 @@ void RpcServer::RpcCall(int32_t event_fd, void *arg) {
     CallBackParams* cb_params_ptr = new CallBackParams();
     cb_params_ptr->event_fd = event_fd;
     cb_params_ptr->rpc_server_ptr = rs;
-    // push the task to thread pool
 
     bool ret = rs->worker_threads_ptr_->DispatchRpcCall(RpcServer::RpcProcessor, cb_params_ptr);
     if (!ret) {

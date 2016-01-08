@@ -23,7 +23,6 @@ namespace libevrpc {
 using namespace PUBLIC_UTIL;
 
 int32_t LibevThreadPool::item_per_alloc_ = 64;
-// atomic_bool LibevThreadPool::running_ = true;
 
 LibevThreadPool::LibevThreadPool() :
     current_thread_(-1),
@@ -39,7 +38,6 @@ LibevThreadPool::~LibevThreadPool() {
 bool LibevThreadPool::LibevThreadInitialization(int32_t num_threads) {
     num_threads_ = num_threads;
     libev_threads_ = (LIBEV_THREAD*)calloc(num_threads_, sizeof(LIBEV_THREAD));
-
     rqi_freelist_ = NULL;
 
     if (NULL == libev_threads_) {

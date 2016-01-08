@@ -93,7 +93,6 @@ void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
         return;
     }
 
-    // struct ev_io *client_eio = (struct ev_io*)malloc(sizeof(struct ev_io));
     DispatchThread* dt = (DispatchThread*)(watcher->data);
     EIO_ITEM *eio_item = dt->NewEIO();
     struct ev_io& client_eio = eio_item->eio;
