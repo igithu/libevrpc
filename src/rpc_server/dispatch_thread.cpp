@@ -27,8 +27,25 @@ DispatchThread::DispatchThread() : epoller_(NULL), eio_freelist_(NULL) {
 }
 
 DispatchThread::~DispatchThread() {
+    Stop();
+    Wait();
     if (NULL != epoller_) {
         delete epoller_;
+    }
+    if (NULL != eio_freelist_) {
+        for (EIO_ITEM* eif = eio_freelist_->next; eio_freelist_ != NULL; ) {
+            free(eio_freelist_);
+            eio_freelist_ = eif;
+            if (NULL != eif) {
+                eif = eif->next;
+            }
+        }
+    }
+    EioQueue& eul = DispatchThread::eio_uselist_;
+    for (EIO_ITEM* eiptr = eul.head ; eiptr != eul.tail && eiptr != NULL; ) {
+        eul.head = eiptr->next;
+        free(eiptr);
+        eiptr = eul.head;
     }
 }
 
@@ -144,10 +161,26 @@ void DispatchThread::FreeEIO(EIO_ITEM* eio_item) {
     eio_freelist_ = eio_item;
 }
 
-void DispatchThread::PushEIO(EioQueue& wq,  EIO_ITEM* eio_item) {
+void DispatchThread::PushEIO(EioQueue& eq,  EIO_ITEM* eio_item) {
+    eio_item->next = NULL;
+    if (NULL == eq.tail) {
+        eq.head = eio_item;
+    } else {
+        eq.tail->next = eio_item;
+    }
+    eq.tail = eio_item;
 }
 
 EIO_ITEM* DispatchThread::PopEIO(EioQueue& eq) {
+    EIO_ITEM* ei = NULL;
+    ei = eq.head;
+    if (NULL != ei) {
+        eq.head = ei->next;
+        if (NULL == eq.head) {
+            eq.tail = NULL;
+        }
+    }
+    return ei;
 }
 
 

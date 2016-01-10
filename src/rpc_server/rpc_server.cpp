@@ -171,6 +171,7 @@ void RpcServer::RpcCall(int32_t event_fd, void *arg) {
     if (!ret) {
         perror("DispatchRpcCall failed! connection closed.");
         close(event_fd);
+        delete cb_params_ptr;
     }
 }
 
