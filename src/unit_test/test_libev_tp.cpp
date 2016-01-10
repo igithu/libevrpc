@@ -16,7 +16,7 @@
 
 #include <string>
 
-#include "../rpc_server/libev_thread_pool.h"
+#include "rpc_server/libev_thread_pool.h"
 
 using namespace libevrpc;
 using std::string;

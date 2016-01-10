@@ -1,12 +1,13 @@
 AUTOMAKE_OPTIONS=foreign subdir-objects
 
-top_dir = ${top_srcdir}/..
-server_rootdir = ${top_srcdir}/src/rpc_server
-util_dir = ${top_srcdir}/src/util
-ut_dir = ${top_srcdir}/src/ut_test/
+proj_dir = ${top_srcdir}/..
+top_dir = ${proj_dir}/../..
+server_rootdir = ${proj_dir}/rpc_server
+util_dir = ${proj_dir}/util
+ut_dir = ${proj_dir}/unit_test
 third_dir = ${top_dir}/third-64
 
-AM_CPPFLAGS = -I${top_srcdir}/src \
+AM_CPPFLAGS = -I${proj_dir}/ \
               -I${third_dir}/gperftools/include/ \
 			  -I${third_dir}/protobuf/include/ \
 			  -I${third_dir}/libev/include/
@@ -33,9 +34,10 @@ RPC_SRC = ${server_rootdir}/rpc_server.h \
 		  ${util_dir}/rpc_communication.h \
 		  ${util_dir}/rpc_communication.cpp
 
+LTP = ${ut_dir}/test_libev_tp.cpp ${util_dir}/pthread_mutex.h ${server_rootdir}/libev_thread_pool.h ${server_rootdir}/libev_thread_pool.cpp
 
-bin_PROGRAMS = ut rpc_client
+bin_PROGRAMS = ltp
 
-librpc_server_a_SOURCES = ${RPC_SRC}
+ltp_SOURCES = ${LTP}
 
 #SUBDIRS = test

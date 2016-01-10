@@ -77,7 +77,7 @@ class LibevThreadPool {
 
         virtual ~LibevThreadPool();
 
-        bool Start(int32_t num_threads);
+        bool Start(int32_t num_threads = 10);
 
         bool Wait();
 
