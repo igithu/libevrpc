@@ -35,6 +35,7 @@ DispatchThread::~DispatchThread() {
     if (NULL != eio_freelist_) {
         for (EIO_ITEM* eif = eio_freelist_->next; eio_freelist_ != NULL; ) {
             free(eio_freelist_);
+            eio_freelist_ = NULL;
             eio_freelist_ = eif;
             if (NULL != eif) {
                 eif = eif->next;
