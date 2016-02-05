@@ -116,7 +116,6 @@ class Channel : public RpcChannel {
 
         PUBLIC_UTIL::RWLock tids_map_rwlock_;
         PUBLIC_UTIL::RWLock ret_map_rwlock_;
-
 };
 
 }  // end of namespace libevrpc
