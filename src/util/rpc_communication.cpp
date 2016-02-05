@@ -109,13 +109,8 @@ int32_t TcpListen(const char *host, const char *port, bool non_block, int32_t fa
         return -1;
     }
 
-    // if (addrlenp) {
-    //     *addrlenp = res->ai_addrlen;    /* return size of protocol address */
-    // }
-
     freeaddrinfo(ressave);
     return listenfd;
-
 }
 
 int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, int32_t family) {
@@ -178,8 +173,6 @@ int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, in
 
     freeaddrinfo(ressave);
     return sockfd;
-
-
 }
 
 int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen, bool non_block) {
@@ -235,9 +228,6 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen, bool non_block) 
         return -1;
     }
 
- //   if (non_block) {
- //       SetNonBlock(new_fd);
- //   }
     return new_fd;
 }
 
