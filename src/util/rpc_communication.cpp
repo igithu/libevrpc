@@ -270,7 +270,7 @@ int32_t RpcRecv(int32_t fd, std::string& recv_info_str, bool need_closed) {
 
 int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, bool need_closed) {
     /*
-     * call id less zero, error call id
+     * call id is less zero, error call id
      */
     if (transfer_id < 0) {
         return -1;

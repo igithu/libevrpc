@@ -21,11 +21,9 @@
 #define  __LIBEV_THREAD_POOL_H_
 
 
-//#include <pthread.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
-// #include <atomic.h>
 
 #include <ev.h>
 
