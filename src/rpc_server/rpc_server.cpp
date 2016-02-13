@@ -65,7 +65,6 @@ RpcServer::~RpcServer() {
 
 }
 
-// initial prameters
 bool RpcServer::Initialize() {
     // should read from config file
     // strcpy(host_, "127.0.0.1");
@@ -74,13 +73,17 @@ bool RpcServer::Initialize() {
     return true;
 }
 
-// Note: not thread safe in old c++
+/*
+ * Note: not thread safe in old c++
+ */
 RpcServer& RpcServer::GetInstance() {
     static RpcServer server_instance;
     return server_instance;
 }
 
-// Registe the service into map
+/*
+ * Registe the service into map
+ */
 bool RpcServer::RegisteService(Service* reg_service) {
     const ServiceDescriptor* descriptor = reg_service->GetDescriptor();
     for (int32_t i = 0; i < descriptor->method_count(); ++i) {
@@ -88,18 +91,24 @@ bool RpcServer::RegisteService(Service* reg_service) {
         const Message* request = &reg_service->GetRequestPrototype(method_desc);
         const Message* response = &reg_service->GetResponsePrototype(method_desc);
 
-        // format rpc method
+        /*
+         * format rpc method
+         */
         RpcMethod* rpc_method =
             new RpcMethod(reg_service, request, response, method_desc);
 
-        // format hash code of function called
+        /*
+         * format hash code of function called
+         */
         uint32_t hash_code = BKDRHash(method_desc->full_name().c_str());
 
         HashMap::iterator ret_iter = method_hashmap_.find(hash_code);
         if (ret_iter == method_hashmap_.end()) {
             method_hashmap_.insert(std::make_pair(hash_code, rpc_method));
         } else {
-            // if conflict, replace old one
+            /*
+             * if conflict, replace old one
+             */
             delete ret_iter->second;
             method_hashmap_[hash_code] = rpc_method;
         }
@@ -121,7 +130,9 @@ bool RpcServer::Start(const char* addr,
     dispatcher_thread_ptr_->Start();
     worker_threads_ptr_->Start(20);
 
-    // if start readerpool or writerpool
+    /*
+     * if start readerpool or writerpool
+     */
     if (0 != reader_num) {
         reader_threads_ptr_ = new LibevThreadPool();
         reader_threads_ptr_->Start(reader_num);
@@ -188,7 +199,9 @@ void* RpcServer::RpcProcessor(void *arg) {
     }
     int32_t event_fd = cb_params_ptr->event_fd;
 
-    // start recv the msg
+    /*
+     * start recv the msg
+     */
     string recv_info;
     int32_t call_id = -1;
     if (NULL == rpc_serv_ptr->reader_threads_ptr_) {
@@ -202,7 +215,9 @@ void* RpcServer::RpcProcessor(void *arg) {
         }
     }
 
-    // find the function will be called
+    /*
+     * find the function will be called
+     */
     HashMap& method_hashmap = rpc_serv_ptr->method_hashmap_;
     HashMap::iterator method_iter = method_hashmap.find(call_id);
     if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
@@ -226,10 +241,14 @@ void* RpcServer::RpcProcessor(void *arg) {
 
     const MethodDescriptor* method_desc = rpc_method->method;
     Message* response = rpc_method->response->New();
-    // call method!!
+    /*
+     * call method!!
+     */
     rpc_method->service->CallMethod(method_desc, NULL, request, response, NULL);
 
-    // get send info
+    /*
+     * get send info
+     */
     string response_str = "";
     if (!response->SerializeToString(&response_str)) {
         perror("SerializeToString response failed!");
@@ -270,7 +289,9 @@ void* RpcServer::RpcReader(void *arg) {
 
     cb_params_ptr->call_id = RpcRecv(event_fd, cb_params_ptr->recv_info, false);
 
-    // push the task into processor
+    /*
+     * push the task into processor
+     */
     rpc_serv_ptr->worker_threads_ptr_->DispatchRpcCall(
             RpcServer::RpcProcessor, cb_params_ptr);
 }
@@ -296,7 +317,9 @@ void* RpcServer::RpcWriter(void *arg) {
     if (RpcSend(event_fd, 0, response_str, true) < 0) {
         perror("Send the info data failed!");
     }
-    // The current cb_params_ptr never be used!
+    /*
+     * The current cb_params_ptr never be used!
+     */
     delete cb_params_ptr;
 }
 

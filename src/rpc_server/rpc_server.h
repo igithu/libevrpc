@@ -116,7 +116,9 @@ class RpcServer {
 
             int32_t event_fd;
             int32_t call_id;
-            // current rpc server ptr
+            /*
+             * current rpc server ptr
+             */
             RpcServer* rpc_server_ptr;
 
             std::string recv_info;
