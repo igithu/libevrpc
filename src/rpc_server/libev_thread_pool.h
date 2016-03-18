@@ -3,15 +3,15 @@
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
  * 
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file libev_thread_pool.h
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/07 15:32:07
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -65,6 +65,7 @@ typedef struct {
     struct ev_io libev_watcher;
     int32_t notify_receive_fd;
     int32_t notify_send_fd;
+    int32_t pool_index;
     RQ* new_request_queue;
     LibevThreadPool* lt_pool;
 } LIBEV_THREAD;
