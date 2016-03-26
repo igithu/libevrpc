@@ -25,7 +25,7 @@
 #include <memory>
 #include <string>
 
-#include "connection.h"
+#include "util/disallow_copy_and_assign.h"
 #include "util/thread.h"
 
 namespace libevrpc {
@@ -36,33 +36,49 @@ typedef std::shared_ptr<CI_MAP> CI_MAP_PTR;
 typedef std::vector<CI_MAP_PTR> CIM_VEC;
 typedef std::shared_ptr<CIM_VEC> CIM_VEC_PTR;
 
-
-
 struct ConnectionTimer {
     time_t start_time;
     time_t expire_time;
     int32_t fd;
     std::string client_addr;
-};
 
+    CI_PTR next;
+};
 
 class ConnectionTimerManager : public PUBLIC_UTIL::Thread {
     public:
-        ConnectionTimerManager();
         ~ConnectionTimerManager();
 
+        static ConnectionTimerManager& GetInstance();
         int32_t InitTimerPool();
-        bool InsertConnectinTimer(
+        int32_t InsertConnectionTimer(
                 const std::string& ip_addr,
                 int32_t fd,
                 int32_t pool_index);
 
+        bool DeleteConnectionTimer(
+                int32_t pool_index,
+                int32_t connection_id);
+
         virtual void Run();
 
     private:
+        ConnectionTimerManager();
+
+        int32_t GenrateTimerKey(const std::string& ip_addr, int32_t fd);
+
+        DISALLOW_COPY_AND_ASSIGN(ConnectionTimerManager);
+
+    private:
+        /*
+         * in fact, is vector and thread no safe!
+         * NO push_back! except in InitTimerPool!
+         */
         CIM_VEC_PTR connection_pool_ptr_;
         int32_t pool_index_;
+        int32_t refresh_interval_;
 
+        volatile bool running_;
         PUBLIC_UTIL::Mutex connection_pool_mutex_;
 
 };

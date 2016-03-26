@@ -41,6 +41,7 @@ struct RequestQueueItem {
     void *param;
     RQ_ITEM *prev;
     RQ_ITEM *next;
+    int32_t connection_id;
 };
 
 /*

@@ -61,9 +61,7 @@ class RpcServer {
         ~RpcServer();
 
         static RpcServer& GetInstance();
-
         bool RegisteService(Service* reg_service);
-
         bool Start(const char* addr = "",
                    const char* port = "",
                    int32_t thread_num = 20,
@@ -73,11 +71,8 @@ class RpcServer {
         bool Wait();
 
         static void RpcCall(int32_t event_fd, void *arg);
-
         static void* RpcProcessor(void *arg);
-
         static void* RpcReader(void *arg);
-
         static void* RpcWriter(void *arg);
 
 
