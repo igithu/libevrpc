@@ -18,6 +18,8 @@
 
 #include <stdlib.h>
 
+#include "rpc_server.h"
+
 namespace libevrpc {
 
 using namespace PUBLIC_UTIL;

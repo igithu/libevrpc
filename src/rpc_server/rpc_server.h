@@ -75,6 +75,8 @@ class RpcServer {
         static void* RpcReader(void *arg);
         static void* RpcWriter(void *arg);
 
+        bool OpenConnectionTimer();
+
 
     private:
         RpcServer();
@@ -87,7 +89,6 @@ class RpcServer {
 
 
     private:
-
         PUBLIC_UTIL::Mutex hashmap_mutex_;
 
         HashMap method_hashmap_;
@@ -96,6 +97,9 @@ class RpcServer {
         LibevThreadPool* worker_threads_ptr_;
         LibevThreadPool* reader_threads_ptr_;
         LibevThreadPool* writer_threads_ptr_;
+
+        int32_t active_wtd_num_;
+        bool connection_timer_open_;
 
         struct CallBackParams {
             CallBackParams() :

@@ -25,14 +25,18 @@
 
 #include "util/rpc_util.h"
 #include "util/rpc_communication.h"
+#include "connection_timer_manager.h"
 
 namespace libevrpc {
+
+static ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
 
 RpcServer::RpcServer() :
     dispatcher_thread_ptr_(NULL),
     worker_threads_ptr_(NULL),
     reader_threads_ptr_(NULL),
-    writer_threads_ptr_(NULL) {
+    writer_threads_ptr_(NULL),
+    connection_timer_open_(false) {
     Initialize();
 }
 
@@ -128,7 +132,8 @@ bool RpcServer::Start(const char* addr,
     worker_threads_ptr_ = new LibevThreadPool();
 
     dispatcher_thread_ptr_->Start();
-    worker_threads_ptr_->Start(20);
+    worker_threads_ptr_->Start(thread_num);
+    active_wtd_num_ = thread_num;
 
     /*
      * if start readerpool or writerpool
@@ -321,6 +326,12 @@ void* RpcServer::RpcWriter(void *arg) {
      * The current cb_params_ptr never be used!
      */
     delete cb_params_ptr;
+}
+
+bool RpcServer::OpenConnectionTimer() {
+    ctm_instance.Start();
+    connection_timer_open_ = true;
+    return true;
 }
 
 }  // end of namespace libevrpc
