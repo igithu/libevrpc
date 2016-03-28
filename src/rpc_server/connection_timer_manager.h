@@ -25,8 +25,8 @@
 #include <memory>
 #include <string>
 
-#include "util/disallow_copy_and_assign.h"
-#include "util/thread.h"
+#include "disallow_copy_and_assign.h"
+#include "thread.h"
 
 namespace libevrpc {
 

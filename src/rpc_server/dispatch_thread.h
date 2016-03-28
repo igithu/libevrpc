@@ -23,7 +23,7 @@
 #include <ev.h>
 #include <stdint.h>
 
-#include "util/thread.h"
+#include "thread.h"
 
 namespace libevrpc {
 

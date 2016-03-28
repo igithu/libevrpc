@@ -23,8 +23,8 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/common.h>
 
-#include "util/rpc_util.h"
-#include "util/rpc_communication.h"
+#include "rpc_util.h"
+#include "rpc_communication.h"
 #include "connection_timer_manager.h"
 
 namespace libevrpc {

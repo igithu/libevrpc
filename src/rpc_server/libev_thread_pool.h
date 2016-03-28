@@ -27,7 +27,7 @@
 
 #include <ev.h>
 
-#include "util/pthread_mutex.h"
+#include "pthread_mutex.h"
 
 namespace libevrpc {
 

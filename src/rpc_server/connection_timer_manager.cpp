@@ -19,7 +19,7 @@
 
 #include <time.h>
 
-#include "util/rpc_util.h"
+#include "rpc_util.h"
 
 
 namespace libevrpc {
