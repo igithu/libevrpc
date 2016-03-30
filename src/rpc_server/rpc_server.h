@@ -24,10 +24,10 @@
 
 #include <google/protobuf/service.h>
 
-#include "disallow_copy_and_assign.h"
-#include "pthread_mutex.h"
 #include "dispatch_thread.h"
 #include "libev_thread_pool.h"
+#include "util/disallow_copy_and_assign.h"
+#include "util/pthread_mutex.h"
 
 
 namespace libevrpc {

@@ -23,13 +23,13 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/common.h>
 
-#include "rpc_util.h"
-#include "rpc_communication.h"
-#include "connection_timer_manager.h"
+#include "util/rpc_util.h"
+#include "util/rpc_communication.h"
+// #include "connection_timer_manager.h"
 
 namespace libevrpc {
 
-static ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
+// static ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
 
 RpcServer::RpcServer() :
     dispatcher_thread_ptr_(NULL),
@@ -329,7 +329,7 @@ void* RpcServer::RpcWriter(void *arg) {
 }
 
 bool RpcServer::OpenConnectionTimer() {
-    ctm_instance.Start();
+//    ctm_instance.Start();
     connection_timer_open_ = true;
     return true;
 }
