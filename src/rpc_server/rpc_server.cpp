@@ -10,8 +10,8 @@
  * @file rpc_server.cpp
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/24 00:10:22
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 #include "rpc_server.h"
@@ -280,7 +280,6 @@ void* RpcServer::RpcProcessor(void *arg) {
 }
 
 void* RpcServer::RpcReader(void *arg) {
-
     CallBackParams* cb_params_ptr = (CallBackParams*) arg;
     if (NULL == cb_params_ptr) {
         return NULL;

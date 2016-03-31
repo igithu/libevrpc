@@ -34,13 +34,10 @@ class RpcClient {
         virtual ~RpcClient();
 
         bool OpenRpcAsyncMode();
-
         bool GetAsyncResponse(const std::string& method_name, Message* response);
-
         bool SetRpcConnectionInfo(int32_t rpc_timeout, int32_t try_time = 1);
 
     protected:
-
         bool InitClient(const char* addr = "127.0.0.1", const char* port = "8899");
 
         Channel* GetRpcChannel();

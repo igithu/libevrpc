@@ -17,8 +17,8 @@
 
 
 
-#ifndef __CONNECTION_TIMER_H
-#define __CONNECTION_TIMER_H
+#ifndef __CONNECTION_TIMER_MANAGER_H
+#define __CONNECTION_TIMER_MANAGER_H
 
 #include <vector>
 #include <map>
@@ -86,7 +86,7 @@ class ConnectionTimerManager : public PUBLIC_UTIL::Thread {
 }  // end of namespace libevrpc
 
 
-#endif // __CONNECTION_TIMER_H
+#endif // __CONNECTION_TIMER_MANAGER_H
 
 
 
