@@ -22,20 +22,22 @@
 
 #include "rpc_channel.h"
 
+#include <string>
+
 namespace libevrpc {
 
-using namespace google::protobuf;
-
 class RpcClient {
-
     public:
         RpcClient();
-
         virtual ~RpcClient();
 
         bool OpenRpcAsyncMode();
-        bool GetAsyncResponse(const std::string& method_name, Message* response);
+        bool GetAsyncResponse(const std::string& method_name, google::protobuf::Message* response);
         bool SetRpcConnectionInfo(int32_t rpc_timeout, int32_t try_time = 1);
+        google::protobuf::RpcController* Status();
+
+        bool IsCallOk();
+        std::string GetErrorInfo() const;
 
     protected:
         bool InitClient(const char* addr = "127.0.0.1", const char* port = "8899");
@@ -44,6 +46,9 @@ class RpcClient {
 
     private:
         Channel* rpc_channel_ptr_;
+        google::protobuf::RpcController* rpc_controller_ptr_;
+
+
 
 };
 

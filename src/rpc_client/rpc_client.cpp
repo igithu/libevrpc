@@ -16,22 +16,50 @@
 
 #include <rpc_client.h>
 
+#include "rpc_client_controller.h"
+
 namespace libevrpc {
 
+using std::string;
+
 RpcClient::RpcClient() :
-    rpc_channel_ptr_(NULL) {
+    rpc_channel_ptr_(NULL),
+    rpc_controller_ptr_(NULL) {
 }
 
 RpcClient::~RpcClient() {
     if (NULL != rpc_channel_ptr_) {
         delete rpc_channel_ptr_;
     }
+
+    if (NULL != rpc_controller_ptr_) {
+        delete rpc_controller_ptr_;
+    }
 }
 
 bool RpcClient::InitClient(const char* addr, const char* port) {
     rpc_channel_ptr_ = new Channel(addr, port);
+    rpc_controller_ptr_ = new RpcClientController();
     SetRpcConnectionInfo(1000, 1);
     return true;
+}
+
+RpcController* RpcClient::Status() {
+    return rpc_controller_ptr_;
+}
+
+bool RpcClient::IsCallOk() {
+    if (NULL == rpc_controller_ptr_) {
+        return true;
+    }
+    return !rpc_controller_ptr_->Failed();
+}
+
+string RpcClient::GetErrorInfo() const {
+    if (NULL == rpc_controller_ptr_) {
+        return "";
+    }
+    return rpc_controller_ptr_->ErrorText();
 }
 
 Channel* RpcClient::GetRpcChannel() {

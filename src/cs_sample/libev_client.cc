@@ -68,7 +68,7 @@ void AsyscCall() {
     RpcClientImp rpc_client;
     rpc_client.OpenRpcAsyncMode();
     EchoResponse echo_response;
-    rpc_client.RpcCall().Echo(NULL, &echo_request, &echo_response, NULL);
+    rpc_client.RpcCall().Echo(rpc_client.Status(), &echo_request, &echo_response, NULL);
 
     sleep(5);
     rpc_client.RpcClient::GetAsyncResponse("Echo", &echo_response);

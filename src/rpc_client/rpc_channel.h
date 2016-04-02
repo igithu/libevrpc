@@ -22,6 +22,7 @@
 
 #include <ext/hash_map>
 
+#include <string>
 #include <vector>
 #include <list>
 #include <memory>
@@ -34,7 +35,11 @@
 
 namespace libevrpc {
 
-using namespace google::protobuf;
+using google::protobuf::Message;
+using google::protobuf::Closure;
+using google::protobuf::RpcChannel;
+using google::protobuf::RpcController;
+using google::protobuf::MethodDescriptor;
 
 typedef std::list<pthread_t> TidList;
 typedef std::shared_ptr<TidList> TidListPtr;
@@ -46,8 +51,8 @@ class Channel;
 
 struct RpcCallParams {
     RpcCallParams(
-            const string& method_full_name,
-            const string& method_client_name,
+            const std::string& method_full_name,
+            const std::string& method_client_name,
             const Message* request,
             Message* response,
             Channel* channel) :
@@ -74,24 +79,20 @@ class Channel : public RpcChannel {
         virtual ~Channel();
 
         virtual void CallMethod(const MethodDescriptor* method,
-                                RpcController* controll,
+                                RpcController* controller,
                                 const Message* request,
                                 Message* response,
                                 Closure* done);
 
         bool OpenRpcAsyncMode();
-
         bool RpcCommunication(RpcCallParams* rpc_params);
-
         bool AsyncRpcCall(RpcCallParams* rpc_params_ptr);
-
         bool GetAsyncResponse(const std::string& method_name, Message* response);
 
         /*
          * try_time for timeout
          */
         void SetConnectionInfo(int32_t timeout, int32_t try_time = 1);
-
         void SetCallLimit(int32_t limit);
 
         static void* RpcProcessor(void *arg);
@@ -109,6 +110,7 @@ class Channel : public RpcChannel {
          * only for time out
          */
         int32_t try_time_;
+        std::string err_text_;
 
         std::vector<pthread_t> thread_ids_vec_;
         MsgHashMap call_results_map_;

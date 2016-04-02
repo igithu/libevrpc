@@ -46,7 +46,7 @@ Channel::~Channel() {
 }
 
 void Channel::CallMethod(const MethodDescriptor* method,
-                         RpcController* control,
+                         RpcController* controller,
                          const Message* request,
                          Message* response,
                          Closure* done) {
@@ -61,8 +61,8 @@ void Channel::CallMethod(const MethodDescriptor* method,
         fprintf(stderr, "TcpConnect timeout! try again\n");
     } while (try_times <= 0);
 
-    if (connect_fd_ < 0) {
-        perror("Rpc connect server failed!");
+    if (connect_fd_ < 0 && NULL != controller) {
+        controller->SetFailed("Rpc connect server failed!");
         return;
     }
 
@@ -70,9 +70,11 @@ void Channel::CallMethod(const MethodDescriptor* method,
     if (is_channel_async_call_) {
         AsyncRpcCall(rpc_params_ptr);
     } else {
-        RpcCommunication(rpc_params_ptr);
-        if (!response->ParseFromString(rpc_params_ptr->response_str)) {
-            perror("SerializeToString response error in RpcChannel!");
+        if (!RpcCommunication(rpc_params_ptr)) {
+            controller->SetFailed(err_text_);
+        }
+        if (!response->ParseFromString(rpc_params_ptr->response_str) && NULL != controller) {
+            controller->SetFailed("SerializeToString response error in RpcChannel!");
             // TODO
         }
         delete rpc_params_ptr;
@@ -95,17 +97,18 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
 
     string send_str;
     if (!request->SerializeToString(&send_str)) {
-        perror("SerializeToString request failed!");
+        err_text_ = "SerializeToString request failed!";
         return false;
     }
     uint32_t hash_code = BKDRHash(method_name.c_str());
     if (RpcSend(connect_fd_, hash_code, send_str, false) < 0) {
+        err_text_ = "Send data error in rpc channel.";
         return false;
     }
 
     int32_t ret_id = RpcRecv(connect_fd_, recv_str, true);
     if (ERROR_RECV == ret_id) {
-        perror("Recv data error in rpc channel");
+        err_text_ = "Recv data error in rpc channel.";
         return false;
     }
     return true;
@@ -144,7 +147,7 @@ bool Channel::GetAsyncResponse(const string& method_name, Message* response) {
         ReadLockGuard rguard(tids_map_rwlock_);
         ret_iter = call_tids_map_.find(method_code);
         if (call_tids_map_.end() == ret_iter || ret_iter->second->size() == 0) {
-            perror("Get the response list failed");
+            err_text_ = "Get the response list failed";
             return false;
         }
         cur_tid = ret_iter->second->front();

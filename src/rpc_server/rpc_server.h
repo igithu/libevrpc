@@ -32,7 +32,6 @@
 
 namespace libevrpc {
 
-using namespace PUBLIC_UTIL;
 using namespace google::protobuf;
 using __gnu_cxx::hash_map;
 
@@ -97,6 +96,7 @@ class RpcServer {
         LibevThreadPool* worker_threads_ptr_;
         LibevThreadPool* reader_threads_ptr_;
         LibevThreadPool* writer_threads_ptr_;
+        RpcController* rpc_controller_ptr_;
 
         int32_t active_wtd_num_;
         bool connection_timer_open_;
@@ -122,6 +122,7 @@ class RpcServer {
 
             std::string recv_info;
             Message* response_ptr;
+            RpcController* rpc_controller_ptr;
         };
 
 };

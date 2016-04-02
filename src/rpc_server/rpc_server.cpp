@@ -23,11 +23,14 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/common.h>
 
+#include "rpc_server_controller.h"
 #include "util/rpc_util.h"
 #include "util/rpc_communication.h"
 // #include "connection_timer_manager.h"
 
 namespace libevrpc {
+
+using namespace PUBLIC_UTIL;
 
 // static ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
 
@@ -134,6 +137,7 @@ bool RpcServer::Start(const char* addr,
     dispatcher_thread_ptr_->Start();
     worker_threads_ptr_->Start(thread_num);
     active_wtd_num_ = thread_num;
+
 
     /*
      * if start readerpool or writerpool
@@ -246,10 +250,11 @@ void* RpcServer::RpcProcessor(void *arg) {
 
     const MethodDescriptor* method_desc = rpc_method->method;
     Message* response = rpc_method->response->New();
+    RpcController* rpc_controller_ptr = cb_params_ptr->rpc_controller_ptr;
     /*
      * call method!!
      */
-    rpc_method->service->CallMethod(method_desc, NULL, request, response, NULL);
+    rpc_method->service->CallMethod(method_desc, rpc_controller_ptr, request, response, NULL);
 
     /*
      * get send info
