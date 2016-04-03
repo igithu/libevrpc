@@ -7,72 +7,66 @@
 
 
 /**
- * @file rpc_client_controller.cpp
+ * @file client_rpc_controller.cpp
  * @author aishuyu(asy5178@163.com)
- * @date 2016/04/01 19:31:21
+ * @date 2016/04/04 00:04:09
  * @brief
  *
  **/
 
 
-#include "rpc_client_controller.h"
+
+
+#include "client_rpc_controller.h"
 
 namespace libevrpc {
 
 using std::string;
 using google::protobuf::Closure;
 
-RpcClientController::RpcClientController() : error_info_("") {
+ClientRpcController::ClientRpcController() : error_info_("") {
 }
 
-RpcClientController::~RpcClientController() {
+ClientRpcController::~ClientRpcController() {
 }
 
-void RpcClientController::Reset() {
+void ClientRpcController::Reset() {
     error_info_.clear();
 }
 
-bool RpcClientController::Failed() const {
+bool ClientRpcController::Failed() const {
     return !error_info_.empty();
 }
 
-string RpcClientController::ErrorText() const {
+string ClientRpcController::ErrorText() const {
     ReadLockGuard rguard(error_info_rwlock_);
     return error_info_;
 }
 
-void RpcClientController::StartCancel() {
+void ClientRpcController::StartCancel() {
     /*
      * TODO
      */
 }
 
-void RpcClientController::SetFailed(const string& reason) {
+void ClientRpcController::SetFailed(const string& reason) {
     WriteLockGuard wguard(error_info_rwlock_);
     error_info_.append(reason + "\n");
 }
 
-bool RpcClientController::IsCanceled() const {
+bool ClientRpcController::IsCanceled() const {
     /*
      * TODO
      */
 }
 
-void RpcClientController::NotifyOnCancel(Closure* callback) {
+void ClientRpcController::NotifyOnCancel(Closure* callback) {
     /*
      * TODO
      */
 }
 
-
-}  // end of namespace libevrpc
-
-
-
-
-
-
-
+}  // namespace of libevrpc
 
 
 

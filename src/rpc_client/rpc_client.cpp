@@ -16,7 +16,7 @@
 
 #include <rpc_client.h>
 
-#include "rpc_client_controller.h"
+#include "client_rpc_controller.h"
 
 namespace libevrpc {
 
@@ -39,7 +39,7 @@ RpcClient::~RpcClient() {
 
 bool RpcClient::InitClient(const char* addr, const char* port) {
     rpc_channel_ptr_ = new Channel(addr, port);
-    rpc_controller_ptr_ = new RpcClientController();
+    rpc_controller_ptr_ = new ClientRpcController();
     SetRpcConnectionInfo(1000, 1);
     return true;
 }

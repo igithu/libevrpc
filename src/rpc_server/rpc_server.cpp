@@ -23,7 +23,7 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/common.h>
 
-#include "rpc_server_controller.h"
+#include "server_rpc_controller.h"
 #include "util/rpc_util.h"
 #include "util/rpc_communication.h"
 // #include "connection_timer_manager.h"

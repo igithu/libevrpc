@@ -7,9 +7,9 @@
 
 
 /**
- * @file rpc_client_controller.h
+ * @file client_rpc_controller.h
  * @author aishuyu(asy5178@163.com)
- * @date 2016/04/01 19:27:34
+ * @date 2016/04/04 00:02:36
  * @brief
  *
  **/
@@ -17,8 +17,8 @@
 
 
 
-#ifndef __RPC_CLIENT_CONTROLLER_H
-#define __RPC_CLIENT_CONTROLLER_H
+#ifndef __CLIENT_RPC_CONTROLLER_H
+#define __CLIENT_RPC_CONTROLLER_H
 
 #include <google/protobuf/service.h>
 
@@ -26,10 +26,10 @@
 
 namespace libevrpc {
 
-class RpcClientController : public google::protobuf::RpcController {
+class ClientRpcController : public google::protobuf::RpcController {
     public:
-        RpcClientController();
-        ~RpcClientController();
+        ClientRpcController();
+        ~ClientRpcController();
 
         /*
          *
@@ -71,7 +71,10 @@ class RpcClientController : public google::protobuf::RpcController {
 
 
 
-#endif // __RPC_CLIENT_CONTROLLER_H
+
+
+
+#endif // __CLIENT_RPC_CONTROLLER_H
 
 
 

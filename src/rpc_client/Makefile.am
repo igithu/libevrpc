@@ -19,8 +19,8 @@ RPC_SRC = ${client_rootdir}/rpc_client.h \
 		  ${client_rootdir}/rpc_client.cpp \
 		  ${client_rootdir}/rpc_channel.h \
 		  ${client_rootdir}/rpc_channel.cpp \
-		  ${client_rootdir}/rpc_client_controller.h \
-		  ${client_rootdir}/rpc_client_controller.cpp \
+		  ${client_rootdir}/client_rpc_controller.h \
+		  ${client_rootdir}/client_rpc_controller.cpp \
 		  ${util_dir}/rpc_util.h \
 		  ${util_dir}/rpc_util.cpp \
 		  ${util_dir}/pthread_rwlock.h \

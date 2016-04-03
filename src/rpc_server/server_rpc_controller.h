@@ -7,9 +7,9 @@
 
 
 /**
- * @file rpc_server_controller.h
+ * @file server_rpc_controller.h
  * @author aishuyu(asy5178@163.com)
- * @date 2016/04/01 19:41:39
+ * @date 2016/04/04 00:11:53
  * @brief
  *
  **/
@@ -17,19 +17,18 @@
 
 
 
-#ifndef __RPC_SERVER_CONTROLLER_H
-#define __RPC_SERVER_CONTROLLER_H
+#ifndef __SERVER_RPC_CONTROLLER_H
+#define __SERVER_RPC_CONTROLLER_H
 
 
 #include <google/protobuf/service.h>
 
-
 namespace libevrpc {
 
-class RpcServerController : public google::protobuf::RpcController {
+class ServerRpcController : public google::protobuf::RpcController {
     public:
-        RpcServerController();
-        ~RpcServerController();
+        ServerRpcController();
+        ~ServerRpcController();
 
         /*
          *
@@ -61,7 +60,7 @@ class RpcServerController : public google::protobuf::RpcController {
         virtual void NotifyOnCancel(google::protobuf::Closure* callback);
 
     private:
-        std::string err_text_;
+        std::string error_info_;
 
 };
 
@@ -72,7 +71,8 @@ class RpcServerController : public google::protobuf::RpcController {
 
 
 
-#endif // __RPC_SERVER_CONTROLLER_H
+
+#endif // __SERVER_RPC_CONTROLLER_H
 
 
 
