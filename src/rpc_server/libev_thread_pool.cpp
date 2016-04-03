@@ -22,8 +22,6 @@
 
 namespace libevrpc {
 
-using namespace PUBLIC_UTIL;
-
 int32_t LibevThreadPool::item_per_alloc_ = 64;
 
 LibevThreadPool::LibevThreadPool() :

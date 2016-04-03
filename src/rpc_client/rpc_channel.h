@@ -1,7 +1,7 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
- * 
+ *
  **************************************************************************/
 
 
@@ -10,8 +10,8 @@
  * @file rpc_channel.h
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/23 16:37:20
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -110,14 +110,14 @@ class Channel : public RpcChannel {
          * only for time out
          */
         int32_t try_time_;
-        std::string err_text_;
+        std::string error_info_;
 
         std::vector<pthread_t> thread_ids_vec_;
         MsgHashMap call_results_map_;
         PthreadHashMap call_tids_map_;
 
-        PUBLIC_UTIL::RWLock tids_map_rwlock_;
-        PUBLIC_UTIL::RWLock ret_map_rwlock_;
+        RWLock tids_map_rwlock_;
+        RWLock ret_map_rwlock_;
 };
 
 }  // end of namespace libevrpc

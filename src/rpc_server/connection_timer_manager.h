@@ -45,7 +45,7 @@ struct ConnectionTimer {
     CI_PTR next;
 };
 
-class ConnectionTimerManager : public PUBLIC_UTIL::Thread {
+class ConnectionTimerManager : public Thread {
     public:
         ~ConnectionTimerManager();
 
@@ -79,7 +79,7 @@ class ConnectionTimerManager : public PUBLIC_UTIL::Thread {
         int32_t refresh_interval_;
 
         volatile bool running_;
-        PUBLIC_UTIL::Mutex connection_pool_mutex_;
+        Mutex connection_pool_mutex_;
 
 };
 

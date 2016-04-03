@@ -1,17 +1,17 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2015 aishuyu, Inc. All Rights Reserved
- * 
+ *
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file pthread_rwlock.h
  * @author aishuyu(asy5178@163.com)
  * @date 2015/01/04 17:09:52
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -27,7 +27,7 @@
 #include <unistd.h>
 
 
-namespace PUBLIC_UTIL {
+namespace libevrpc {
 
 class RWLock {
     public:
@@ -143,7 +143,7 @@ class WriteLockGuard {
 
 };
 
-}  // end of namespace PUBLIC_UTIL
+}  // end of namespace libervpc
 
 
 

@@ -22,6 +22,7 @@
 
 #include <google/protobuf/service.h>
 
+#include "util/pthread_rwlock.h"
 
 namespace libevrpc {
 
@@ -60,7 +61,8 @@ class RpcClientController : public google::protobuf::RpcController {
         virtual void NotifyOnCancel(google::protobuf::Closure* callback);
 
     private:
-        std::string err_text_;
+        std::string error_info_;
+        mutable RWLock error_info_rwlock_;
 
 };
 

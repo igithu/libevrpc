@@ -1,17 +1,17 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
- * 
+ *
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file thread.h
  * @author aishuyu(asy5178@163.com)
  * @date 2014/10/30 21:39:40
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 
-namespace PUBLIC_UTIL {
+namespace libevrpc {
 
 class Thread {
     public:

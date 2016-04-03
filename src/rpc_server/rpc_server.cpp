@@ -30,8 +30,6 @@
 
 namespace libevrpc {
 
-using namespace PUBLIC_UTIL;
-
 // static ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
 
 RpcServer::RpcServer() :

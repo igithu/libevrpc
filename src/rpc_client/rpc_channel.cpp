@@ -1,7 +1,7 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
- * 
+ *
  **************************************************************************/
 
 
@@ -10,7 +10,7 @@
  * @file rpc_channel.cpp
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/23 16:25:13
- * @brief 
+ * @brief
  *
  **/
 
@@ -24,7 +24,6 @@
 
 namespace libevrpc {
 
-using namespace PUBLIC_UTIL;
 using std::string;
 using std::vector;
 
@@ -71,7 +70,7 @@ void Channel::CallMethod(const MethodDescriptor* method,
         AsyncRpcCall(rpc_params_ptr);
     } else {
         if (!RpcCommunication(rpc_params_ptr)) {
-            controller->SetFailed(err_text_);
+            controller->SetFailed(error_info_);
         }
         if (!response->ParseFromString(rpc_params_ptr->response_str) && NULL != controller) {
             controller->SetFailed("SerializeToString response error in RpcChannel!");
@@ -97,18 +96,18 @@ bool Channel::RpcCommunication(RpcCallParams* rpc_params) {
 
     string send_str;
     if (!request->SerializeToString(&send_str)) {
-        err_text_ = "SerializeToString request failed!";
+        error_info_ = "SerializeToString request failed!";
         return false;
     }
     uint32_t hash_code = BKDRHash(method_name.c_str());
     if (RpcSend(connect_fd_, hash_code, send_str, false) < 0) {
-        err_text_ = "Send data error in rpc channel.";
+        error_info_ = "Send data error in rpc channel.";
         return false;
     }
 
     int32_t ret_id = RpcRecv(connect_fd_, recv_str, true);
     if (ERROR_RECV == ret_id) {
-        err_text_ = "Recv data error in rpc channel.";
+        error_info_ = "Recv data error in rpc channel.";
         return false;
     }
     return true;
@@ -147,7 +146,7 @@ bool Channel::GetAsyncResponse(const string& method_name, Message* response) {
         ReadLockGuard rguard(tids_map_rwlock_);
         ret_iter = call_tids_map_.find(method_code);
         if (call_tids_map_.end() == ret_iter || ret_iter->second->size() == 0) {
-            err_text_ = "Get the response list failed";
+            error_info_ = "Get the response list failed";
             return false;
         }
         cur_tid = ret_iter->second->front();

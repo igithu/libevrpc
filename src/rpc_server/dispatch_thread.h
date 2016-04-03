@@ -27,7 +27,6 @@
 
 namespace libevrpc {
 
-using namespace PUBLIC_UTIL;
 
 /*
  * callback in dispatch_thread

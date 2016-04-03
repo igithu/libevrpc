@@ -55,6 +55,9 @@ void SysncCall() {
     EchoResponse echo_response;
     RpcClientImp rpc_client;
     rpc_client.RpcCall().Echo(NULL, &echo_request, &echo_response, NULL);;
+    if (!rpc_client.IsCallOk()) {
+        printf("error call in rpc client! error info is %d\n", rpc_client.GetErrorInfo().c_str());
+    }
     echo_response.PrintDebugString();
     string ret = echo_response.response();
     printf("echo recv msg is %s\n", ret.c_str());

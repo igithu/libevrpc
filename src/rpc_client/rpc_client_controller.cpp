@@ -22,22 +22,23 @@ namespace libevrpc {
 using std::string;
 using google::protobuf::Closure;
 
-RpcClientController::RpcClientController() : err_text_("") {
+RpcClientController::RpcClientController() : error_info_("") {
 }
 
 RpcClientController::~RpcClientController() {
 }
 
 void RpcClientController::Reset() {
-    err_text_.clear();
+    error_info_.clear();
 }
 
 bool RpcClientController::Failed() const {
-    return !err_text_.empty();
+    return !error_info_.empty();
 }
 
 string RpcClientController::ErrorText() const {
-    return err_text_;
+    ReadLockGuard rguard(error_info_rwlock_);
+    return error_info_;
 }
 
 void RpcClientController::StartCancel() {
@@ -47,7 +48,8 @@ void RpcClientController::StartCancel() {
 }
 
 void RpcClientController::SetFailed(const string& reason) {
-    err_text_ = reason;
+    WriteLockGuard wguard(error_info_rwlock_);
+    error_info_.append(reason + "\n");
 }
 
 bool RpcClientController::IsCanceled() const {

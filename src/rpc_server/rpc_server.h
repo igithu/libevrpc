@@ -88,7 +88,7 @@ class RpcServer {
 
 
     private:
-        PUBLIC_UTIL::Mutex hashmap_mutex_;
+        Mutex hashmap_mutex_;
 
         HashMap method_hashmap_;
 

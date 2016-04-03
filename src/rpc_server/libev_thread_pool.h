@@ -53,7 +53,7 @@ class RequestQueue {
     public:
         RQ_ITEM* head;
         RQ_ITEM* tail;
-        PUBLIC_UTIL::Mutex q_mutex;
+        Mutex q_mutex;
 };
 
 /*
@@ -115,7 +115,7 @@ class LibevThreadPool {
         LIBEV_THREAD* libev_threads_;
         RQ_ITEM*  rqi_freelist_;
 
-        PUBLIC_UTIL::Mutex rqi_freelist_mutex_;
+        Mutex rqi_freelist_mutex_;
 
         static int32_t item_per_alloc_;
         //static atomic_bool running_;
