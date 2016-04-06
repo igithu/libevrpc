@@ -44,7 +44,8 @@ function get_sources_deps() {
 function install_deps() {
     if [ -f $INSTALL_ROOT_DIR/$2/mark_done ]
     then
-        exit 0
+        echo "$1 hash been installed in $INSTALL_ROOT_DIR/$2"
+        return 0
     fi
 
     if [ -d $BUILD_ROOT/deps/$1 ]
@@ -68,10 +69,7 @@ function install_deps() {
         exit -1
     fi
     touch $INSTALL_ROOT_DIR/$2/mark_done
-    touch $BUILD_ROOT/deps/mark_done
-    echo $INSTALL_ROOT_DIR/$2/mark_done
-    echo $BUILD_ROOT/deps/$1
-    exit 0
+    touch $BUILD_ROOT/third-64/mark_done
 }
 
 
@@ -81,35 +79,5 @@ get_sources_deps  deps
 check_directory third-64
 
 install_deps libev-4.19 libev && install_deps protobuf-2.6.0 protobuf
-
-
-#cd $BUILD_ROOT/deps
-#
-#tar -zxvf libev-4.19.tar.gz
-#cd libev-4.19
-#make && make check &
-
-#if [ ! -f $BUILD_ROOT/deps/mark_done ]
-#then
-#    if [ -d $BUILD_ROOT/deps ]
-#    then
-#        rm -rf $BUILD_ROOT/deps
-#    fi
-#    git clone $DEPS_PRFIX/deps.git
-#    if [ $? -e 0 ]
-#    then
-#        touch deps/mark_done
-#    fi
-#fi
-#
-#if [ ! -f $BUILD_ROOT/deps/mark_done ]
-#    echo "Get deps file failed!"
-#    exit -1
-#fi
-
-
-
-
-
 
 
