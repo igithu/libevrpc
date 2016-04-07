@@ -26,6 +26,11 @@
 
 namespace libevepc {
 
+#define DEFAULT_INT -1
+#define DEFAULT_DOUBLE -1.0
+#define DEFAULT_CHAR NULL
+#define DEFAULT_BOOL false
+
 class ConfigParser {
     public:
         ~ConfigParser();
@@ -41,6 +46,8 @@ class ConfigParser {
         // const char *IniGetLocalIPAddr();
         // const char *IniGetLocalHostName();
 
+        void PrintErrorInfo();
+
     private:
         ConfigParser();
         ConfigParser(const std::string& ini_file);
@@ -52,6 +59,7 @@ class ConfigParser {
     private:
         bool is_init_;
         std::string ini_file_;
+        std::string error_info_;
 
         dictionary* dict_ini_;
 };

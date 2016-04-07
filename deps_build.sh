@@ -40,7 +40,7 @@ function get_sources_deps() {
     fi
 }
 
-# $1:with version
+# $1:must be with version number
 function install_deps() {
     if [ -f $INSTALL_ROOT_DIR/$2/mark_done ]
     then

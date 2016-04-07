@@ -33,6 +33,9 @@ ConfigParser::ConfigParser(const std::string& ini_file) :
 }
 
 ConfigParser::~ConfigParser() {
+    if (NULL != dict_ini_) {
+        iniparser_freedict(dict_ini_);
+    }
 }
 
 ConfigParser& ConfigParser::GetInstance() {
@@ -46,25 +49,47 @@ ConfigParser& ConfigParser::GetInstance(const std::string& ini_file) {
 }
 
 bool ConfigParser::InitConfigParser() {
+    dict_ini_ = iniparser_load(ini_file_);
     return true;
 }
 
 int32_t ConfigParser::GetSecKeysNum(const string& sec_key) {
+    if (NULL != dict_ini_) {
+        exit(-1);
+    }
+    return iniparser_getsecnkeys(dict_ini_, const_cast<char*>(sec_key.c_str()));
 }
 
 int32_t ConfigParser::IniGetInt(const string& sec_key) {
+    if (NULL != dict_ini_) {
+        exit(-1);
+    }
+    return iniparser_getint(dict_ini_, sec_key.c_str(), DEFAULT_INT);
 }
 
 double ConfigParser::IniGetDouble(const string& sec_key) {
+    if (NULL != dict_ini_) {
+        exit(-1);
+    }
+    return iniparser_getdouble(dict_ini_, sec_key.c_str(), DEFAULT_DOUBLE);
 }
 
 const char* ConfigParser::IniGetString(const string& sec_key) {
+    if (NULL != dict_ini_) {
+        exit(-1);
+    }
+    return iniparser_getstring(dict_ini_, sec_key.c_str(), DEFAULT_CHAR);
 }
 
 bool ConfigParser::IniGetBool(const string& sec_key) {
-    return true;
+    if (NULL != dict_ini_) {
+        exit(-1);
+    }
+    return iniparser_getboolean(dict_ini_, sec_key.c_str(), DEFAULT_BOOL);;
 }
 
+void PrintErrorInfo() {
+}
 
 
 
