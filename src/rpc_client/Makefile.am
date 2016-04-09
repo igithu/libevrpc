@@ -26,9 +26,9 @@ RPC_SRC = ${client_rootdir}/rpc_client.h \
 		  ${config_dir}/config_parser.h \
 		  ${config_dir}/config_parser.cpp \
 		  ${config_dir}/dictionary.h \
-		  ${config_dir}/dictionary.c \
+		  ${config_dir}/dictionary.cpp \
 		  ${config_dir}/iniparser.h \
-		  ${config_dir}/iniparser.c \
+		  ${config_dir}/iniparser.cpp \
 		  ${util_dir}/rpc_util.h \
 		  ${util_dir}/rpc_util.cpp \
 		  ${util_dir}/pthread_rwlock.h \

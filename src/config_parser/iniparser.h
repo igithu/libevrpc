@@ -27,9 +27,12 @@
 
 #include "dictionary.h"
 
+namespace libevrpc {
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -311,5 +314,7 @@ void iniparser_freedict(dictionary * d);
 #ifdef __cplusplus
 }
 #endif
+
+} // end of namespace libevrpc
 
 #endif

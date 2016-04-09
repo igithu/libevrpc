@@ -22,9 +22,10 @@
 
 #include <string>
 
+#include "iniparser.h"
 #include "util/disallow_copy_and_assign.h"
 
-namespace libevepc {
+namespace libevrpc {
 
 #define DEFAULT_INT -1
 #define DEFAULT_DOUBLE -1.0
@@ -64,7 +65,7 @@ class ConfigParser {
         dictionary* dict_ini_;
 };
 
-}  // end of namespace libevepc
+}  // end of namespace libevrpc
 
 
 #endif // __CONFIG_PARSER_H

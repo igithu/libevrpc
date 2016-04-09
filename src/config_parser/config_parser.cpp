@@ -16,7 +16,7 @@
 
 #include "config_parser.h"
 
-namespace libevepc {
+namespace libevrpc {
 
 using std::string;
 
@@ -49,7 +49,7 @@ ConfigParser& ConfigParser::GetInstance(const std::string& ini_file) {
 }
 
 bool ConfigParser::InitConfigParser() {
-    dict_ini_ = iniparser_load(ini_file_);
+    dict_ini_ = iniparser_load(ini_file_.c_str());
     return true;
 }
 
@@ -93,7 +93,7 @@ void PrintErrorInfo() {
 
 
 
-}  // end of namespace libevepc
+}  // end of namespace libevrpc
 
 
 

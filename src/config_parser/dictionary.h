@@ -23,9 +23,12 @@
 #include <string.h>
 #include <unistd.h>
 
+namespace libevrpc {
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /*---------------------------------------------------------------------------
                                 New types
@@ -178,8 +181,11 @@ void dictionary_dump(dictionary * d, FILE * out);
 /*--------------------------------------------------------------------------*/
 char * xstrdup(const char * s);
 
+
 #ifdef __cplusplus
 }
 #endif
+
+} // end of namespace libevrpc
 
 #endif
