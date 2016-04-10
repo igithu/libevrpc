@@ -1,7 +1,7 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
- * 
+ *
  **************************************************************************/
 
 
@@ -10,8 +10,8 @@
  * @file rpc_client.cpp
  * @author aishuyu(asy5178@163.com)
  * @date 2014/12/02 14:41:35
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 #include <stdio.h>
@@ -36,7 +36,7 @@ class RpcClientImp : public RpcClient {
 };
 
 RpcClientImp::RpcClientImp() {
-    InitClient("127.0.0.1", "9999");
+    // InitClient("127.0.0.1", "9999");
     service_call_ptr_ = new EchoService_Stub(GetRpcChannel());
 }
 

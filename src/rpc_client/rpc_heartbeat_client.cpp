@@ -18,7 +18,9 @@
 
 namespace libevrpc {
 
-RpcHeartbeatClient::RpcHeartbeatClient() : running_(true) {
+RpcHeartbeatClient::RpcHeartbeatClient(
+        const char* hb_server_addr, const char* hb_server_port) :
+    running_(true) {
 }
 
 RpcHeartbeatClient::~RpcHeartbeatClient() {

@@ -24,11 +24,14 @@
 
 #include <string>
 
+#include "rpc_heartbeat_client.h"
+#include "config_parser/config_parser.h"
+
 namespace libevrpc {
 
 class RpcClient {
     public:
-        RpcClient();
+        RpcClient(const std::string& config_file = "../conf/libevrpc.ini");
         virtual ~RpcClient();
 
         bool OpenRpcAsyncMode();
@@ -40,13 +43,27 @@ class RpcClient {
         std::string GetErrorInfo() const;
 
     protected:
-        bool InitClient(const char* addr = "127.0.0.1", const char* port = "8899");
+        bool InitClient();
 
         Channel* GetRpcChannel();
 
     private:
+        /*
+         * rpc channel: communication with server
+         */
         Channel* rpc_channel_ptr_;
+        /*
+         *controll the rpc client action
+         */
         google::protobuf::RpcController* rpc_controller_ptr_;
+        /*
+         *
+         */
+        RpcHeartbeatClient* rpc_heartbeat_ptr_;;
+        /*
+         * when init, read config from config file
+         */
+        ConfigParser& config_parser_instance_;
 
 
 

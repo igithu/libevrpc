@@ -30,6 +30,7 @@ ConfigParser::ConfigParser(const std::string& ini_file) :
     is_init_(false),
     ini_file_(ini_file),
     dict_ini_(NULL) {
+        InitConfigParser();
 }
 
 ConfigParser::~ConfigParser() {
@@ -53,39 +54,39 @@ bool ConfigParser::InitConfigParser() {
     return true;
 }
 
-int32_t ConfigParser::GetSecKeysNum(const string& sec_key) {
+int32_t ConfigParser::GetSecKeysNum(const char* sec_key, int32_t defalut_val) {
     if (NULL != dict_ini_) {
-        exit(-1);
+        return defalut_val;
     }
-    return iniparser_getsecnkeys(dict_ini_, const_cast<char*>(sec_key.c_str()));
+    return iniparser_getsecnkeys(dict_ini_, const_cast<char*>(sec_key));
 }
 
-int32_t ConfigParser::IniGetInt(const string& sec_key) {
+int32_t ConfigParser::IniGetInt(const char* sec_key, int32_t defalut_val) {
     if (NULL != dict_ini_) {
-        exit(-1);
+        return defalut_val;
     }
-    return iniparser_getint(dict_ini_, sec_key.c_str(), DEFAULT_INT);
+    return iniparser_getint(dict_ini_, sec_key, defalut_val);
 }
 
-double ConfigParser::IniGetDouble(const string& sec_key) {
+double ConfigParser::IniGetDouble(const char* sec_key, double defalut_val) {
     if (NULL != dict_ini_) {
-        exit(-1);
+        return defalut_val;
     }
-    return iniparser_getdouble(dict_ini_, sec_key.c_str(), DEFAULT_DOUBLE);
+    return iniparser_getdouble(dict_ini_, sec_key, defalut_val);
 }
 
-const char* ConfigParser::IniGetString(const string& sec_key) {
+const char* ConfigParser::IniGetString(const char* sec_key, const char* defalut_val) {
     if (NULL != dict_ini_) {
-        exit(-1);
+        defalut_val;
     }
-    return iniparser_getstring(dict_ini_, sec_key.c_str(), DEFAULT_CHAR);
+    return iniparser_getstring(dict_ini_, sec_key, const_cast<char*>(defalut_val));
 }
 
-bool ConfigParser::IniGetBool(const string& sec_key) {
+bool ConfigParser::IniGetBool(const char* sec_key, bool defalut_val) {
     if (NULL != dict_ini_) {
-        exit(-1);
+        defalut_val;
     }
-    return iniparser_getboolean(dict_ini_, sec_key.c_str(), DEFAULT_BOOL);;
+    return iniparser_getboolean(dict_ini_, sec_key, defalut_val);;
 }
 
 void PrintErrorInfo() {

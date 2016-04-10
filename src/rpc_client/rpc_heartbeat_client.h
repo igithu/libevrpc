@@ -27,7 +27,8 @@ namespace libevrpc {
 
 class RpcHeartbeatClient : public Thread {
     public:
-        RpcHeartbeatClient();
+        RpcHeartbeatClient(const char* hb_server_addr,
+                           const char* hb_server_port);
         ~RpcHeartbeatClient();
 
         int32_t InitRpcConnection();
