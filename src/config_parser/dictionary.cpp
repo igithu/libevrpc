@@ -68,7 +68,7 @@ char * xstrdup(const char * s)
         return NULL ;
 
     len = strlen(s) + 1 ;
-    t = malloc(len) ;
+    t = (char*)malloc(len) ;
     if (t) {
         memcpy(t, s, len) ;
     }
@@ -126,13 +126,13 @@ dictionary * dictionary_new(size_t size)
     /* If no size was specified, allocate space for DICTMINSZ */
     if (size<DICTMINSZ) size=DICTMINSZ ;
 
-    d = calloc(1, sizeof *d) ;
+    d = (dictionary*)calloc(1, sizeof *d) ;
 
     if (d) {
         d->size = size ;
-        d->val  = calloc(size, sizeof *d->val);
-        d->key  = calloc(size, sizeof *d->key);
-        d->hash = calloc(size, sizeof *d->hash);
+        d->val  = (char**)calloc(size, sizeof *d->val);
+        d->key  = (char**)calloc(size, sizeof *d->key);
+        d->hash = (unsigned*)calloc(size, sizeof *d->hash);
     }
     return d ;
 }
@@ -255,9 +255,9 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     if (d->n==d->size) {
 
         /* Reached maximum size: reallocate dictionary */
-        d->val  = mem_double(d->val,  d->size * sizeof *d->val) ;
-        d->key  = mem_double(d->key,  d->size * sizeof *d->key) ;
-        d->hash = mem_double(d->hash, d->size * sizeof *d->hash) ;
+        d->val  = (char**)mem_double(d->val,  d->size * sizeof *d->val) ;
+        d->key  = (char**)mem_double(d->key,  d->size * sizeof *d->key) ;
+        d->hash = (unsigned*)mem_double(d->hash, d->size * sizeof *d->hash) ;
         if ((d->val==NULL) || (d->key==NULL) || (d->hash==NULL)) {
             /* Cannot grow dictionary */
             return -1 ;
