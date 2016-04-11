@@ -23,6 +23,8 @@ RPC_SRC = ${client_rootdir}/rpc_client.h \
 		  ${client_rootdir}/rpc_channel.cpp \
 		  ${client_rootdir}/client_rpc_controller.h \
 		  ${client_rootdir}/client_rpc_controller.cpp \
+		  ${client_rootdir}/rpc_heartbeat_client.h \
+		  ${client_rootdir}/rpc_heartbeat_client.cpp \
 		  ${config_dir}/config_parser.h \
 		  ${config_dir}/config_parser.cpp \
 		  ${config_dir}/dictionary.h \

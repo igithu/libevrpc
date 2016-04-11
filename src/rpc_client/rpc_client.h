@@ -57,7 +57,7 @@ class RpcClient {
          */
         google::protobuf::RpcController* rpc_controller_ptr_;
         /*
-         *
+         * heartbeat in client
          */
         RpcHeartbeatClient* rpc_heartbeat_ptr_;;
         /*

@@ -42,17 +42,18 @@ RpcClient::~RpcClient() {
 }
 
 bool RpcClient::InitClient() {
-
     const char* rpc_server_addr = config_parser_instance_.IniGetString("rpc_server_addr", NULL);
     const char* rpc_server_port = config_parser_instance_.IniGetString("rpc_server_port", NULL);
     const char* hb_server_port = config_parser_instance_.IniGetString("server_heartbeat_port", NULL);
+    int32_t rpc_connection_timeout = config_parser_instance_.IniGetInt("connection_timeout", 10);
+
     if (NULL != rpc_server_addr && NULL != rpc_server_port) {
         rpc_channel_ptr_ = new Channel(rpc_server_addr, rpc_server_port);
     } else {
         rpc_channel_ptr_ = new Channel("127.0.0.1", "8899");
         fprintf(stderr, "Attention! rpc client cann't read config file! Init with local server address and default port:8899!\n");
     }
-    // rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port);
+    rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port, rpc_connection_timeout);
     rpc_controller_ptr_ = new ClientRpcController();
     SetRpcConnectionInfo(1000, 1);
     return true;

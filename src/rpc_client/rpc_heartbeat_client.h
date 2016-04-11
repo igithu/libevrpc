@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright (c) 2015 aishuyu, Inc. All Rights Reserved
+ * Copyright (c) 2016 aishuyu, Inc. All Rights Reserved
  *
  **************************************************************************/
 
@@ -20,6 +20,7 @@
 #ifndef __RPC_HEARTBEAT_CLIENT_H
 #define __RPC_HEARTBEAT_CLIENT_H
 
+#include <stdint.h>
 
 #include "util/thread.h"
 
@@ -28,7 +29,8 @@ namespace libevrpc {
 class RpcHeartbeatClient : public Thread {
     public:
         RpcHeartbeatClient(const char* hb_server_addr,
-                           const char* hb_server_port);
+                           const char* hb_server_port,
+                           int32_t timeout);
         ~RpcHeartbeatClient();
 
         int32_t InitRpcConnection();
@@ -37,6 +39,8 @@ class RpcHeartbeatClient : public Thread {
     private:
         char* hb_server_addr_;
         char* hb_server_port_;
+        int32_t timeout_;
+        int32_t connect_fd_;
 
         volatile bool running_;
 };
