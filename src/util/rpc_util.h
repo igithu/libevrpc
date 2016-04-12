@@ -26,6 +26,8 @@ namespace libevrpc {
 
 uint32_t BKDRHash(const char *orig_str);
 
+void PrintErrorInfo(const char* error_info);
+
 }  // end of namespace libevrpc
 
 

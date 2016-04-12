@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright (c) 2015 aishuyu, Inc. All Rights Reserved
+ * Copyright (c) 2016 aishuyu, Inc. All Rights Reserved
  *
  **************************************************************************/
 
@@ -28,7 +28,8 @@ using std::string;
 
 
 ConnectionTimerManager::ConnectionTimerManager() :
-    connection_pool_ptr_(new CIM_VEC()),
+    connection_buf_ptr_(new CIM_VEC()),
+    connection_buf_mutex_ptr_(new MUTEX_VEC()),
     pool_index_(0),
     refresh_interval_(30),
     running_(false) {
@@ -48,7 +49,8 @@ int32_t ConnectionTimerManager::InitTimerPool() {
      int32_t cur_index = 0;
      {
          MutexLockGuard lock(connection_pool_mutex_);
-         connection_pool_ptr_->push_back(ci_map_ptr);
+         connection_buf_ptr_->push_back(ci_map_ptr);
+         connection_buf_mutex_ptr_->push_back(new Mutex());
          cur_index = pool_index_;
          ++pool_index_;
      }
@@ -60,33 +62,41 @@ int32_t ConnectionTimerManager::InsertConnectionTimer(
         const string& ip_addr,
         int32_t fd,
         int32_t pool_index) {
-    /*
-     * every thread has its own pool_index
-     */
-    CI_MAP_PTR cim_ptr = connection_pool_ptr_->at(pool_index);
-    if (NULL == cim_ptr) {
-        return false;
-    }
-    int32_t t_key = GenrateTimerKey(ip_addr, fd);
     CI_PTR ci_ptr(new ConnectionTimer());
     ci_ptr->fd = fd;
     ci_ptr->client_addr = std::move(ip_addr);
     ci_ptr->expire_time = time(NULL) + refresh_interval_;
 
     /*
-     * use auto in c++ 11
+     * every thread has its own pool_index
+     * mutex is shared with background thread
      */
-    CI_MAP::iterator iter = cim_ptr->find(t_key);
-    if (iter == cim_ptr->end()) {
-        cim_ptr->insert(std::make_pair(t_key, ci_ptr));
-    } else {
-        iter->sencond = ci_ptr;
+    Mutex& mutex = connection_buf_mutex_ptr_->at(pool_index);
+    {
+        MutexLockGuard guard(mutex)
+        CI_MAP_PTR cim_ptr = connection_buf_ptr_->at(pool_index);
+        if (NULL == cim_ptr) {
+            /*
+             * means the connection map is taken to in the connection 
+             * time wheel bucket
+             */
+            cim_ptr = new CI_MAP();
+        }
+        /*
+         * use auto in c++ 11
+         */
+        CI_MAP::iterator iter = cim_ptr->find(t_key);
+        if (iter == cim_ptr->end()) {
+            cim_ptr->insert(std::make_pair(t_key, ci_ptr));
+        } else {
+            iter->sencond = ci_ptr;
+        }
     }
     return t_key;
 }
 
 bool DeleteConnectionTimer(int32_t pool_index, int32_t connection_id) {
-    CI_MAP_PTR cim_ptr = connection_pool_ptr_->at(pool_index);
+    CI_MAP_PTR cim_ptr = connection_buf_ptr_->at(pool_index);
     if (NULL == cim_ptr) {
         return false;
     }
@@ -103,9 +113,9 @@ bool DeleteConnectionTimer(int32_t pool_index, int32_t connection_id) {
 
 void ConnectionTimerManager::Run() {
     pool_index_ = 0;
-    int32_t total_size = connection_pool_ptr_->size();
+    int32_t total_size = connection_buf_ptr_->size();
     while (running_) {
-        CI_MAP_PTR cim_ptr = connection_pool_ptr_->at(pool_index_);
+        CI_MAP_PTR cim_ptr = connection_buf_ptr_->at(pool_index_);
         if (NULL == cim_ptr || cim_ptr->empty()) {
             sleep(3);
         }
@@ -126,7 +136,7 @@ void ConnectionTimerManager::Run() {
     }
 }
 
-int32_t GenrateTimerKey(const std::string& ip_addr, int32_t fd) {
+int32_t GenerateTimerKey(const std::string& ip_addr, int32_t fd) {
     int32_t hash_code = BKDRHash(ip_addr);
     return hash_code + fd;
 }

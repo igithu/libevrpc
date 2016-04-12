@@ -17,6 +17,7 @@
 #include <rpc_client.h>
 
 #include "client_rpc_controller.h"
+#include "util/rpc_util.h"
 
 namespace libevrpc {
 
@@ -51,7 +52,8 @@ bool RpcClient::InitClient() {
         rpc_channel_ptr_ = new Channel(rpc_server_addr, rpc_server_port);
     } else {
         rpc_channel_ptr_ = new Channel("127.0.0.1", "8899");
-        fprintf(stderr, "Attention! rpc client cann't read config file! Init with local server address and default port:8899!\n");
+        PrintErrorInfo("Attention! rpc client cann't read config file!");
+        PrintErrorInfo("Init with local server address and default port:8899!");
     }
     rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port, rpc_connection_timeout);
     rpc_controller_ptr_ = new ClientRpcController();
@@ -83,7 +85,7 @@ Channel* RpcClient::GetRpcChannel() {
 
 bool RpcClient::OpenRpcAsyncMode() {
     if (NULL == rpc_channel_ptr_) {
-        perror("Maybe YOU DIDNOT call InitClient first! open the async failed!");
+        PrintErrorInfo("Maybe YOU DIDNOT call InitClient first! open the async failed!");
         exit(0);
     }
     rpc_channel_ptr_->OpenRpcAsyncMode();

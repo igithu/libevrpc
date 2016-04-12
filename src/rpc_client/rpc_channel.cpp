@@ -57,7 +57,7 @@ void Channel::CallMethod(const MethodDescriptor* method,
             break;
         }
         --try_times;
-        fprintf(stderr, "TcpConnect timeout! try again\n");
+        PrintErrorInfo("TcpConnect timeout! try again!");
     } while (try_times <= 0);
 
     if (connect_fd_ < 0 && NULL != controller) {

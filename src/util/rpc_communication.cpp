@@ -29,6 +29,8 @@
 #include <netinet/tcp.h>
 #include <netdb.h>
 
+#include "rpc_util.h"
+
 namespace libevrpc {
 
 using std::string;
@@ -37,7 +39,7 @@ bool NonBlockMode(int32_t sock, bool mode) {
     int32_t opts = fcntl(sock, F_GETFL);
 
     if (opts < 0) {
-        perror("Get Flag sock mode failed!\n");
+        PrintErrorInfo("Get Flag sock mode failed!\n");
         return false;
     }
 
@@ -47,7 +49,7 @@ bool NonBlockMode(int32_t sock, bool mode) {
         opts = opts | ~O_NONBLOCK;
     }
     if (fcntl(sock, F_SETFL, opts) < 0) {
-        perror("Call fcntl failed!\n");
+        PrintErrorInfo("Call fcntl failed!\n");
         return false;
     }
     return true;
@@ -234,6 +236,10 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen, bool non_block) 
 
 int32_t RpcRecv(int32_t fd, std::string& recv_info_str, bool need_closed) {
     char recv_buf[MetaSize];
+    /*
+     * transfer_id : when h_code less 0, is RpcSend the info
+     *               others, is error code or nothing
+     */
     int32_t transfer_id;
 
     do {
@@ -275,6 +281,11 @@ int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, boo
     if (transfer_id < 0) {
         return -1;
     } else if (0 == transfer_id) {
+        /*
+         * transfer_id is 0, in fact make the h_code be -1
+         * the user of RpcRecv should ingore it. because it
+         * means noting
+         */
         transfer_id = 1;
     }
 
@@ -288,7 +299,7 @@ int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, boo
         (meta_data.body)[BODY_SIZE - 1] = '\0';
         meta_data.h_code = i;
         if (send(fd, &meta_data, MetaSize, 0) < 0) {
-            perror("Send Meta Data failed!\n");
+            PrintErrorInfo("Send Meta Data failed!\n");
             close(fd);
             return -1;
         }
@@ -301,7 +312,7 @@ int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, boo
         (meta_data.body)[rest_len] = '\0';
         meta_data.h_code = -1 * transfer_id;
         if (send(fd, &meta_data, MetaSize, 0) < 0) {
-            perror("Send Meta Data failed!\n");
+            PrintErrorInfo("Send Meta Data failed!\n");
             close(fd);
             return -1;
         }

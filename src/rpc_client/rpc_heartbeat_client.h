@@ -33,7 +33,7 @@ class RpcHeartbeatClient : public Thread {
                            int32_t timeout);
         ~RpcHeartbeatClient();
 
-        int32_t InitRpcConnection();
+        bool CreateRpcConnection();
         virtual void Run();
 
     private:

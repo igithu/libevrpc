@@ -19,9 +19,12 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "util/rpc_util.h"
 #include "util/rpc_communication.h"
 
 namespace libevrpc {
+
+using std::string;
 
 RpcHeartbeatClient::RpcHeartbeatClient(
         const char* hb_server_addr, const char* hb_server_port, int32_t timeout) :
@@ -46,7 +49,7 @@ RpcHeartbeatClient::~RpcHeartbeatClient() {
     }
 }
 
-int32_t RpcHeartbeatClient::InitRpcConnection() {
+bool RpcHeartbeatClient::CreateRpcConnection() {
     int32_t try_times = 3;
     do {
         connect_fd_ = TcpConnect(hb_server_addr_, hb_server_port_, timeout_);
@@ -54,18 +57,32 @@ int32_t RpcHeartbeatClient::InitRpcConnection() {
             break;
         }
         --try_times;
-        fprintf(stderr, "TcpConnect timeout! try again\n");
+        PrintErrorInfo("Heart beat tcp connect timeout! try again!");
     } while (try_times <= 0);
+
+    if (connect_fd_ < 0) {
+        return false;
+    }
 
     return 0;
 }
 
 void RpcHeartbeatClient::Run() {
-    InitRpcConnection();
+    if (!CreateRpcConnection()) {
+        PrintErrorInfo("Create the rpc heartbeat connection failed! Heartbeat thread exit!");
+        return;
+    }
 
+    string ping = "ping";
     while (running_) {
+        if (RpcSend(connect_fd_, 0, ping, false) < 0) {
+            PrintErrorInfo("Rpc Heartbeat send info failed!");
+            sleep(5);
+            continue;
+        }
         sleep(5);
     }
+    close(connect_fd_);
 }
 
 

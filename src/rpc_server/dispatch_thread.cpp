@@ -17,6 +17,7 @@
 #include "dispatch_thread.h"
 
 #include "util/rpc_communication.h"
+#include "util/rpc_util.h"
 
 namespace libevrpc {
 
@@ -59,7 +60,7 @@ bool DispatchThread::InitializeService(const char *host, const char *port, RpcCa
 
     int32_t listenfd = TcpListen(host, port);
     if (listenfd < 0) {
-        perror("Rpc server listen current port failed\n");
+        PrintErrorInfo("Rpc server listen current port failed\n");
         return false;
     }
 
@@ -67,7 +68,7 @@ bool DispatchThread::InitializeService(const char *host, const char *port, RpcCa
     epoller_ = ev_loop_new(0);
 
     if (NULL == epoller_) {
-        perror("Call ev_loop_new failed!\n");
+        PrintErrorInfo("Call ev_loop_new failed!\n");
         return false;
     }
 
@@ -86,7 +87,7 @@ bool DispatchThread::InitializeService(const char *host, const char *port, RpcCa
  */
 void DispatchThread::Run() {
     if (NULL == epoller_) {
-        perror("The epoller ptr is null!\n");
+        PrintErrorInfo("The epoller ptr is null!\n");
         return;
     }
     ev_run(epoller_, 0);
@@ -96,12 +97,12 @@ void DispatchThread::Run() {
 
 void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (NULL == loop) {
-        perror("Ev loop ptr is null!\n");
+        PrintErrorInfo("Ev loop ptr is null!\n");
         return;
     }
 
     if (EV_ERROR & revents) {
-        perror("EV_ERROR in AcceptCb callback!\n");
+        PrintErrorInfo("EV_ERROR in AcceptCb callback!\n");
         return;
     }
     struct sockaddr_in client_addr;
@@ -125,7 +126,7 @@ void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
  */
 void DispatchThread::ProcessCb(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     if (EV_ERROR & revents) {
-        perror("EV_ERROR in AcceptCb callback!\n");
+        PrintErrorInfo("EV_ERROR in AcceptCb callback!\n");
         return;
     }
     DispatchThread* dt = (DispatchThread*)(watcher->data);
@@ -144,7 +145,7 @@ EIO_ITEM* DispatchThread::NewEIO() {
     if (NULL == ei) {
          ei = (EIO_ITEM*)malloc(sizeof(EIO_ITEM) * ei_per_alloc_);
          if (NULL == ei) {
-             perror("Alloc the ei item mem failed!");
+             PrintErrorInfo("Alloc the ei item mem failed!");
              return NULL;
          }
          for (int i = 0; i < ei_per_alloc_; ++i) {

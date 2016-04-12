@@ -187,7 +187,7 @@ void RpcServer::RpcCall(int32_t event_fd, void *arg) {
 
     bool ret = rs->worker_threads_ptr_->DispatchRpcCall(RpcServer::RpcProcessor, cb_params_ptr);
     if (!ret) {
-        perror("DispatchRpcCall failed! connection closed.");
+        PrintErrorInfo("DispatchRpcCall failed! connection closed.");
         close(event_fd);
         delete cb_params_ptr;
     }
@@ -214,7 +214,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     if (NULL == rpc_serv_ptr->reader_threads_ptr_) {
         call_id = RpcRecv(event_fd, recv_info, false);
         if (ERROR_RECV == call_id) {
-            perror("Recv data in RpcProcessor error!");
+            PrintErrorInfo("Recv data in RpcProcessor error!");
             delete cb_params_ptr;
             cb_params_ptr = NULL;
             close(event_fd);
@@ -228,7 +228,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     HashMap& method_hashmap = rpc_serv_ptr->method_hashmap_;
     HashMap::iterator method_iter = method_hashmap.find(call_id);
     if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
-        perror("Find the method failed!");
+        PrintErrorInfo("Find the method failed!");
         delete cb_params_ptr;
         cb_params_ptr = NULL;
         close(event_fd);
@@ -238,7 +238,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     RpcMethod* rpc_method = method_iter->second;
     Message* request = rpc_method->request->New();
     if (!request->ParseFromString(recv_info)) {
-        perror("Parse body msg error!");
+        PrintErrorInfo("Parse body msg error!");
         delete cb_params_ptr;
         delete request;
         cb_params_ptr = NULL;
@@ -259,7 +259,7 @@ void* RpcServer::RpcProcessor(void *arg) {
      */
     string response_str = "";
     if (!response->SerializeToString(&response_str)) {
-        perror("SerializeToString response failed!");
+        PrintErrorInfo("SerializeToString response failed!");
         delete cb_params_ptr;
         delete request;
         delete response;
@@ -271,7 +271,7 @@ void* RpcServer::RpcProcessor(void *arg) {
     if (NULL == rpc_serv_ptr->writer_threads_ptr_) {
         /*The writer pool is not started*/
         if (RpcSend(event_fd, 0, response_str, true) < 0) {
-            perror("Send info data in RpcProcessor failed!");
+            PrintErrorInfo("Send info data in RpcProcessor failed!");
         }
     } else {
         /*The writer pool is started, push the task to writer pool */
@@ -318,11 +318,11 @@ void* RpcServer::RpcWriter(void *arg) {
 
     string response_str;
     if (!cb_params_ptr->response_ptr->SerializeToString(&response_str)) {
-        perror("SerializeToString response failed!");
+        PrintErrorInfo("SerializeToString response failed!");
     }
 
     if (RpcSend(event_fd, 0, response_str, true) < 0) {
-        perror("Send the info data failed!");
+        PrintErrorInfo("Send the info data failed!");
     }
     /*
      * The current cb_params_ptr never be used!

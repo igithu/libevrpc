@@ -35,6 +35,8 @@ typedef std::map<int32_t, CI_PTR> CI_MAP;
 typedef std::shared_ptr<CI_MAP> CI_MAP_PTR;
 typedef std::vector<CI_MAP_PTR> CIM_VEC;
 typedef std::shared_ptr<CIM_VEC> CIM_VEC_PTR;
+typedef std::vector<Mutex> MUTEX_VEC;
+typedef std::shared_ptr<MUTEX_VEC> MUTEX_VEC_PTR;
 
 struct ConnectionTimer {
     time_t start_time;
@@ -65,7 +67,7 @@ class ConnectionTimerManager : public Thread {
     private:
         ConnectionTimerManager();
 
-        int32_t GenrateTimerKey(const std::string& ip_addr, int32_t fd);
+        int32_t GenerateTimerKey(const std::string& ip_addr, int32_t fd);
 
         DISALLOW_COPY_AND_ASSIGN(ConnectionTimerManager);
 
@@ -74,7 +76,8 @@ class ConnectionTimerManager : public Thread {
          * in fact, is vector and thread no safe!
          * NO push_back! except in InitTimerPool!
          */
-        CIM_VEC_PTR connection_pool_ptr_;
+        CIM_VEC_PTR connection_buf_ptr_;
+        MUTEX_VEC_PTR connection_buf_mutex_ptr_;
         int32_t pool_index_;
         int32_t refresh_interval_;
 

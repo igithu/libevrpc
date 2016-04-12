@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright (c) 2015 aishuyu, Inc. All Rights Reserved
+ * Copyright (c) 2016 aishuyu, Inc. All Rights Reserved
  *
  **************************************************************************/
 
@@ -29,7 +29,7 @@ class RpcHeartbeatServer : public Thread {
         RpcHeartbeatServer();
         ~RpcHeartbeatServer();
 
-        void Intit();
+        void Init();
         virtual void Run();
 
     private:
