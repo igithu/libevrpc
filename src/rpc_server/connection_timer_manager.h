@@ -30,11 +30,11 @@
 
 namespace libevrpc {
 
-typedef std::shared_ptr<ConnectionTimer> CI_PTR;
-typedef std::map<int32_t, CI_PTR> CI_MAP;
-typedef std::shared_ptr<CI_MAP> CI_MAP_PTR;
-typedef std::vector<CI_MAP_PTR> CIM_VEC;
-typedef std::shared_ptr<CIM_VEC> CIM_VEC_PTR;
+typedef std::shared_ptr<ConnectionTimer> CT_PTR;
+typedef std::map<int32_t, CT_PTR> CT_MAP;
+typedef std::shared_ptr<CT_MAP> CT_MAP_PTR;
+typedef std::vector<CT_MAP_PTR> CTM_VEC;
+typedef std::shared_ptr<CTM_VEC> CTM_VEC_PTR;
 typedef std::vector<Mutex> MUTEX_VEC;
 typedef std::shared_ptr<MUTEX_VEC> MUTEX_VEC_PTR;
 
@@ -44,15 +44,17 @@ struct ConnectionTimer {
     int32_t fd;
     std::string client_addr;
 
-    CI_PTR next;
+    CT_PTR next;
 };
+
+const int32_t buckets_size = 60;
 
 class ConnectionTimerManager : public Thread {
     public:
         ~ConnectionTimerManager();
 
         static ConnectionTimerManager& GetInstance();
-        int32_t InitTimerPool();
+        int32_t InitTimerBuf();
         int32_t InsertConnectionTimer(
                 const std::string& ip_addr,
                 int32_t fd,
@@ -68,6 +70,7 @@ class ConnectionTimerManager : public Thread {
         ConnectionTimerManager();
 
         int32_t GenerateTimerKey(const std::string& ip_addr, int32_t fd);
+        bool ConnectionBufCrawler();
 
         DISALLOW_COPY_AND_ASSIGN(ConnectionTimerManager);
 
@@ -76,9 +79,16 @@ class ConnectionTimerManager : public Thread {
          * in fact, is vector and thread no safe!
          * NO push_back! except in InitTimerPool!
          */
-        CIM_VEC_PTR connection_buf_ptr_;
+        CTM_VEC_PTR connection_buf_ptr_;
         MUTEX_VEC_PTR connection_buf_mutex_ptr_;
-        int32_t pool_index_;
+        CT_MAP_PTR[buckets_size] connection_pool_buckets_;
+
+        /*
+         * buf_index_ : user to get the init index in order that multiThreads
+         * call InitTimerBuf and get its buf index in connection_buf
+         */
+        int32_t buf_index_;
+        int32_t bucket_index_;
         int32_t refresh_interval_;
 
         volatile bool running_;
