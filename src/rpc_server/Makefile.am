@@ -25,6 +25,8 @@ RPC_SRC = ${server_rootdir}/rpc_server.h \
 		  ${server_rootdir}/libev_thread_pool.cpp \
 		  ${server_rootdir}/server_rpc_controller.h \
 		  ${server_rootdir}/server_rpc_controller.cpp \
+		  ${server_rootdir}/connection_timer_manager.h \
+		  ${server_rootdir}/connection_timer_manager.cpp \
 		  ${util_dir}/rpc_util.h \
 		  ${util_dir}/rpc_util.cpp \
 		  ${util_dir}/thread.h \

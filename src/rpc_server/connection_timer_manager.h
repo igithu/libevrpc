@@ -25,18 +25,12 @@
 #include <memory>
 #include <string>
 
-#include "disallow_copy_and_assign.h"
-#include "thread.h"
+#include "util/pthread_mutex.h"
+#include "util/thread.h"
+#include "util/disallow_copy_and_assign.h"
 
 namespace libevrpc {
 
-typedef std::shared_ptr<ConnectionTimer> CT_PTR;
-typedef std::map<int32_t, CT_PTR> CT_MAP;
-typedef std::shared_ptr<CT_MAP> CT_MAP_PTR;
-typedef std::vector<CT_MAP_PTR> CTM_VEC;
-typedef std::shared_ptr<CTM_VEC> CTM_VEC_PTR;
-typedef std::vector<Mutex> MUTEX_VEC;
-typedef std::shared_ptr<MUTEX_VEC> MUTEX_VEC_PTR;
 
 struct ConnectionTimer {
     time_t start_time;
@@ -44,8 +38,22 @@ struct ConnectionTimer {
     int32_t fd;
     std::string client_addr;
 
-    CT_PTR next;
+    ConnectionTimer* next;
 };
+
+
+typedef std::shared_ptr<ConnectionTimer> CT_PTR;
+typedef std::vector<CT_PTR> CT_PTR_LIST;
+typedef std::shared_ptr<CT_PTR_LIST> CTL_PTR;
+typedef std::vector<CTL_PTR> BUF_LIST;
+typedef std::shared_ptr<BUF_LIST> BUF_LIST_PTR;
+
+typedef std::map<int32_t, CT_PTR> CT_MAP;
+typedef std::shared_ptr<CT_MAP> CT_MAP_PTR;
+typedef std::vector<CT_MAP_PTR> CTM_VEC;
+
+typedef std::vector<Mutex> MUTEX_VEC;
+typedef std::shared_ptr<MUTEX_VEC> MUTEX_VEC_PTR;
 
 const int32_t buckets_size = 60;
 
@@ -60,9 +68,7 @@ class ConnectionTimerManager : public Thread {
                 int32_t fd,
                 int32_t pool_index);
 
-        bool DeleteConnectionTimer(
-                int32_t pool_index,
-                int32_t connection_id);
+        int32_t GetBucketNum(const std::string& ip_addr, int32_t fd);
 
         virtual void Run();
 
@@ -79,9 +85,9 @@ class ConnectionTimerManager : public Thread {
          * in fact, is vector and thread no safe!
          * NO push_back! except in InitTimerPool!
          */
-        CTM_VEC_PTR connection_buf_ptr_;
+        BUF_LIST_PTR connection_buf_ptr_;
         MUTEX_VEC_PTR connection_buf_mutex_ptr_;
-        CT_MAP_PTR[buckets_size] connection_pool_buckets_;
+        CT_MAP_PTR connection_pool_buckets_[buckets_size];
 
         /*
          * buf_index_ : user to get the init index in order that multiThreads
