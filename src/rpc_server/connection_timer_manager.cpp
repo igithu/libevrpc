@@ -30,12 +30,17 @@ using std::string;
 ConnectionTimerManager::ConnectionTimerManager() :
     connection_buf_ptr_(new BUF_LIST()),
     connection_buf_mutex_ptr_(new MUTEX_VEC()),
+    connection_bucket_mutex_ptr_(new MUTEX_VEC()),
     buf_index_(0),
     bucket_index_(0),
     refresh_interval_(30),
     running_(false) {
     for (int32_t i = 0; i < 60; ++i) {
         connection_pool_buckets_[i] = NULL;
+    }
+
+    for (int32_t i = 0; i < buckets_size; ++i) {
+        connection_buf_mutex_ptr_-
     }
 }
 
@@ -49,16 +54,17 @@ ConnectionTimerManager& ConnectionTimerManager::GetInstance() {
 
 int32_t ConnectionTimerManager::InitTimerBuf() {
      CTL_PTR ctl_ptr(new CT_PTR_LIST());
-     int32_t cur_index = 0;
+     int32_t cur_buf_index = 0;
      {
          MutexLockGuard lock(connection_pool_mutex_);
          connection_buf_ptr_->push_back(ctl_ptr);
-         // connection_buf_mutex_ptr_->push_back(new Mutex());
-         cur_index = buf_index_;
+         Mutex mutex;
+         connection_buf_mutex_ptr_->push_back(std::move(mutex));
+         cur_buf_index = buf_index_;
          ++buf_index_;
      }
      running_ = true;
-     return cur_index;
+     return cur_buf_index;
 }
 
 int32_t ConnectionTimerManager::InsertConnectionTimer(
@@ -141,7 +147,7 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
             continue;
         }
         /*
-         * Hash all connection into connection_pool buckets
+         * Hash(by modulo for now) all connection into connection_pool buckets
          */
         for (CT_PTR_LIST::iterator iter = local_ctl_ptr->begin();
              iter != local_ctl_ptr->end();

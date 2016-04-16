@@ -86,9 +86,10 @@ class ConnectionTimerManager : public Thread {
          * NO push_back! except in InitTimerPool!
          */
         BUF_LIST_PTR connection_buf_ptr_;
-        MUTEX_VEC_PTR connection_buf_mutex_ptr_;
         CT_MAP_PTR connection_pool_buckets_[buckets_size];
 
+        MUTEX_VEC_PTR connection_buf_mutex_ptr_;
+        MUTEX_VEC_PTR connection_bucket_mutex_ptr_;
         /*
          * buf_index_ : user to get the init index in order that multiThreads
          * call InitTimerBuf and get its buf index in connection_buf
