@@ -96,7 +96,7 @@ int32_t ConnectionTimerManager::InsertConnectionTimer(
     return 0;
 }
 
-void DeleteConnectionTimer(
+void ConnectionTimerManager::DeleteConnectionTimer(
         const std::string& ip_addr,
         int32_t fd,
         int32_t buf_index) {
