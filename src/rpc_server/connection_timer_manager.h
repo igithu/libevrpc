@@ -66,9 +66,12 @@ class ConnectionTimerManager : public Thread {
         int32_t InsertConnectionTimer(
                 const std::string& ip_addr,
                 int32_t fd,
-                int32_t pool_index);
+                int32_t buf_index);
 
-        int32_t GetBucketNum(const std::string& ip_addr, int32_t fd);
+        void DeleteConnectionTimer(
+                const std::string& ip_addr,
+                int32_t fd,
+                int32_t buf_index);
 
         virtual void Run();
 
