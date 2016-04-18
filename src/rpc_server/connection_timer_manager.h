@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "util/pthread_mutex.h"
 #include "util/thread.h"
@@ -43,14 +44,18 @@ struct ConnectionTimer {
 
 
 typedef std::shared_ptr<ConnectionTimer> CT_PTR;
-typedef std::vector<CT_PTR> CT_PTR_LIST;
-typedef std::shared_ptr<CT_PTR_LIST> CTL_PTR;
-typedef std::vector<CTL_PTR> BUF_LIST;
-typedef std::shared_ptr<BUF_LIST> BUF_LIST_PTR;
 
 typedef std::map<int32_t, CT_PTR> CT_MAP;
+typedef std::unordered_map<int32_t, CT_PTR> CT_HASH_MAP;
+
 typedef std::shared_ptr<CT_MAP> CT_MAP_PTR;
+typedef std::shared_ptr<CT_HASH_MAP> CT_HASH_MAP_PTR;
+
+typedef std::vector<CT_HASH_MAP_PTR> CTHM_VEC;
+typedef std::shared_ptr<CTHM_VEC> CTHM_VEC_PTR;
+
 typedef std::vector<CT_MAP_PTR> CTM_VEC;
+typedef std::shared_ptr<CTM_VEC> CTM_VEC_PTR;
 
 typedef std::vector<Mutex> MUTEX_VEC;
 typedef std::shared_ptr<MUTEX_VEC> MUTEX_VEC_PTR;
@@ -88,7 +93,7 @@ class ConnectionTimerManager : public Thread {
          * in fact, is vector and thread no safe!
          * NO push_back! except in InitTimerPool!
          */
-        BUF_LIST_PTR connection_buf_ptr_;
+        CTHM_VEC_PTR connection_buf_ptr_;
         CT_MAP_PTR connection_pool_buckets_[buckets_size];
 
         MUTEX_VEC_PTR connection_buf_mutex_ptr_;

@@ -28,7 +28,7 @@ using std::string;
 
 
 ConnectionTimerManager::ConnectionTimerManager() :
-    connection_buf_ptr_(new BUF_LIST()),
+    connection_buf_ptr_(new CTHM_VEC()),
     connection_buf_mutex_ptr_(new MUTEX_VEC()),
     connection_bucket_mutex_ptr_(new MUTEX_VEC()),
     buf_index_(0),
@@ -40,7 +40,7 @@ ConnectionTimerManager::ConnectionTimerManager() :
     }
 
     for (int32_t i = 0; i < buckets_size; ++i) {
-        connection_buf_mutex_ptr_-
+        //connection_buf_mutex_ptr_-
     }
 }
 
@@ -53,11 +53,11 @@ ConnectionTimerManager& ConnectionTimerManager::GetInstance() {
 }
 
 int32_t ConnectionTimerManager::InitTimerBuf() {
-     CTL_PTR ctl_ptr(new CT_PTR_LIST());
+     CT_HASH_MAP_PTR ctm_ptr(new CT_HASH_MAP());
      int32_t cur_buf_index = 0;
      {
          MutexLockGuard lock(connection_pool_mutex_);
-         connection_buf_ptr_->push_back(ctl_ptr);
+         connection_buf_ptr_->push_back(ctm_ptr);
          Mutex mutex;
          connection_buf_mutex_ptr_->push_back(std::move(mutex));
          cur_buf_index = buf_index_;
@@ -83,15 +83,16 @@ int32_t ConnectionTimerManager::InsertConnectionTimer(
     Mutex& mutex = connection_buf_mutex_ptr_->at(buf_index);
     {
         MutexLockGuard guard(mutex);
-        CTL_PTR ctl_ptr = connection_buf_ptr_->at(buf_index);
-        if (NULL == ctl_ptr) {
+        CT_HASH_MAP_PTR& ctm_ptr = connection_buf_ptr_->at(buf_index);
+        if (NULL == ctm_ptr) {
             /*
              * means the connection map is taken to in the connection
              * time wheel bucket
              */
-            ctl_ptr.reset(new CT_PTR_LIST());
+            ctm_ptr.reset(new CT_HASH_MAP());
         }
-        ctl_ptr->push_back(ct_ptr);
+        int32_t ct_key = GenerateTimerKey(ip_addr, fd);
+        ctm_ptr->insert(std::make_pair(ct_key, ct_ptr));
     }
     return 0;
 }
@@ -100,6 +101,16 @@ void ConnectionTimerManager::DeleteConnectionTimer(
         const std::string& ip_addr,
         int32_t fd,
         int32_t buf_index) {
+    int32_t ct_key = GenerateTimerKey(ip_addr, fd);
+    Mutex& mutex = connection_buf_mutex_ptr_->at(buf_index);
+    {
+        MutexLockGuard guard(mutex);
+        CT_HASH_MAP_PTR& ctm_ptr =  connection_buf_ptr_->at(buf_index);
+        if (NULL != ctm_ptr) {
+            ctm_ptr->find(ct_key);
+            return;
+        }
+    }
 }
 
 void ConnectionTimerManager::Run() {
@@ -139,24 +150,24 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
     }
 
     for (int32_t buf_index = 0; buf_index < connection_buf_ptr_->size(); ++buf_index) {
-        CTL_PTR local_ctl_ptr = NULL;
+        CT_HASH_MAP_PTR local_ctm_ptr = NULL;
         {
             MutexLockGuard guard(connection_buf_mutex_ptr_->at(buf_index));
-            CTL_PTR& ctl_ptr = connection_buf_ptr_->at(buf_index);
-            local_ctl_ptr = ctl_ptr;
-            ctl_ptr = NULL;
+            CT_HASH_MAP_PTR& ctm_ptr =  connection_buf_ptr_->at(buf_index);
+            local_ctm_ptr = ctm_ptr;
+            ctm_ptr = NULL;
         }
-        if (NULL == local_ctl_ptr) {
+        if (NULL == local_ctm_ptr) {
             continue;
         }
         /*
          * Hash(by modulo for now) all connection into connection_pool buckets
          */
-        for (CT_PTR_LIST::iterator iter = local_ctl_ptr->begin();
-             iter != local_ctl_ptr->end();
+        for (CT_HASH_MAP::iterator iter = local_ctm_ptr->begin();
+             iter != local_ctm_ptr->end();
              ++iter) {
-            CT_PTR& ct_ptr = *iter;
-            int32_t c_key = GenerateTimerKey(ct_ptr->client_addr, ct_ptr->fd);
+            int32_t c_key = iter->first;
+            CT_PTR& ct_ptr = iter->second;
             int32_t bucket_num = c_key % buckets_size;
             CT_MAP_PTR& ct_map_ptr = connection_pool_buckets_[bucket_num];
             if (NULL == ct_map_ptr) {
