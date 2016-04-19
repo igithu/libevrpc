@@ -47,18 +47,22 @@ typedef std::shared_ptr<ConnectionTimer> CT_PTR;
 
 typedef std::map<int32_t, CT_PTR> CT_MAP;
 typedef std::unordered_map<int32_t, CT_PTR> CT_HASH_MAP;
-
 typedef std::shared_ptr<CT_MAP> CT_MAP_PTR;
 typedef std::shared_ptr<CT_HASH_MAP> CT_HASH_MAP_PTR;
 
+typedef std::vector<CT_MAP_PTR> CTM_VEC;
+typedef std::shared_ptr<CTM_VEC> CTM_VEC_PTR;
 typedef std::vector<CT_HASH_MAP_PTR> CTHM_VEC;
 typedef std::shared_ptr<CTHM_VEC> CTHM_VEC_PTR;
 
-typedef std::vector<CT_MAP_PTR> CTM_VEC;
-typedef std::shared_ptr<CTM_VEC> CTM_VEC_PTR;
-
 typedef std::vector<Mutex> MUTEX_VEC;
 typedef std::shared_ptr<MUTEX_VEC> MUTEX_VEC_PTR;
+
+typedef std::vector<int32_t> INT_LIST;
+typedef std::shared_ptr<INT_LIST> INT_LIST_PTR;
+typedef std::vector<INT_LIST_PTR> INT_LIST_PTR_LIST;
+typedef std::shared_ptr<INT_LIST_PTR_LIST> INT_LIST_PPTR;
+
 
 const int32_t buckets_size = 60;
 
@@ -95,9 +99,13 @@ class ConnectionTimerManager : public Thread {
          */
         CTHM_VEC_PTR connection_buf_ptr_;
         CT_MAP_PTR connection_pool_buckets_[buckets_size];
+        INT_LIST_PPTR connection_del_list_ptr_;
 
         MUTEX_VEC_PTR connection_buf_mutex_ptr_;
         MUTEX_VEC_PTR connection_bucket_mutex_ptr_;
+        MUTEX_VEC_PTR connection_dellist_mutex_ptr_;
+
+
         /*
          * buf_index_ : user to get the init index in order that multiThreads
          * call InitTimerBuf and get its buf index in connection_buf
