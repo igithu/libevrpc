@@ -158,14 +158,69 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
         return false;
     }
 
+    /*
+     * crawl all the connection timer from buffer into connection pool
+     */
     for (int32_t buf_index = 0; buf_index < connection_buf_ptr_->size(); ++buf_index) {
-        CT_HASH_MAP_PTR local_ctm_ptr = NULL;
+        /*
+         *  get the all connection been deleted
+         */
+        INT_LIST_PTR& ilp = NULL;
+        Mutex& del_mutex = connection_dellist_mutex_ptr_->at(buf_index);
         {
-            MutexLockGuard guard(connection_buf_mutex_ptr_->at(buf_index));
+            MutexLockGuard guard(del_mutex);
+            INT_LIST_PTR& tmp_ilp = connection_del_list_ptr_->at(buf_index);
+            /*
+             * take the del connection list
+             */
+            ilp = tmp_ilp;
+            tmp_ilp = NULL;
+        }
+
+        /*
+         * get connection from buf
+         */
+        CT_HASH_MAP_PTR local_ctm_ptr = NULL;
+        Mutex& buf_mutex = connection_buf_mutex_ptr_->at(buf_index);
+        {
+            MutexLockGuard guard(buf_mutex);
             CT_HASH_MAP_PTR& ctm_ptr =  connection_buf_ptr_->at(buf_index);
             local_ctm_ptr = ctm_ptr;
             ctm_ptr = NULL;
         }
+        /*
+         * start to del the connection
+         */
+        if (NULL != ilp) {
+            for (int32_t del_index = 0; del_index < ilp->size(); ++del_index) {
+                int32_t del_key = ilp->at(del_index);
+                /*
+                 * delete the connction from buffer first
+                 */
+                if (NULL != local_ctm_ptr) {
+                    CT_HASH_MAP::iterator ct_iter = local_ctm_ptr->find(del_key);
+                    if (ct_iter != local_ctm_ptr->end()) {
+                        local_ctm_ptr->erase(ct_iter);
+                    }
+                }
+                /*
+                 * delete the connction from connection pool
+                 */
+                int32_t bucket_num = del_key % buckets_size;
+                Mutex& bucket_mutex = connection_bucket_mutex_ptr_->at(bucket_num);
+                {
+                    MutexLockGuard guard(bucket_mutex);
+                    CT_MAP_PTR& ct_map_ptr = connection_pool_buckets_[bucket_num];
+                    if (NULL != ct_map_ptr) {
+                        CT_MAP::iterator ct_iter = ct_map_ptr->find(del_key);
+                        if (ct_iter != ct_map_ptr->end()) {
+                            ct_map_ptr->erase(ct_iter);
+                        }
+                    }
+                }
+            }
+        }
+
         if (NULL == local_ctm_ptr) {
             continue;
         }

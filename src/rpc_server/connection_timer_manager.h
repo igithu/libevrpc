@@ -88,6 +88,9 @@ class ConnectionTimerManager : public Thread {
         ConnectionTimerManager();
 
         int32_t GenerateTimerKey(const std::string& ip_addr, int32_t fd);
+        /*
+         * background thread call
+         */
         bool ConnectionBufCrawler();
 
         DISALLOW_COPY_AND_ASSIGN(ConnectionTimerManager);
