@@ -26,15 +26,18 @@ namespace libevrpc {
 
 class RpcHeartbeatServer : public Thread {
     public:
-        RpcHeartbeatServer();
+        RpcHeartbeatServer(const char* hb_host, const char* hb_port);
         ~RpcHeartbeatServer();
 
-        void Init();
+        bool InitHeartbeatServer();
         virtual void Run();
 
     private:
         char* hb_host_;
         char* hb_port_;
+
+        int32_t listenfd_;
+
 };
 
 }  // end of namespace libevrpc

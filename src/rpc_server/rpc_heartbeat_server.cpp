@@ -21,14 +21,34 @@
 
 namespace libevrpc {
 
-RpcHeartbeatServer::RpcHeartbeatServer() {
+RpcHeartbeatServer::RpcHeartbeatServer(const char* hb_host, const char* hb_port) :
+    hb_host_(NULL), hb_port_(NULL) {
+
+    hb_host_ = (char*)malloc(strlen(hb_host));
+    hb_port_ = (char*)malloc(strlen(hb_port));
+    strcpy(hb_host_, hb_host);
+    strcpy(hb_port_, hb_port);
 }
 
 RpcHeartbeatServer::~RpcHeartbeatServer() {
+    if (NULL != hb_host_) {
+        free(hb_host_);
+    }
+    if (NULL != hb_port_) {
+        free(hb_port_);
+    }
+}
+
+bool RpcHeartbeatServer::InitHeartbeatServer() {
+    int32_t listenfd_ = TcpListen(hb_host_, hb_port_);
+    if (listenfd_ < 0) {
+        PrintErrorInfo("Rpc server listen current port failed\n");
+        return false;
+    }
+    return true;
 }
 
 void RpcHeartbeatServer::Run() {
-    int32_t listenfd = TcpListen(hb_host_, hb_port_);
 }
 
 

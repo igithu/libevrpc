@@ -40,10 +40,6 @@ ConnectionTimerManager::ConnectionTimerManager() :
     for (int32_t i = 0; i < 60; ++i) {
         connection_pool_buckets_[i] = NULL;
     }
-
-    for (int32_t i = 0; i < buckets_size; ++i) {
-        //connection_buf_mutex_ptr_-
-    }
 }
 
 ConnectionTimerManager::~ConnectionTimerManager() {
@@ -116,7 +112,7 @@ void ConnectionTimerManager::DeleteConnectionTimer(
         MutexLockGuard guard(mutex);
         INT_LIST_PTR& ilp = connection_del_list_ptr_->at(buf_index);
         if (NULL == ilp) {
-            ilp->reset(new INT_LIST());
+            ilp.reset(new INT_LIST());
         }
         ilp->push_back(ct_key);
     }
@@ -165,7 +161,7 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
         /*
          *  get the all connection been deleted
          */
-        INT_LIST_PTR& ilp = NULL;
+        INT_LIST_PTR ilp = NULL;
         Mutex& del_mutex = connection_dellist_mutex_ptr_->at(buf_index);
         {
             MutexLockGuard guard(del_mutex);
