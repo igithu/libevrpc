@@ -20,19 +20,21 @@
 #ifndef __RPC_HEARTBEAT_SERVER_H
 #define __RPC_HEARTBEAT_SERVER_H
 
+#include "dispatch_thread.h"
 #include "util/thread.h"
 
 namespace libevrpc {
 
-class RpcHeartbeatServer : public Thread {
+class RpcHeartbeatServer {
     public:
         RpcHeartbeatServer(const char* hb_host, const char* hb_port);
         ~RpcHeartbeatServer();
 
         bool InitHeartbeatServer();
-        virtual void Run();
+        bool HeartBeatStart();
 
     private:
+        DispatchThread*  dispatcher_thread_ptr_;
         char* hb_host_;
         char* hb_port_;
 

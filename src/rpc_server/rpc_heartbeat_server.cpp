@@ -22,7 +22,7 @@
 namespace libevrpc {
 
 RpcHeartbeatServer::RpcHeartbeatServer(const char* hb_host, const char* hb_port) :
-    hb_host_(NULL), hb_port_(NULL) {
+    dispatcher_thread_ptr_(NULL), hb_host_(NULL), hb_port_(NULL) {
 
     hb_host_ = (char*)malloc(strlen(hb_host));
     hb_port_ = (char*)malloc(strlen(hb_port));
@@ -37,6 +37,9 @@ RpcHeartbeatServer::~RpcHeartbeatServer() {
     if (NULL != hb_port_) {
         free(hb_port_);
     }
+    if (NULL != dispatcher_thread_ptr_) {
+        delete dispatcher_thread_ptr_;
+    }
 }
 
 bool RpcHeartbeatServer::InitHeartbeatServer() {
@@ -48,9 +51,10 @@ bool RpcHeartbeatServer::InitHeartbeatServer() {
     return true;
 }
 
-void RpcHeartbeatServer::Run() {
-}
 
+bool RpcHeartbeatServer::HeartBeatStart() {
+    return true;
+}
 
 }  // end of namespace libevrpc
 
