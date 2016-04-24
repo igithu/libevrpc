@@ -16,6 +16,8 @@
 
 #include "rpc_heartbeat_server.h"
 
+#include <string.h>
+
 #include "util/rpc_communication.h"
 
 
@@ -43,17 +45,20 @@ RpcHeartbeatServer::~RpcHeartbeatServer() {
 }
 
 bool RpcHeartbeatServer::InitHeartbeatServer() {
-    int32_t listenfd_ = TcpListen(hb_host_, hb_port_);
-    if (listenfd_ < 0) {
-        PrintErrorInfo("Rpc server listen current port failed\n");
-        return false;
-    }
     return true;
 }
 
-
 bool RpcHeartbeatServer::HeartBeatStart() {
-    dispatcher_thread_ptr_ = new DispatchThread();`
+    dispatcher_thread_ptr_ = new DispatchThread();
+    dispatcher_thread_ptr_->InitializeService(hb_host_, hb_port_, &RpcHeartbeatServer::HeartBeatProcessor, (void*)this);
+    dispatcher_thread_ptr_->Start();
+    return true;
+}
+
+bool RpcHeartbeatServer::Wait() {
+    if (NULL != dispatcher_thread_ptr_) {
+        dispatcher_thread_ptr_->Wait();
+    }
     return true;
 }
 

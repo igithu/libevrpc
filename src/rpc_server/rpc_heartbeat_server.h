@@ -32,7 +32,12 @@ class RpcHeartbeatServer {
 
         bool InitHeartbeatServer();
         bool HeartBeatStart();
+        bool Wait();
 
+        /*
+         * recv the hearbeat in libev and put the hb info
+         * into connectin timer manager
+         */
         static void HeartBeatProcessor(int32_t fd, void *arg);
 
     private:
