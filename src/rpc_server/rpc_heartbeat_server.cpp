@@ -53,8 +53,13 @@ bool RpcHeartbeatServer::InitHeartbeatServer() {
 
 
 bool RpcHeartbeatServer::HeartBeatStart() {
+    dispatcher_thread_ptr_ = new DispatchThread();`
     return true;
 }
+
+void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
+}
+
 
 }  // end of namespace libevrpc
 

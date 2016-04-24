@@ -33,6 +33,8 @@ class RpcHeartbeatServer {
         bool InitHeartbeatServer();
         bool HeartBeatStart();
 
+        static void HeartBeatProcessor(int32_t fd, void *arg);
+
     private:
         DispatchThread*  dispatcher_thread_ptr_;
         char* hb_host_;
