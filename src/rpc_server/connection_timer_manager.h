@@ -63,7 +63,6 @@ typedef std::shared_ptr<INT_LIST> INT_LIST_PTR;
 typedef std::vector<INT_LIST_PTR> INT_LIST_PTR_LIST;
 typedef std::shared_ptr<INT_LIST_PTR_LIST> INT_LIST_PPTR;
 
-
 const int32_t buckets_size = 60;
 
 class ConnectionTimerManager : public Thread {
@@ -82,6 +81,8 @@ class ConnectionTimerManager : public Thread {
                 int32_t fd,
                 int32_t buf_index);
 
+        bool InsertRefreshConnectionInfo(const std::string& ip_addr);
+
         virtual void Run();
 
     private:
@@ -98,11 +99,25 @@ class ConnectionTimerManager : public Thread {
     private:
         /*
          * in fact, is vector and thread no safe!
-         * NO push_back! except in InitTimerPool!
+         * connection_buf_ptr :
+         *       one thread, on buf element
+         *       thread buf index -> hash map(connection key -> connection timer)
          */
         CTHM_VEC_PTR connection_buf_ptr_;
+        /*
+         * one step, update and refresh one buckets
+         */
         CT_MAP_PTR connection_pool_buckets_[buckets_size];
+        /*
+         * connection_del_list_ptr_ :
+         *       one thread, one connection deleted list
+         *       thread index -> deleted list
+         */
         INT_LIST_PPTR connection_del_list_ptr_;
+        /*
+         * contains all client address
+         */
+        INT_LIST_PTR refresh_client_list_ptr_;
 
         MUTEX_VEC_PTR connection_buf_mutex_ptr_;
         MUTEX_VEC_PTR connection_bucket_mutex_ptr_;
@@ -119,6 +134,7 @@ class ConnectionTimerManager : public Thread {
 
         volatile bool running_;
         Mutex connection_pool_mutex_;
+        Mutex refresh_client_list_mutex_;
 
 };
 

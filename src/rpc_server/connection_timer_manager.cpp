@@ -33,6 +33,7 @@ ConnectionTimerManager::ConnectionTimerManager() :
     connection_buf_mutex_ptr_(new MUTEX_VEC()),
     connection_bucket_mutex_ptr_(new MUTEX_VEC()),
     connection_dellist_mutex_ptr_(new MUTEX_VEC()),
+    refresh_client_list_ptr_(new INT_LIST()),
     buf_index_(0),
     bucket_index_(0),
     refresh_interval_(30),
@@ -118,6 +119,18 @@ void ConnectionTimerManager::DeleteConnectionTimer(
     }
 }
 
+bool ConnectionTimerManager::InsertRefreshConnectionInfo(const std::string& ip_addr) {
+    int32_t hash_code = BKDRHash(ip_addr.c_str());
+    {
+        MutexLockGuard guard(refresh_client_list_mutex_);
+        if (NULL == refresh_client_list_ptr_) {
+            refresh_client_list_ptr_.reset(new INT_LIST());
+        }
+        refresh_client_list_ptr_->push_back(hash_code);
+    }
+    return true;
+}
+
 void ConnectionTimerManager::Run() {
     bucket_index_ = 0;
     while (running_) {
@@ -144,6 +157,9 @@ void ConnectionTimerManager::Run() {
     }
 }
 
+/*
+ * FIX ME
+ */
 int32_t ConnectionTimerManager::GenerateTimerKey(const std::string& ip_addr, int32_t fd) {
     uint32_t hash_code = BKDRHash(ip_addr.c_str());
     return hash_code + fd;
