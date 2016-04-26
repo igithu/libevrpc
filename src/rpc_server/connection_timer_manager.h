@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright (c) 2015 aishuyu, Inc. All Rights Reserved
+ * Copyright (c) 2016 aishuyu, Inc. All Rights Reserved
  *
  **************************************************************************/
 
@@ -42,7 +42,6 @@ struct ConnectionTimer {
     ConnectionTimer* next;
 };
 
-
 typedef std::shared_ptr<ConnectionTimer> CT_PTR;
 
 typedef std::map<int32_t, CT_PTR> CT_MAP;
@@ -62,6 +61,8 @@ typedef std::vector<int32_t> INT_LIST;
 typedef std::shared_ptr<INT_LIST> INT_LIST_PTR;
 typedef std::vector<INT_LIST_PTR> INT_LIST_PTR_LIST;
 typedef std::shared_ptr<INT_LIST_PTR_LIST> INT_LIST_PPTR;
+typedef std::unordered_map<int32_t, INT_LIST_PTR> INT_LIST_MAP;
+typedef std::shared_ptr<INT_LIST_MAP> INT_LIST_MAP_PTR;
 
 const int32_t buckets_size = 60;
 
@@ -105,7 +106,7 @@ class ConnectionTimerManager : public Thread {
          */
         CTHM_VEC_PTR connection_buf_ptr_;
         /*
-         * one step, update and refresh one buckets
+         * one step, one time to update and refresh one buckets
          */
         CT_MAP_PTR connection_pool_buckets_[buckets_size];
         /*

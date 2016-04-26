@@ -18,6 +18,7 @@
 #include "connection_timer_manager.h"
 
 #include <time.h>
+#include <algorithm>
 
 #include "util/rpc_util.h"
 
