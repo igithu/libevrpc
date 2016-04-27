@@ -27,7 +27,6 @@ namespace libevrpc {
 
 using std::string;
 
-
 ConnectionTimerManager::ConnectionTimerManager() :
     connection_buf_ptr_(new CTHM_VEC()),
     connection_del_list_ptr_(new INT_LIST_PTR_LIST()),
@@ -98,8 +97,8 @@ int32_t ConnectionTimerManager::InsertConnectionTimer(
              */
             ctm_ptr.reset(new CT_HASH_MAP());
         }
-        int32_t ct_key = GenerateTimerKey(ip_addr, fd);
-        ctm_ptr->insert(std::make_pair(ct_key, ct_ptr));
+        string ct_key = GenerateTimerKey(ip_addr, fd);
+        ctm_ptr->insert(std::make_pair(std::move(ct_key), ct_ptr));
     }
     return 0;
 }
@@ -108,7 +107,7 @@ void ConnectionTimerManager::DeleteConnectionTimer(
         const std::string& ip_addr,
         int32_t fd,
         int32_t buf_index) {
-    int32_t ct_key = GenerateTimerKey(ip_addr, fd);
+    string ct_key = GenerateTimerKey(ip_addr, fd);
     Mutex& mutex = connection_dellist_mutex_ptr_->at(buf_index);
     {
         MutexLockGuard guard(mutex);
@@ -116,19 +115,16 @@ void ConnectionTimerManager::DeleteConnectionTimer(
         if (NULL == ilp) {
             ilp.reset(new INT_LIST());
         }
-        ilp->push_back(ct_key);
+        ilp->push_back(std::move(ct_key));
     }
 }
 
-bool ConnectionTimerManager::InsertRefreshConnectionInfo(const std::string& ip_addr) {
-    int32_t hash_code = BKDRHash(ip_addr.c_str());
-    {
-        MutexLockGuard guard(refresh_client_list_mutex_);
-        if (NULL == refresh_client_list_ptr_) {
-            refresh_client_list_ptr_.reset(new INT_LIST());
-        }
-        refresh_client_list_ptr_->push_back(hash_code);
+bool ConnectionTimerManager::InsertRefreshConnectionInfo(string& ip_addr) {
+    MutexLockGuard guard(refresh_client_list_mutex_);
+    if (NULL == refresh_client_list_ptr_) {
+        refresh_client_list_ptr_.reset(new INT_LIST());
     }
+    refresh_client_list_ptr_->push_back(std::move(ip_addr));
     return true;
 }
 
@@ -161,9 +157,13 @@ void ConnectionTimerManager::Run() {
 /*
  * FIX ME
  */
-int32_t ConnectionTimerManager::GenerateTimerKey(const std::string& ip_addr, int32_t fd) {
-    uint32_t hash_code = BKDRHash(ip_addr.c_str());
-    return hash_code + fd;
+string ConnectionTimerManager::GenerateTimerKey(const std::string& ip_addr, int32_t fd) {
+    // uint32_t hash_code = BKDRHash(ip_addr.c_str());
+    return ip_addr + "_" + std::to_string(fd);
+}
+
+int32_t ConnectionTimerManager::GenerateBucketNum(const string& ori_key) {
+    return BKDRHash(ori_key.c_str()) % buckets_size;
 }
 
 bool ConnectionTimerManager::ConnectionBufCrawler() {
@@ -206,7 +206,7 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
          */
         if (NULL != ilp) {
             for (int32_t del_index = 0; del_index < ilp->size(); ++del_index) {
-                int32_t del_key = ilp->at(del_index);
+                string& del_key = ilp->at(del_index);
                 /*
                  * delete the connction from buffer first
                  */
@@ -219,7 +219,7 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
                 /*
                  * delete the connction from connection pool
                  */
-                int32_t bucket_num = del_key % buckets_size;
+                int32_t bucket_num = GenerateBucketNum(del_key);
                 Mutex& bucket_mutex = connection_bucket_mutex_ptr_->at(bucket_num);
                 {
                     MutexLockGuard guard(bucket_mutex);
@@ -243,9 +243,8 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
         for (CT_HASH_MAP::iterator iter = local_ctm_ptr->begin();
              iter != local_ctm_ptr->end();
              ++iter) {
-            int32_t c_key = iter->first;
             CT_PTR& ct_ptr = iter->second;
-            int32_t bucket_num = c_key % buckets_size;
+            int32_t bucket_num = GenerateBucketNum(iter->first);
             Mutex& bucket_mutex = connection_bucket_mutex_ptr_->at(bucket_num);
             {
                 MutexLockGuard guard(bucket_mutex);
@@ -253,7 +252,7 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
                 if (NULL == ct_map_ptr) {
                     ct_map_ptr.reset(new CT_MAP());
                 }
-                ct_map_ptr->insert(std::make_pair(c_key, ct_ptr));
+                ct_map_ptr->insert(std::make_pair(std::move(iter->first), ct_ptr));
             }
         }
     }

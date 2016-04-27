@@ -44,8 +44,8 @@ struct ConnectionTimer {
 
 typedef std::shared_ptr<ConnectionTimer> CT_PTR;
 
-typedef std::map<int32_t, CT_PTR> CT_MAP;
-typedef std::unordered_map<int32_t, CT_PTR> CT_HASH_MAP;
+typedef std::map<std::string, CT_PTR> CT_MAP;
+typedef std::unordered_map<std::string, CT_PTR> CT_HASH_MAP;
 typedef std::shared_ptr<CT_MAP> CT_MAP_PTR;
 typedef std::shared_ptr<CT_HASH_MAP> CT_HASH_MAP_PTR;
 
@@ -57,12 +57,10 @@ typedef std::shared_ptr<CTHM_VEC> CTHM_VEC_PTR;
 typedef std::vector<Mutex> MUTEX_VEC;
 typedef std::shared_ptr<MUTEX_VEC> MUTEX_VEC_PTR;
 
-typedef std::vector<int32_t> INT_LIST;
+typedef std::vector<std::string> INT_LIST;
 typedef std::shared_ptr<INT_LIST> INT_LIST_PTR;
 typedef std::vector<INT_LIST_PTR> INT_LIST_PTR_LIST;
 typedef std::shared_ptr<INT_LIST_PTR_LIST> INT_LIST_PPTR;
-typedef std::unordered_map<int32_t, INT_LIST_PTR> INT_LIST_MAP;
-typedef std::shared_ptr<INT_LIST_MAP> INT_LIST_MAP_PTR;
 
 const int32_t buckets_size = 60;
 
@@ -82,14 +80,15 @@ class ConnectionTimerManager : public Thread {
                 int32_t fd,
                 int32_t buf_index);
 
-        bool InsertRefreshConnectionInfo(const std::string& ip_addr);
+        bool InsertRefreshConnectionInfo(std::string& ip_addr);
 
         virtual void Run();
 
     private:
         ConnectionTimerManager();
 
-        int32_t GenerateTimerKey(const std::string& ip_addr, int32_t fd);
+        std::string GenerateTimerKey(const std::string& ip_addr, int32_t fd);
+        int32_t GenerateBucketNum(const std::string& ori_key);
         /*
          * background thread call
          */
