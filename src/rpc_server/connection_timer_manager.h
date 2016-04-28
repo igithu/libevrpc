@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "util/pthread_mutex.h"
 #include "util/thread.h"
@@ -57,10 +58,13 @@ typedef std::shared_ptr<CTHM_VEC> CTHM_VEC_PTR;
 typedef std::vector<Mutex> MUTEX_VEC;
 typedef std::shared_ptr<MUTEX_VEC> MUTEX_VEC_PTR;
 
-typedef std::vector<std::string> INT_LIST;
-typedef std::shared_ptr<INT_LIST> INT_LIST_PTR;
-typedef std::vector<INT_LIST_PTR> INT_LIST_PTR_LIST;
-typedef std::shared_ptr<INT_LIST_PTR_LIST> INT_LIST_PPTR;
+typedef std::vector<std::string> LIST;
+typedef std::shared_ptr<LIST> LIST_PTR;
+typedef std::vector<LIST_PTR> LIST_PTR_LIST;
+typedef std::shared_ptr<LIST_PTR_LIST> LIST_PPTR;
+
+typedef std::unordered_set<std::string> HASH_SET;
+typedef std::shared_ptr<HASH_SET> HASH_SET_PTR;
 
 const int32_t buckets_size = 60;
 
@@ -113,11 +117,11 @@ class ConnectionTimerManager : public Thread {
          *       one thread, one connection deleted list
          *       thread index -> deleted list
          */
-        INT_LIST_PPTR connection_del_list_ptr_;
+        LIST_PPTR connection_del_list_ptr_;
         /*
          * contains all client address
          */
-        INT_LIST_PTR refresh_client_list_ptr_;
+        HASH_SET_PTR refresh_client_list_ptr_;
 
         MUTEX_VEC_PTR connection_buf_mutex_ptr_;
         MUTEX_VEC_PTR connection_bucket_mutex_ptr_;

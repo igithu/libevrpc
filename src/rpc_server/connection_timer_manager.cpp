@@ -29,11 +29,11 @@ using std::string;
 
 ConnectionTimerManager::ConnectionTimerManager() :
     connection_buf_ptr_(new CTHM_VEC()),
-    connection_del_list_ptr_(new INT_LIST_PTR_LIST()),
+    connection_del_list_ptr_(new LIST_PTR_LIST()),
     connection_buf_mutex_ptr_(new MUTEX_VEC()),
     connection_bucket_mutex_ptr_(new MUTEX_VEC()),
     connection_dellist_mutex_ptr_(new MUTEX_VEC()),
-    refresh_client_list_ptr_(new INT_LIST()),
+    refresh_client_list_ptr_(new HASH_SET()),
     buf_index_(0),
     bucket_index_(0),
     refresh_interval_(30),
@@ -57,7 +57,7 @@ int32_t ConnectionTimerManager::InitTimerBuf() {
      {
          MutexLockGuard lock(connection_pool_mutex_);
          connection_buf_ptr_->push_back(ctm_ptr);
-         INT_LIST_PTR ilp(new INT_LIST());
+         LIST_PTR ilp(new LIST());
          connection_del_list_ptr_->push_back(ilp);
 
          Mutex buf_mutex;
@@ -111,9 +111,9 @@ void ConnectionTimerManager::DeleteConnectionTimer(
     Mutex& mutex = connection_dellist_mutex_ptr_->at(buf_index);
     {
         MutexLockGuard guard(mutex);
-        INT_LIST_PTR& ilp = connection_del_list_ptr_->at(buf_index);
+        LIST_PTR& ilp = connection_del_list_ptr_->at(buf_index);
         if (NULL == ilp) {
-            ilp.reset(new INT_LIST());
+            ilp.reset(new LIST());
         }
         ilp->push_back(std::move(ct_key));
     }
@@ -122,31 +122,53 @@ void ConnectionTimerManager::DeleteConnectionTimer(
 bool ConnectionTimerManager::InsertRefreshConnectionInfo(string& ip_addr) {
     MutexLockGuard guard(refresh_client_list_mutex_);
     if (NULL == refresh_client_list_ptr_) {
-        refresh_client_list_ptr_.reset(new INT_LIST());
+        refresh_client_list_ptr_.reset(new HASH_SET());
     }
-    refresh_client_list_ptr_->push_back(std::move(ip_addr));
+    refresh_client_list_ptr_->insert(std::move(ip_addr));
     return true;
 }
 
-void ConnectionTimerManager::Run() {
-    bucket_index_ = 0;
-    while (running_) {
-        ConnectionBufCrawler();
-        CT_MAP_PTR& ctm_ptr = connection_pool_buckets_[bucket_index_];
-        if (NULL == ctm_ptr || ctm_ptr->empty()) {
+    void ConnectionTimerManager::Run() {
+        bucket_index_ = 0;
+        while (running_) {
+            ConnectionBufCrawler();
+            CT_MAP_PTR& ctm_ptr = connection_pool_buckets_[bucket_index_];
+            if (NULL == ctm_ptr || ctm_ptr->empty()) {
             sleep(3);
             continue;
         }
+        HASH_SET_PTR refresh_set_ptr = NULL;
+        {
+            MutexLockGuard guard(refresh_client_list_mutex_);
+            refresh_client_list_ptr_ = refresh_client_list_ptr_;
+            refresh_client_list_ptr_.reset();
+        }
+        /*
+         * lookup every connection and process it
+         */
         for (CT_MAP::iterator iter = ctm_ptr->begin(); iter != ctm_ptr->end(); ++iter) {
             CT_PTR& ct_ptr = iter->second;
             if (NULL == ct_ptr) {
                 continue;
             }
+            /*
+             * if the connection is marker in refresh_client_list by heartbeat
+             * , refresh it!
+             */
+            if (NULL != refresh_set_ptr) {
+                int32_t spliter_location = (iter->first).find_first_of("_");
+                if (spliter_location < 0) {
+                    iter = ctm_ptr->erase(iter);
+                    continue;
+                }
+                if (refresh_set_ptr->find((iter->first).substr(0, spliter_location)) != refresh_set_ptr->end()) {
+                    ct_ptr->expire_time = time(NULL) + refresh_interval_;
+                    continue;
+                }
+            }
             if (ct_ptr->expire_time > time(NULL)) {
                 // TODO  if client is gone, disconnect it! and remove it
                 //       if client is fine, expire_time += refresh_interval_
-            } else {
-                break;
             }
         }
         bucket_index_ = (bucket_index_ + 1) % buckets_size;
@@ -178,11 +200,11 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
         /*
          *  get the all connection been deleted
          */
-        INT_LIST_PTR ilp = NULL;
+        LIST_PTR ilp = NULL;
         Mutex& del_mutex = connection_dellist_mutex_ptr_->at(buf_index);
         {
             MutexLockGuard guard(del_mutex);
-            INT_LIST_PTR& tmp_ilp = connection_del_list_ptr_->at(buf_index);
+            LIST_PTR& tmp_ilp = connection_del_list_ptr_->at(buf_index);
             /*
              * take the del connection list
              */
