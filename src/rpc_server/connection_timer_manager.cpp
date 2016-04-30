@@ -128,12 +128,12 @@ bool ConnectionTimerManager::InsertRefreshConnectionInfo(string& ip_addr) {
     return true;
 }
 
-    void ConnectionTimerManager::Run() {
-        bucket_index_ = 0;
-        while (running_) {
-            ConnectionBufCrawler();
-            CT_MAP_PTR& ctm_ptr = connection_pool_buckets_[bucket_index_];
-            if (NULL == ctm_ptr || ctm_ptr->empty()) {
+void ConnectionTimerManager::Run() {
+    bucket_index_ = 0;
+    while (running_) {
+        ConnectionBufCrawler();
+        CT_MAP_PTR& ctm_ptr = connection_pool_buckets_[bucket_index_];
+        if (NULL == ctm_ptr || ctm_ptr->empty()) {
             sleep(3);
             continue;
         }
