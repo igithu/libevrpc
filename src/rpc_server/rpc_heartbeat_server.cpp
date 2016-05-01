@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright (c) 2015 aishuyu, Inc. All Rights Reserved
+ * Copyright (c) 2016 aishuyu, Inc. All Rights Reserved
  *
  **************************************************************************/
 
@@ -18,6 +18,7 @@
 
 #include <string.h>
 
+#include "connection_timer_manager.h"
 #include "util/rpc_communication.h"
 
 
@@ -63,6 +64,10 @@ bool RpcHeartbeatServer::Wait() {
 }
 
 void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
+    RpcHeartbeatServer* rhs = (RpcHeartbeatServer*)arg;
+    if (NULL == rhs) {
+        return;
+    }
 }
 
 
