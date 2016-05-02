@@ -78,8 +78,13 @@ class LibevThreadPool {
         virtual ~LibevThreadPool();
 
         bool Start(int32_t num_threads = 10);
-
         bool Wait();
+
+        /*
+         * kill the current thread and restart a new thread to
+         * replace it
+         */
+        bool ResartThread(pthread_t thread_id);
 
         /*
          * nonblock call the processor and return shortly

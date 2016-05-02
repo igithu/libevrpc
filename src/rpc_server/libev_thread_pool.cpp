@@ -172,6 +172,40 @@ bool LibevThreadPool::Wait() {
     }
 }
 
+bool LibevThreadPool::ResartThread(pthread_t thread_id) {
+    /*
+     * notify the one thread exit
+     */
+    int32_t index = 0;
+    for (int32_t i = 0; i < num_threads_; ++i) {
+        pthread_t tid = (libev_threads_ + i)->thread_id;
+        if (thread_id == tid) {
+            /*
+             * get the index of thread need to exit
+             */
+            index = i;
+            break;
+        }
+    }
+    LIBEV_THREAD* lt = libev_threads_ + index;
+    /*
+     * make current thread exit
+     */
+    char buf[1] = {'q'};
+    if (write(lt->notify_send_fd, buf, 1) != 1) {
+        PrintErrorInfo("Restart, Write to thread notify pipe failed!");
+        return false;
+    }
+    delete (lt)->new_request_queue;
+
+    /*
+     * start to generate new thread
+     * TODO
+     */
+    return true;
+}
+
+
 bool LibevThreadPool::Destroy() {
     /*
      * notify all thread exit
