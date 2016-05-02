@@ -187,21 +187,15 @@ bool LibevThreadPool::ResartThread(pthread_t thread_id) {
             break;
         }
     }
-    LIBEV_THREAD* lt = libev_threads_ + index;
-    /*
-     * make current thread exit
-     */
-    char buf[1] = {'q'};
-    if (write(lt->notify_send_fd, buf, 1) != 1) {
-        PrintErrorInfo("Restart, Write to thread notify pipe failed!");
-        return false;
-    }
-    delete (lt)->new_request_queue;
+    LIBEV_THREAD* new_thread = libev_threads_ + index;
 
-    /*
-     * start to generate new thread
-     * TODO
-     */
+    // char buf[1] = {'q'};
+    // if (write(new_thread->notify_send_fd, buf, 1) != 1) {
+    //     PrintErrorInfo("Restart, Write to thread notify pipe failed!");
+    //     return false;
+    // }
+    ev_resume(new_thread->epoller);
+
     return true;
 }
 
