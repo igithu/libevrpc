@@ -51,7 +51,11 @@ DispatchThread::~DispatchThread() {
     }
 }
 
-bool DispatchThread::InitializeService(const char *host, const char *port, RpcCallBackPtr cb, void *arg) {
+bool DispatchThread::InitializeService(
+        const char *host,
+        const char *port,
+        RpcCallBackPtr cb,
+        void *arg) {
     /*
      * copy the callback function to mem callback_
      */

@@ -63,7 +63,10 @@ int32_t RpcRecv(int32_t fd, std::string& recv_info_str, bool need_closed = false
 
 int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, bool need_closed = false);
 
+int32_t GetPeerAddr(int32_t fd, std::string& guest_addr);
+
 bool SetNonBlock(int32_t sock);
+
 
 }  // end of namespace libevrpc
 

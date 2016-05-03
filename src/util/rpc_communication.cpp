@@ -325,6 +325,14 @@ int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, boo
     return 0;
 }
 
+int32_t GetPeerAddr(int32_t fd, std::string& guest_addr) {
+    sockaddr_in guest;
+    socklen_t guest_len = sizeof(guest);
+    if (getpeername(fd, (struct sockaddr *)&guest, &guest_len) < 0) {
+        return -1;
+    }
+    return 0;
+}
 
 }  // end of namespace libevrpc
 
