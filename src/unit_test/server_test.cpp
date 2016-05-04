@@ -5,8 +5,8 @@
 #include <string>
 #include <string.h>
 
-#include <test_def.h>
-#include <../rpc_communication.h>
+#include "test_def.h"
+#include "../util/rpc_communication.h"
 
 using namespace libevrpc;
 
@@ -22,10 +22,14 @@ int main() {
         return 0;
     }
 
+    std::string guest_addr;
+    GetPeerAddr(cfd, guest_addr);
+
     std::string  recv_msg;
     int id = RpcRecv(cfd, recv_msg, true);
 
     printf("Test string is :%s\n", recv_msg.c_str());
+    printf("Test guest_addr string is :%s\n", guest_addr.c_str());
 
     return 0;
 }

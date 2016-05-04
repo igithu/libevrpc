@@ -4,14 +4,14 @@
 #include <string>
 #include <string.h>
 
-#include <test_def.h>
-#include <../rpc_communication.h>
+#include "test_def.h"
+#include "../util/rpc_communication.h"
 
 using namespace libevrpc;
 using namespace std;
 
 int main() {
-    int32_t conn_fd = TcpConnect(ADDR, PORT);
+    int32_t conn_fd = TcpConnect(ADDR, PORT, 10);
 
     if (conn_fd < 0) {
         printf("Tcp conncect error!\n");

@@ -331,6 +331,11 @@ int32_t GetPeerAddr(int32_t fd, std::string& guest_addr) {
     if (getpeername(fd, (struct sockaddr *)&guest, &guest_len) < 0) {
         return -1;
     }
+    char* addr = inet_ntoa(guest.sin_addr);
+    if (NULL == addr || strlen(addr) == 0) {
+        return -1;
+    }
+    guest_addr = addr;
     return 0;
 }
 
