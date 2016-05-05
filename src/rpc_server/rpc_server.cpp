@@ -30,13 +30,16 @@
 
 namespace libevrpc {
 
+using std::string;
+
 // static ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
 
-RpcServer::RpcServer() :
+RpcServer::RpcServer(const std::string& config_file) :
     dispatcher_thread_ptr_(NULL),
     worker_threads_ptr_(NULL),
     reader_threads_ptr_(NULL),
     writer_threads_ptr_(NULL),
+    config_parser_instance_(ConfigParser::GetInstance(config_file)),
     connection_timer_open_(false) {
     Initialize();
 }
@@ -83,6 +86,14 @@ bool RpcServer::Initialize() {
  */
 RpcServer& RpcServer::GetInstance() {
     static RpcServer server_instance;
+    return server_instance;
+}
+
+/*
+ * Note: not thread safe in old c++
+ */
+RpcServer& RpcServer::GetInstance(const string& config_file) {
+    static RpcServer server_instance(config_file);
     return server_instance;
 }
 

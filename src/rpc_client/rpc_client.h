@@ -31,15 +31,31 @@ namespace libevrpc {
 
 class RpcClient {
     public:
-        RpcClient(const std::string& config_file = "../conf/libevrpc.ini");
+        RpcClient(const std::string& config_file = "../conf/rpc_client.ini");
         virtual ~RpcClient();
 
+        /*
+         * open the async rpc call
+         */
         bool OpenRpcAsyncMode();
+        /*
+         * in async call, get the result from local memory
+         * if the async call is not finnished, will be blocked!!
+         */
         bool GetAsyncResponse(const std::string& method_name, google::protobuf::Message* response);
+        /*
+         * set the rpc connection timeout and if connection failed, tye times
+         */
         bool SetRpcConnectionInfo(int32_t rpc_timeout, int32_t try_time = 1);
         google::protobuf::RpcController* Status();
 
+        /*
+         * is the rpc call ok?
+         */
         bool IsCallOk();
+        /*
+         * if the rpc failed, YOU may get error info
+         */
         std::string GetErrorInfo() const;
 
     protected:

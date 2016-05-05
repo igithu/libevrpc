@@ -33,6 +33,11 @@ RpcClient::RpcClient(const string& config_file) :
 }
 
 RpcClient::~RpcClient() {
+    if (NULL != rpc_heartbeat_ptr_) {
+        rpc_heartbeat_ptr_->Stop();
+        rpc_heartbeat_ptr_->Wait();
+        delete rpc_heartbeat_ptr_;
+    }
     if (NULL != rpc_channel_ptr_) {
         delete rpc_channel_ptr_;
     }
@@ -43,10 +48,11 @@ RpcClient::~RpcClient() {
 }
 
 bool RpcClient::InitClient() {
-    const char* rpc_server_addr = config_parser_instance_.IniGetString("rpc_server_addr", NULL);
-    const char* rpc_server_port = config_parser_instance_.IniGetString("rpc_server_port", NULL);
-    const char* hb_server_port = config_parser_instance_.IniGetString("server_heartbeat_port", NULL);
-    int32_t rpc_connection_timeout = config_parser_instance_.IniGetInt("connection_timeout", 10);
+    const char* rpc_server_addr = config_parser_instance_.IniGetString("rpc_server:addr", NULL);
+    const char* rpc_server_port = config_parser_instance_.IniGetString("rpc_server:port", NULL);
+    const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", NULL);
+    bool hb_open = config_parser_instance_.IniGetBool("heartbeat:open", true);
+    int32_t rpc_connection_timeout = config_parser_instance_.IniGetInt("connection:timeout", 10);
 
     if (NULL != rpc_server_addr && NULL != rpc_server_port) {
         rpc_channel_ptr_ = new Channel(rpc_server_addr, rpc_server_port);
@@ -55,7 +61,10 @@ bool RpcClient::InitClient() {
         PrintErrorInfo("Attention! rpc client cann't read config file!");
         PrintErrorInfo("Init with local server address and default port:8899!");
     }
-    rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port, rpc_connection_timeout);
+    if (hb_open) {
+        rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port, rpc_connection_timeout);
+        rpc_heartbeat_ptr_->Start();
+    }
     rpc_controller_ptr_ = new ClientRpcController();
     SetRpcConnectionInfo(1000, 1);
     return true;

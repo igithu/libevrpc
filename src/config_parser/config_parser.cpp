@@ -89,10 +89,6 @@ bool ConfigParser::IniGetBool(const char* sec_key, bool defalut_val) {
     return iniparser_getboolean(dict_ini_, sec_key, defalut_val);;
 }
 
-void PrintErrorInfo() {
-}
-
-
 
 }  // end of namespace libevrpc
 
