@@ -28,6 +28,8 @@ uint32_t BKDRHash(const char *orig_str);
 
 void PrintErrorInfo(const char* error_info);
 
+const char* GetLocalAddress();
+
 }  // end of namespace libevrpc
 
 

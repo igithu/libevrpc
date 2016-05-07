@@ -81,7 +81,7 @@ class RpcServer {
 
 
     private:
-        RpcServer(const std::string& config_file = "../conf/rpc_server.ini");
+        RpcServer(const std::string& config_file = "../rpc_conf/rpc_server.ini");
 
         bool Initialize();
 

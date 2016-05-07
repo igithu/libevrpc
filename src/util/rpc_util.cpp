@@ -42,6 +42,9 @@ void PrintErrorInfo(const char* error_info) {
     fprintf(stderr, "%s [] %s\n", time, error_info);
 }
 
+const char* GetLocalAddress() {
+
+}
 }  // end of namespace libevrpc
 
 
