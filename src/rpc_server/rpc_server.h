@@ -64,11 +64,7 @@ class RpcServer {
         static RpcServer& GetInstance(const std::string& config_file);
 
         bool RegisteService(Service* reg_service);
-        bool Start(const char* addr = "",
-                   const char* port = "",
-                   int32_t thread_num = 20,
-                   int32_t reader_num = 0,
-                   int32_t writer_num = 0);
+        bool Start();
 
         bool Wait();
 

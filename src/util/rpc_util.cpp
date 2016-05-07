@@ -20,6 +20,10 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+
 namespace libevrpc {
 
 uint32_t BKDRHash(const char *orig_str) {
@@ -43,8 +47,13 @@ void PrintErrorInfo(const char* error_info) {
 }
 
 const char* GetLocalAddress() {
-
+    char hname[128];
+    gethostname(hname, sizeof(hname));
+    struct hostent *hptr = gethostbyname(hname);
+    const char* addr = inet_ntoa(*(struct in_addr*)(hptr->h_addr_list[0]));
+    return addr;
 }
+
 }  // end of namespace libevrpc
 
 

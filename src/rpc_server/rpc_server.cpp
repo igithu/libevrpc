@@ -1,7 +1,7 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
- * 
+ *
  **************************************************************************/
 
 
@@ -31,8 +31,6 @@
 namespace libevrpc {
 
 using std::string;
-
-// static ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
 
 RpcServer::RpcServer(const std::string& config_file) :
     dispatcher_thread_ptr_(NULL),
@@ -132,14 +130,15 @@ bool RpcServer::RegisteService(Service* reg_service) {
    return true;
 }
 
-bool RpcServer::Start(const char* addr,
-                      const char* port,
-                      int32_t thread_num,
-                      int32_t reader_num,
-                      int32_t writer_num) {
+bool RpcServer::Start() {
+    const char* server_addr = config_parser_instance_.IniGetString("rpc_server:addr", GetLocalAddress());
+    const char* server_port = config_parser_instance_.IniGetString("rpc_server:port", "9998");
+    int32_t thread_num = config_parser_instance_.IniGetInt("rpc_server:thread_num", 10);;
+    int32_t reader_thread_num = config_parser_instance_.IniGetInt("rpc_server:reader_thread_num", 0);;
+    int32_t writer_thread_num = config_parser_instance_.IniGetInt("rpc_server:writer_thread_num", 0);;
 
     dispatcher_thread_ptr_ = new DispatchThread();
-    dispatcher_thread_ptr_->InitializeService(addr, port, &RpcServer::RpcCall, (void*)this);
+    dispatcher_thread_ptr_->InitializeService(server_addr, server_port, &RpcServer::RpcCall, (void*)this);
 
     worker_threads_ptr_ = new LibevThreadPool();
 
@@ -151,14 +150,14 @@ bool RpcServer::Start(const char* addr,
     /*
      * if start readerpool or writerpool
      */
-    if (0 != reader_num) {
+    if (0 != reader_thread_num) {
         reader_threads_ptr_ = new LibevThreadPool();
-        reader_threads_ptr_->Start(reader_num);
+        reader_threads_ptr_->Start(reader_thread_num);
     }
 
-    if (0 != writer_num) {
+    if (0 != writer_thread_num) {
         writer_threads_ptr_ = new LibevThreadPool();
-        writer_threads_ptr_->Start(writer_num);
+        writer_threads_ptr_->Start(writer_thread_num);
     }
 }
 

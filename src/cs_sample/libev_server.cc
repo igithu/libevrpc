@@ -51,7 +51,7 @@ int main() {
     EchoServiceImpl service;
     rpc_server.RegisteService(&service);
     printf("Start the rpc sevice....\n");
-    rpc_server.Start("127.0.0.1", "9999", 10);
+    rpc_server.Start();
 
     printf("Start wait.........\n");
     rpc_server.Wait();
