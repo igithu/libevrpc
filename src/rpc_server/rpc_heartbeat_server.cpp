@@ -19,6 +19,7 @@
 #include <string.h>
 #include <string>
 
+#include "connection_timer_manager.h"
 #include "util/rpc_communication.h"
 
 
@@ -26,9 +27,10 @@ namespace libevrpc {
 
 using std::string;
 
+ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
+
 RpcHeartbeatServer::RpcHeartbeatServer(const char* hb_host, const char* hb_port) :
     dispatcher_thread_ptr_(NULL),
-    ctm_instance_(ConnectionTimerManager::GetInstance()),
     hb_host_(NULL),
     hb_port_(NULL) {
 
@@ -77,7 +79,7 @@ void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
     if (GetPeerAddr(fd, clien_addr) < 0) {
         return;
     }
-    rhs->ctm_instance_.InsertRefreshConnectionInfo(clien_addr);
+    ctm_instance.InsertRefreshConnectionInfo(clien_addr);
 }
 
 

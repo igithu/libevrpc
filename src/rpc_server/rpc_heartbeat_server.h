@@ -21,7 +21,6 @@
 #define __RPC_HEARTBEAT_SERVER_H
 
 #include "dispatch_thread.h"
-#include "connection_timer_manager.h"
 #include "util/thread.h"
 
 namespace libevrpc {
@@ -43,7 +42,6 @@ class RpcHeartbeatServer {
 
     private:
         DispatchThread*  dispatcher_thread_ptr_;
-        ConnectionTimerManager& ctm_instance_;
         char* hb_host_;
         char* hb_port_;
 

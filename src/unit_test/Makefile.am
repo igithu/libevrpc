@@ -25,6 +25,10 @@ RPC_SRC = ${server_rootdir}/rpc_server.h \
 		  ${server_rootdir}/dispatch_thread.cpp \
 		  ${server_rootdir}/libev_thread_pool.h \
 		  ${server_rootdir}/libev_thread_pool.cpp \
+		  ${server_rootdir}/connection_timer_manager.h \
+		  ${server_rootdir}/connection_timer_manager.cpp \
+		  ${server_rootdir}/rpc_heartbeat_server.h \
+		  ${server_rootdir}/rpc_heartbeat_server.cpp \
 		  ${util_dir}/rpc_util.h \
 		  ${util_dir}/rpc_util.cpp \
 		  ${util_dir}/thread.h \
@@ -34,7 +38,8 @@ RPC_SRC = ${server_rootdir}/rpc_server.h \
 		  ${util_dir}/rpc_communication.h \
 		  ${util_dir}/rpc_communication.cpp
 
-LTP = ${ut_dir}/test_libev_tp.cpp ${util_dir}/pthread_mutex.h ${server_rootdir}/libev_thread_pool.h ${server_rootdir}/libev_thread_pool.cpp
+# LTP = ${ut_dir}/test_libev_tp.cpp ${util_dir}/pthread_mutex.h ${server_rootdir}/libev_thread_pool.h ${server_rootdir}/libev_thread_pool.cpp
+LTP = ${ut_dir}/test_hb_client.cc
 
 bin_PROGRAMS = ltp
 

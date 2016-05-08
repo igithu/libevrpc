@@ -16,15 +16,27 @@ rpc_client_LDFLAGS = -lpthread -lz -lm
 
 #$(top_builddir)/src/rpc_server/librpc_server.a
 
-rpc_client_LDADD = $(top_builddir)/src/rpc_client/librpc_client.a \
+
+LDADD = $(top_builddir)/src/rpc_client/librpc_client.a \
+		$(top_builddir)/src/rpc_server/librpc_server.a \
 		$(top_builddir)/src/cs_sample/proto/libproto.a \
 		${third_dir}/protobuf/lib/*.a \
 		${third_dir}/libev/lib/*.a
 
-bin_PROGRAMS = rpc_client
+bin_PROGRAMS = rpc_server rpc_client
 
-#SERVER_SRC = ${cs_rootdir}/libev_server.cc
-#rpc_server_SOURCES = ${SERVER_SRC}
+SERVER_SRC = ${cs_rootdir}/libev_server.cc
+rpc_server_SOURCES = ${SERVER_SRC}
 
 CLIENT_SRC = ${cs_rootdir}/libev_client.cc
 rpc_client_SOURCES = ${CLIENT_SRC}
+
+# rpc_client_LDADD = $(top_builddir)/src/rpc_client/librpc_client.a \
+# 		$(top_builddir)/src/cs_sample/proto/libproto.a \
+# 		${third_dir}/protobuf/lib/*.a \
+# 		${third_dir}/libev/lib/*.a
+#
+# bin_PROGRAMS = rpc_client
+#
+# CLIENT_SRC = ${cs_rootdir}/libev_client.cc
+# rpc_client_SOURCES = ${CLIENT_SRC}
