@@ -34,16 +34,21 @@ ConnectionTimerManager::ConnectionTimerManager() :
     connection_bucket_mutex_ptr_(new MUTEX_VEC()),
     connection_dellist_mutex_ptr_(new MUTEX_VEC()),
     refresh_client_list_ptr_(new HASH_SET()),
+    config_parser_instance_(ConfigParser::GetInstance(config_file))
     buf_index_(0),
     bucket_index_(0),
     refresh_interval_(30),
     running_(false) {
-    for (int32_t i = 0; i < 60; ++i) {
+    for (int32_t i = 0; i < buckets_size; ++i) {
         connection_pool_buckets_[i] = NULL;
     }
 }
 
 ConnectionTimerManager::~ConnectionTimerManager() {
+    if (NULL != rpc_heartbeat_server_ptr_) {
+        rpc_heartbeat_server_ptr_->Wait();
+        delete rpc_heartbeat_server_ptr_;
+    }
 }
 
 ConnectionTimerManager& ConnectionTimerManager::GetInstance() {
@@ -129,6 +134,7 @@ bool ConnectionTimerManager::InsertRefreshConnectionInfo(string& ip_addr) {
 }
 
 void ConnectionTimerManager::Run() {
+    rpc_heartbeat_server_ptr_->Start();
     bucket_index_ = 0;
     while (running_) {
         ConnectionBufCrawler();
@@ -174,6 +180,7 @@ void ConnectionTimerManager::Run() {
         bucket_index_ = (bucket_index_ + 1) % buckets_size;
         sleep(1);
     }
+    rpc_heartbeat_server_ptr_->Stop();
 }
 
 /*

@@ -15,8 +15,7 @@ AM_CPPFLAGS = -I${proj_dir}/ \
 #AM_LDFLAGS = -lz -lrt
 AM_LDFLAGS = -lz -lstdc++
 
-LDADD = ${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
-		${third_dir}/protobuf/lib/*.a \
+LDADD = ${third_dir}/protobuf/lib/*.a \
 		${third_dir}/libev/lib/*.a
 
 RPC_SRC = ${server_rootdir}/rpc_server.h \
@@ -39,10 +38,13 @@ RPC_SRC = ${server_rootdir}/rpc_server.h \
 		  ${util_dir}/rpc_communication.cpp
 
 # LTP = ${ut_dir}/test_libev_tp.cpp ${util_dir}/pthread_mutex.h ${server_rootdir}/libev_thread_pool.h ${server_rootdir}/libev_thread_pool.cpp
-LTP = ${ut_dir}/test_hb_client.cc
 
-bin_PROGRAMS = ltp
+bin_PROGRAMS = ltp_client ltp_server
 
-ltp_SOURCES = ${LTP}
+LTP_CLIENT = ${ut_dir}/test_hb_client.cc ${RPC_SRC}
+ltp_client_SOURCES = ${LTP_CLIENT}
+
+LTP_SERVER = ${ut_dir}/test_hb_server.cc ${RPC_SRC}
+ltp_server_SOURCES = ${LTP_SERVER}
 
 #SUBDIRS = test

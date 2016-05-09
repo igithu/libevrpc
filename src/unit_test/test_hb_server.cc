@@ -14,6 +14,7 @@
  *
  **/
 
+#include <unistd.h>
 
 #include "rpc_server/connection_timer_manager.h"
 #include "rpc_server/rpc_heartbeat_server.h"

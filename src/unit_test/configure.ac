@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.60])
 AC_INIT([libevrpc], [0.0.2], [asy5178@163.com])
 
 # Checks for programs.

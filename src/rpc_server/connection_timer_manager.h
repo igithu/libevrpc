@@ -27,9 +27,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "rpc_heartbeat_server.h"
+#include "config_parser/config_parser.h"
 #include "util/pthread_mutex.h"
-#include "util/thread.h"
 #include "util/disallow_copy_and_assign.h"
+#include "util/thread.h"
 
 namespace libevrpc {
 
@@ -126,6 +128,9 @@ class ConnectionTimerManager : public Thread {
         MUTEX_VEC_PTR connection_buf_mutex_ptr_;
         MUTEX_VEC_PTR connection_bucket_mutex_ptr_;
         MUTEX_VEC_PTR connection_dellist_mutex_ptr_;
+        ConfigParser& config_parser_instance_;
+
+        RpcHeartbeatServer* rpc_heartbeat_server_ptr_;
 
 
         /*

@@ -14,6 +14,8 @@
  *
  **/
 
+#include <unistd.h>
+
 #include "rpc_client/rpc_heartbeat_client.h"
 
 using namespace libevrpc;
