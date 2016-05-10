@@ -27,14 +27,15 @@ namespace libevrpc {
 
 using std::string;
 
-ConnectionTimerManager::ConnectionTimerManager() :
+ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     connection_buf_ptr_(new CTHM_VEC()),
     connection_del_list_ptr_(new LIST_PTR_LIST()),
     connection_buf_mutex_ptr_(new MUTEX_VEC()),
     connection_bucket_mutex_ptr_(new MUTEX_VEC()),
     connection_dellist_mutex_ptr_(new MUTEX_VEC()),
     refresh_client_list_ptr_(new HASH_SET()),
-    config_parser_instance_(ConfigParser::GetInstance(config_file))
+    config_parser_instance_(ConfigParser::GetInstance()),
+    rpc_heartbeat_server_ptr_(NULL),
     buf_index_(0),
     bucket_index_(0),
     refresh_interval_(30),
@@ -42,6 +43,9 @@ ConnectionTimerManager::ConnectionTimerManager() :
     for (int32_t i = 0; i < buckets_size; ++i) {
         connection_pool_buckets_[i] = NULL;
     }
+    const char* server_addr = config_parser_instance_.IniGetString("rpc_server:addr", GetLocalAddress());
+    const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", "9999");
+    rpc_heartbeat_server_ptr_ = new RpcHeartbeatServer(server_addr, hb_server_port, config_file);
 }
 
 ConnectionTimerManager::~ConnectionTimerManager() {
@@ -51,8 +55,8 @@ ConnectionTimerManager::~ConnectionTimerManager() {
     }
 }
 
-ConnectionTimerManager& ConnectionTimerManager::GetInstance() {
-    static ConnectionTimerManager ctm_instance;
+ConnectionTimerManager& ConnectionTimerManager::GetInstance(const char* config_file) {
+    static ConnectionTimerManager ctm_instance(config_file);
     return ctm_instance;
 }
 

@@ -133,9 +133,9 @@ bool RpcServer::RegisteService(Service* reg_service) {
 bool RpcServer::Start() {
     const char* server_addr = config_parser_instance_.IniGetString("rpc_server:addr", GetLocalAddress());
     const char* server_port = config_parser_instance_.IniGetString("rpc_server:port", "9998");
-    int32_t thread_num = config_parser_instance_.IniGetInt("rpc_server:thread_num", 10);;
-    int32_t reader_thread_num = config_parser_instance_.IniGetInt("rpc_server:reader_thread_num", 0);;
-    int32_t writer_thread_num = config_parser_instance_.IniGetInt("rpc_server:writer_thread_num", 0);;
+    int32_t thread_num = config_parser_instance_.IniGetInt("rpc_server:thread_num", 10);
+    int32_t reader_thread_num = config_parser_instance_.IniGetInt("rpc_server:reader_thread_num", 0);
+    int32_t writer_thread_num = config_parser_instance_.IniGetInt("rpc_server:writer_thread_num", 0);
 
     dispatcher_thread_ptr_ = new DispatchThread();
     dispatcher_thread_ptr_->InitializeService(server_addr, server_port, &RpcServer::RpcCall, (void*)this);

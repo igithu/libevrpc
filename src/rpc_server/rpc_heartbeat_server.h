@@ -27,12 +27,17 @@ namespace libevrpc {
 
 class RpcHeartbeatServer {
     public:
-        RpcHeartbeatServer(const char* hb_host, const char* hb_port);
+        RpcHeartbeatServer(
+                const char* hb_host,
+                const char* hb_port,
+                const char* config_file);
         ~RpcHeartbeatServer();
 
         bool InitHeartbeatServer();
         bool HeartBeatStart();
+        bool Start();
         bool Wait();
+        bool Stop();
 
         /*
          * recv the hearbeat in libev and put the hb info
@@ -44,6 +49,7 @@ class RpcHeartbeatServer {
         DispatchThread*  dispatcher_thread_ptr_;
         char* hb_host_;
         char* hb_port_;
+        char* config_file_;
 
         int32_t listenfd_;
 

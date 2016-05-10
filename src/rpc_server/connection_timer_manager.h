@@ -74,7 +74,7 @@ class ConnectionTimerManager : public Thread {
     public:
         ~ConnectionTimerManager();
 
-        static ConnectionTimerManager& GetInstance();
+        static ConnectionTimerManager& GetInstance(const char* config_file);
         int32_t InitTimerBuf();
         int32_t InsertConnectionTimer(
                 const std::string& ip_addr,
@@ -91,7 +91,7 @@ class ConnectionTimerManager : public Thread {
         virtual void Run();
 
     private:
-        ConnectionTimerManager();
+        ConnectionTimerManager(const char* config_file);
 
         std::string GenerateTimerKey(const std::string& ip_addr, int32_t fd);
         int32_t GenerateBucketNum(const std::string& ori_key);

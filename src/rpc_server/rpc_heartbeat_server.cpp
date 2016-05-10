@@ -27,20 +27,27 @@ namespace libevrpc {
 
 using std::string;
 
-ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance();
 
-RpcHeartbeatServer::RpcHeartbeatServer(const char* hb_host, const char* hb_port) :
+RpcHeartbeatServer::RpcHeartbeatServer(
+        const char* hb_host,
+        const char* hb_port,
+        const char* config_file) :
     dispatcher_thread_ptr_(NULL),
     hb_host_(NULL),
-    hb_port_(NULL) {
+    hb_port_(NULL),
+    config_file_(NULL) {
 
     hb_host_ = (char*)malloc(strlen(hb_host));
     hb_port_ = (char*)malloc(strlen(hb_port));
     strcpy(hb_host_, hb_host);
     strcpy(hb_port_, hb_port);
+    strcpy(config_file_, config_file);
 }
 
 RpcHeartbeatServer::~RpcHeartbeatServer() {
+    if (NULL != config_file_) {
+        free(config_file_);
+    }
     if (NULL != hb_host_) {
         free(hb_host_);
     }
@@ -63,10 +70,26 @@ bool RpcHeartbeatServer::HeartBeatStart() {
     return true;
 }
 
-bool RpcHeartbeatServer::Wait() {
-    if (NULL != dispatcher_thread_ptr_) {
-        dispatcher_thread_ptr_->Wait();
+bool RpcHeartbeatServer::Start() {
+    if (NULL == dispatcher_thread_ptr_) {
+        return false;
     }
+    dispatcher_thread_ptr_->Start();
+}
+
+bool RpcHeartbeatServer::Wait() {
+    if (NULL == dispatcher_thread_ptr_) {
+        return false;
+    }
+    dispatcher_thread_ptr_->Wait();
+    return true;
+}
+
+bool RpcHeartbeatServer::Stop() {
+    if (NULL == dispatcher_thread_ptr_) {
+        return false;
+    }
+    dispatcher_thread_ptr_->Stop();
     return true;
 }
 
@@ -79,6 +102,7 @@ void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
     if (GetPeerAddr(fd, clien_addr) < 0) {
         return;
     }
+    ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance(rhs->config_file_);
     ctm_instance.InsertRefreshConnectionInfo(clien_addr);
 }
 
