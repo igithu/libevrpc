@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS=foreign subdir-objects
 proj_dir = ${top_srcdir}/..
 top_dir = ${proj_dir}/../..
 server_rootdir = ${proj_dir}/rpc_server
+config_parser = ${proj_dir}/config_parser
 util_dir = ${proj_dir}/util
 ut_dir = ${proj_dir}/unit_test
 third_dir = ${top_dir}/third-64
@@ -28,6 +29,12 @@ RPC_SRC = ${server_rootdir}/rpc_server.h \
 		  ${server_rootdir}/connection_timer_manager.cpp \
 		  ${server_rootdir}/rpc_heartbeat_server.h \
 		  ${server_rootdir}/rpc_heartbeat_server.cpp \
+		  ${config_parser}/config_parser.h \
+		  ${config_parser}/config_parser.cpp \
+		  ${config_parser}/dictionary.h \
+		  ${config_parser}/dictionary.cpp \
+		  ${config_parser}/iniparser.h \
+		  ${config_parser}/iniparser.cpp \
 		  ${util_dir}/rpc_util.h \
 		  ${util_dir}/rpc_util.cpp \
 		  ${util_dir}/thread.h \

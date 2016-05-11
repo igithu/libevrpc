@@ -1,9 +1,11 @@
 AUTOMAKE_OPTIONS=foreign subdir-objects
 
 top_dir = ${top_srcdir}/..
+src_dir = ${top_srcdir}/src
 server_rootdir = ${top_srcdir}/src/rpc_server
 util_dir = ${top_srcdir}/src/util
 third_dir = ${top_dir}/third-64
+config_dir = ${src_dir}/config_parser
 
 AM_CPPFLAGS = -I${top_srcdir}/src \
               -I${third_dir}/gperftools/include/ \
@@ -29,6 +31,12 @@ RPC_SRC = ${server_rootdir}/rpc_server.h \
 		  ${server_rootdir}/connection_timer_manager.cpp \
 		  ${server_rootdir}/rpc_heartbeat_server.h \
 		  ${server_rootdir}/rpc_heartbeat_server.cpp \
+		  ${config_dir}/config_parser.h \
+		  ${config_dir}/config_parser.cpp \
+		  ${config_dir}/dictionary.h \
+		  ${config_dir}/dictionary.cpp \
+		  ${config_dir}/iniparser.h \
+		  ${config_dir}/iniparser.cpp \
 		  ${util_dir}/rpc_util.h \
 		  ${util_dir}/rpc_util.cpp \
 		  ${util_dir}/thread.h \
