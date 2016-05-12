@@ -38,6 +38,7 @@ RpcServer::RpcServer(const std::string& config_file) :
     reader_threads_ptr_(NULL),
     writer_threads_ptr_(NULL),
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
+    connection_timer_manager_(ConnectionTimerManager::GetInstance(config_file.c_str())),
     connection_timer_open_(false) {
     Initialize();
 }

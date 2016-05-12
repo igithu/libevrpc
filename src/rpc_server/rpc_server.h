@@ -25,6 +25,7 @@
 #include <google/protobuf/service.h>
 
 #include "dispatch_thread.h"
+#include "connection_timer_manager.h"
 #include "libev_thread_pool.h"
 #include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
@@ -97,6 +98,7 @@ class RpcServer {
         LibevThreadPool* writer_threads_ptr_;
         RpcController* rpc_controller_ptr_;
         ConfigParser& config_parser_instance_;
+        ConnectionTimerManager& connection_timer_manager_;
 
         int32_t active_wtd_num_;
         bool connection_timer_open_;
