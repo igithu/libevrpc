@@ -22,16 +22,13 @@
 using namespace libevrpc;
 
 int main() {
-    ConnectionTimerManager& ctm = ConnectionTimerManager::GetInstance();
-    RpcHeartbeatServer rhs("127.0.0.1", "9999");
+    ConnectionTimerManager& ctm = ConnectionTimerManager::GetInstance("./test.ini");
 
     ctm.Start();
-    rhc.Start();
 
     sleep(1000);
 
     ctm.Stop();
-    rhc.Stop();
 
     return 0;
 }

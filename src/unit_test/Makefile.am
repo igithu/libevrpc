@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS=foreign subdir-objects
 proj_dir = ${top_srcdir}/..
 top_dir = ${proj_dir}/../..
 server_rootdir = ${proj_dir}/rpc_server
+client_rootdir = ${proj_dir}/rpc_client
 config_parser = ${proj_dir}/config_parser
 util_dir = ${proj_dir}/util
 ut_dir = ${proj_dir}/unit_test
@@ -19,17 +20,7 @@ AM_LDFLAGS = -lz -lstdc++
 LDADD = ${third_dir}/protobuf/lib/*.a \
 		${third_dir}/libev/lib/*.a
 
-RPC_SRC = ${server_rootdir}/rpc_server.h \
-		  ${server_rootdir}/rpc_server.cpp \
-		  ${server_rootdir}/dispatch_thread.h \
-		  ${server_rootdir}/dispatch_thread.cpp \
-		  ${server_rootdir}/libev_thread_pool.h \
-		  ${server_rootdir}/libev_thread_pool.cpp \
-		  ${server_rootdir}/connection_timer_manager.h \
-		  ${server_rootdir}/connection_timer_manager.cpp \
-		  ${server_rootdir}/rpc_heartbeat_server.h \
-		  ${server_rootdir}/rpc_heartbeat_server.cpp \
-		  ${config_parser}/config_parser.h \
+RPC_SRC = ${config_parser}/config_parser.h \
 		  ${config_parser}/config_parser.cpp \
 		  ${config_parser}/dictionary.h \
 		  ${config_parser}/dictionary.cpp \
@@ -48,10 +39,22 @@ RPC_SRC = ${server_rootdir}/rpc_server.h \
 
 bin_PROGRAMS = ltp_client ltp_server
 
-LTP_CLIENT = ${ut_dir}/test_hb_client.cc ${RPC_SRC}
+LTP_CLIENT = ${ut_dir}/test_hb_client.cc ${RPC_SRC} \
+			 ${client_rootdir}/rpc_heartbeat_client.h \
+			 ${client_rootdir}/rpc_heartbeat_client.cpp
 ltp_client_SOURCES = ${LTP_CLIENT}
 
-LTP_SERVER = ${ut_dir}/test_hb_server.cc ${RPC_SRC}
+LTP_SERVER = ${ut_dir}/test_hb_server.cc ${RPC_SRC} \
+			 ${server_rootdir}/rpc_server.h \
+			 ${server_rootdir}/rpc_server.cpp \
+			 ${server_rootdir}/dispatch_thread.h \
+			 ${server_rootdir}/dispatch_thread.cpp \
+			 ${server_rootdir}/libev_thread_pool.h \
+			 ${server_rootdir}/libev_thread_pool.cpp \
+			 ${server_rootdir}/connection_timer_manager.h \
+			 ${server_rootdir}/connection_timer_manager.cpp \
+			 ${server_rootdir}/rpc_heartbeat_server.h \
+			 ${server_rootdir}/rpc_heartbeat_server.cpp
 ltp_server_SOURCES = ${LTP_SERVER}
 
 #SUBDIRS = test
