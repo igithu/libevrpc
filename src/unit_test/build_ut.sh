@@ -61,8 +61,8 @@ echo "*******************************************"
 echo ""
 
 
-make distclean 1>/dev/null 2>&1
-./bootstrap.sh clean 1>/dev/null 2>&1
+#make distclean 1>/dev/null 2>&1
+#./bootstrap.sh clean 1>/dev/null 2>&1
 
 #make distclean && ./bootstrap.sh clean
 

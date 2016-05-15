@@ -39,6 +39,7 @@ RpcHeartbeatServer::RpcHeartbeatServer(
 
     hb_host_ = (char*)malloc(strlen(hb_host));
     hb_port_ = (char*)malloc(strlen(hb_port));
+    config_file_ = (char*)malloc(strlen(config_file));
     strcpy(hb_host_, hb_host);
     strcpy(hb_port_, hb_port);
     strcpy(config_file_, config_file);
