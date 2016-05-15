@@ -113,6 +113,7 @@ void DispatchThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int r
     socklen_t len = sizeof(struct sockaddr_in);
     int32_t cfd = Accept(watcher->fd, client_addr, len);
     if (cfd < 0) {
+        PrintErrorInfo("Accept connection failed!");
         return;
     }
 

@@ -21,10 +21,10 @@
 using namespace libevrpc;
 
 int main() {
-    RpcHeartbeatClient rhc("127.0.0.1" ,"9999", 20);
+    RpcHeartbeatClient rhc("192.168.89.100" ,"9999", 1000);
     rhc.Start();
 
-    sleep(50);
+    sleep(5);
     rhc.Stop();
     rhc.Wait();
     return 0;

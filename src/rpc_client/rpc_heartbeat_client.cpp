@@ -64,7 +64,7 @@ bool RpcHeartbeatClient::CreateRpcConnection() {
         return false;
     }
 
-    return 0;
+    return true;
 }
 
 void RpcHeartbeatClient::Run() {

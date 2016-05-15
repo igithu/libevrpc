@@ -22,7 +22,7 @@
 using namespace libevrpc;
 
 int main() {
-    ConnectionTimerManager& ctm = ConnectionTimerManager::GetInstance("./test_conf/test.ini");
+    ConnectionTimerManager& ctm = ConnectionTimerManager::GetInstance("test_conf/test.ini");
 
     ctm.Start();
 

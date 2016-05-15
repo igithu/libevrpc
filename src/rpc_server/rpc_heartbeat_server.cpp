@@ -67,11 +67,11 @@ bool RpcHeartbeatServer::InitHeartbeatServer() {
 bool RpcHeartbeatServer::HeartBeatStart() {
     dispatcher_thread_ptr_ = new DispatchThread();
     dispatcher_thread_ptr_->InitializeService(hb_host_, hb_port_, &RpcHeartbeatServer::HeartBeatProcessor, (void*)this);
-    dispatcher_thread_ptr_->Start();
     return true;
 }
 
 bool RpcHeartbeatServer::Start() {
+    HeartBeatStart();
     if (NULL == dispatcher_thread_ptr_) {
         return false;
     }
@@ -95,6 +95,7 @@ bool RpcHeartbeatServer::Stop() {
 }
 
 void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
+    printf("test\n");
     RpcHeartbeatServer* rhs = (RpcHeartbeatServer*)arg;
     if (NULL == rhs) {
         return;

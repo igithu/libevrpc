@@ -34,7 +34,7 @@ ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     connection_bucket_mutex_ptr_(new MUTEX_VEC()),
     connection_dellist_mutex_ptr_(new MUTEX_VEC()),
     refresh_client_list_ptr_(new HASH_SET()),
-    config_parser_instance_(ConfigParser::GetInstance()),
+    config_parser_instance_(ConfigParser::GetInstance(config_file)),
     rpc_heartbeat_server_ptr_(NULL),
     buf_index_(0),
     bucket_index_(0),
