@@ -21,6 +21,7 @@
 
 #include "connection_timer_manager.h"
 #include "util/rpc_communication.h"
+#include "util/rpc_util.h"
 
 
 namespace libevrpc {
@@ -95,13 +96,18 @@ bool RpcHeartbeatServer::Stop() {
 }
 
 void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
-    printf("test\n");
     RpcHeartbeatServer* rhs = (RpcHeartbeatServer*)arg;
     if (NULL == rhs) {
         return;
     }
     string clien_addr;
     if (GetPeerAddr(fd, clien_addr) < 0) {
+        PrintErrorInfo("Get client address error!");
+        return;
+    }
+    string recv_info;
+    if (RpcRecv(fd, recv_info, false) < 0) {
+        PrintErrorInfo("HeartBeatSeerver recv info error!");
         return;
     }
     ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance(rhs->config_file_);

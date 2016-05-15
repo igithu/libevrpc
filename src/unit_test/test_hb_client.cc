@@ -16,12 +16,13 @@
 
 #include <unistd.h>
 
+#include "util/rpc_util.h"
 #include "rpc_client/rpc_heartbeat_client.h"
 
 using namespace libevrpc;
 
 int main() {
-    RpcHeartbeatClient rhc("192.168.89.100" ,"9999", 1000);
+    RpcHeartbeatClient rhc(GetLocalAddress() ,"9999", 1000);
     rhc.Start();
 
     sleep(5);
