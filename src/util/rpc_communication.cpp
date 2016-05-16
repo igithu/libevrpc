@@ -44,9 +44,9 @@ bool NonBlockMode(int32_t sock, bool mode) {
     }
 
     if (mode) {
-        opts = opts | O_NONBLOCK;
+        opts |= O_NONBLOCK;
     } else {
-        opts = opts | ~O_NONBLOCK;
+        opts |= ~O_NONBLOCK;
     }
     if (fcntl(sock, F_SETFL, opts) < 0) {
         PrintErrorInfo("Call fcntl failed!\n");
@@ -115,7 +115,7 @@ int32_t TcpListen(const char *host, const char *port, bool non_block, int32_t fa
     return listenfd;
 }
 
-int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, int32_t family) {
+int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overtime, int32_t family) {
     struct addrinfo hints, *res = NULL, *ressave = NULL;
 
     bzero(&hints, sizeof(struct addrinfo));
@@ -127,7 +127,7 @@ int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, in
         return -1;
     }
 
-    int32_t  sockfd;
+    int32_t  sockfd, conn_ret;
     ressave = res;
     do {
         sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -140,13 +140,16 @@ int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, in
             continue;
         }
 
-        NonBlockMode(sockfd, true);
+        if (conn_overtime > 0) {
+            NonBlockMode(sockfd, true);
+        }
 
-        int32_t conn_ret = connect(sockfd, res->ai_addr, res->ai_addrlen);
+        conn_ret = connect(sockfd, res->ai_addr, res->ai_addrlen);
         /*
          * 0: connect successfully, conn_ret < 0 and EINPROGRESS: connecting
+         *
          */
-        if (0 == conn_ret|| (conn_ret < 0 && errno == EINPROGRESS)) {
+        if (conn_overtime > 0 && (0 == conn_ret|| (conn_ret < 0 && errno == EINPROGRESS))) {
             fd_set fs;
             FD_ZERO(&fs);
             FD_SET(sockfd, &fs);
@@ -159,15 +162,22 @@ int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, in
                 sockfd = TCP_CONN_TIMEOUT;
                 break;
             } else if (-1 != ret) {
+                sockfd = -1;
                 break;
             }
         }
 
         close(sockfd);  /* ignore this one */
     } while ((res = res->ai_next) != NULL);
-    NonBlockMode(sockfd, false);
 
-    if (NULL == res) {    /* errno set from final connect() */
+    if (conn_overtime > 0 && (sockfd < 0 || !NonBlockMode(sockfd, false))) {
+        PrintErrorInfo("TCP connection failed!");
+        freeaddrinfo(ressave);
+        return -1;
+    }
+
+    /* errno set from final connect() */
+    if (sockfd < 0 || conn_ret < 0) {
         fprintf(stderr, "Tcp_connect error! the errno is: %s\n", strerror(errno));
         freeaddrinfo(ressave);
         return -1;

@@ -55,7 +55,7 @@ int32_t Socket(int32_t family = 0, int32_t type = 0, int32_t protocol = 0);
 
 int32_t TcpListen(const char *host, const char *port, bool non_block = true, int32_t family = AF_UNSPEC);
 
-int32_t TcpConnect(const char *host, const char *port, int32_t conn_overtime, int32_t family = AF_UNSPEC);
+int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overtime, int32_t family = AF_UNSPEC);
 
 int32_t Accept(int fd, struct sockaddr_in& sa, int32_t addrlen, bool non_block = true);
 
