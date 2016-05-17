@@ -34,7 +34,6 @@ class RpcHeartbeatServer {
         ~RpcHeartbeatServer();
 
         bool InitHeartbeatServer();
-        bool HeartBeatStart();
         bool Start();
         bool Wait();
         bool Stop();

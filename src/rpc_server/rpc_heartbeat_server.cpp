@@ -65,14 +65,9 @@ bool RpcHeartbeatServer::InitHeartbeatServer() {
     return true;
 }
 
-bool RpcHeartbeatServer::HeartBeatStart() {
+bool RpcHeartbeatServer::Start() {
     dispatcher_thread_ptr_ = new DispatchThread();
     dispatcher_thread_ptr_->InitializeService(hb_host_, hb_port_, &RpcHeartbeatServer::HeartBeatProcessor, (void*)this);
-    return true;
-}
-
-bool RpcHeartbeatServer::Start() {
-    HeartBeatStart();
     if (NULL == dispatcher_thread_ptr_) {
         return false;
     }
