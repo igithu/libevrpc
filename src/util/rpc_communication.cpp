@@ -149,7 +149,7 @@ int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overti
          * 0: connect successfully, conn_ret < 0 and EINPROGRESS: connecting
          *
          */
-        if (conn_overtime > 0 && (0 == conn_ret|| (conn_ret < 0 && errno == EINPROGRESS))) {
+        if (conn_overtime > 0 && (0 == conn_ret || (conn_ret < 0 && errno == EINPROGRESS))) {
             fd_set fs;
             FD_ZERO(&fs);
             FD_SET(sockfd, &fs);
@@ -162,9 +162,11 @@ int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overti
                 sockfd = TCP_CONN_TIMEOUT;
                 break;
             } else if (-1 != ret) {
-                sockfd = -1;
+                // sockfd = -1;
                 break;
             }
+        } else if (0 == conn_ret) {
+            break;
         }
 
         close(sockfd);  /* ignore this one */
