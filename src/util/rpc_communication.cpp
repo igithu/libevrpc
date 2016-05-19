@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -43,14 +44,26 @@ bool NonBlockMode(int32_t sock, bool mode) {
         return false;
     }
 
+    unsigned long ul = 1;
     if (mode) {
         opts |= O_NONBLOCK;
     } else {
         opts |= ~O_NONBLOCK;
+        ul = 0;
     }
     if (fcntl(sock, F_SETFL, opts) < 0) {
-        PrintErrorInfo("Call fcntl failed!\n");
-        return false;
+        /*
+         * when use fcntl always set mode failed,
+         * use the ioctl!
+         *
+         * fcntl & ioctl differnce:
+         *             fcntl: attribute of file
+         *             ioctl: attribute of device
+         */
+        if (ioctl(sock, FIONBIO, &ul) < 0) {
+            PrintErrorInfo("Call fcntl failed!\n");
+            return false;
+        }
     }
     return true;
 }
@@ -149,7 +162,7 @@ int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overti
          * 0: connect successfully, conn_ret < 0 and EINPROGRESS: connecting
          *
          */
-        if (conn_overtime > 0 && (0 == conn_ret || (conn_ret < 0 && errno == EINPROGRESS))) {
+        if (conn_overtime > 0 && conn_ret < 0 && errno == EINPROGRESS) {
             fd_set fs;
             FD_ZERO(&fs);
             FD_SET(sockfd, &fs);
@@ -172,15 +185,15 @@ int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overti
         close(sockfd);  /* ignore this one */
     } while ((res = res->ai_next) != NULL);
 
-    if (conn_overtime > 0 && (sockfd < 0 || !NonBlockMode(sockfd, false))) {
+    if (conn_overtime > 0 && !NonBlockMode(sockfd, false)) {
         PrintErrorInfo("TCP connection failed!");
         freeaddrinfo(ressave);
         return -1;
     }
 
     /* errno set from final connect() */
-    if (sockfd < 0 || conn_ret < 0) {
-        fprintf(stderr, "Tcp_connect error! the errno is: %s\n", strerror(errno));
+    if (NULL == res) {
+        fprintf(stderr, "TCP connection error! the errno is: %s\n", strerror(errno));
         freeaddrinfo(ressave);
         return -1;
     }
@@ -241,6 +254,7 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen, bool non_block) 
         close(new_fd);
         return -1;
     }
+    PrintErrorInfo("Test in Accept");
 
     return new_fd;
 }

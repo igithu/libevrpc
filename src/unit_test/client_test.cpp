@@ -12,7 +12,7 @@ using namespace libevrpc;
 using namespace std;
 
 int main() {
-    int32_t conn_fd = TcpConnect(ADDR, PORT, -10000);
+    int32_t conn_fd = TcpConnect(ADDR, PORT, 10000);
 
     if (conn_fd < 0) {
         printf("Tcp conncect error!\n");
