@@ -77,10 +77,10 @@ void RpcHeartbeatClient::Run() {
     while (running_) {
         if (RpcSend(connect_fd_, 0, ping, false) < 0) {
             PrintErrorInfo("Rpc Heartbeat send info failed!");
-            sleep(5);
+            sleep(3);
             continue;
         }
-        sleep(5);
+        sleep(3);
     }
     close(connect_fd_);
 }

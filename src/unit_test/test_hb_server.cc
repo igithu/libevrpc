@@ -24,6 +24,10 @@
 using namespace libevrpc;
 
 int main() {
+    ConnectionTimerManager& ctm = ConnectionTimerManager::GetInstance("test_conf/test.ini");
+    int32_t buf_index = ctm.InitTimerBuf();
+    ctm.Start();
+
     int32_t listen_fd = TcpListen(GetLocalAddress(), "7777", false);
 
     struct sockaddr_in client_addr;
@@ -35,14 +39,12 @@ int main() {
         return 0;
     }
 
-    ConnectionTimerManager& ctm = ConnectionTimerManager::GetInstance("test_conf/test.ini");
-    int32_t buf_index = ctm.InitTimerBuf();
-
     std::string guest_addr;
     GetPeerAddr(cfd, guest_addr);
     ctm.InsertConnectionTimer(guest_addr, cfd, buf_index);
+    printf("InsertConnectionTimer done!\n");
 
-    ctm.Start();
+    printf("Start done!\n");
 
     sleep(200);
     std::string  recv_msg;

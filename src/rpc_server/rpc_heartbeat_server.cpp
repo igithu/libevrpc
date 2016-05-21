@@ -36,7 +36,8 @@ RpcHeartbeatServer::RpcHeartbeatServer(
     dispatcher_thread_ptr_(NULL),
     hb_host_(NULL),
     hb_port_(NULL),
-    config_file_(NULL) {
+    config_file_(NULL),
+    hb_running_(true) {
 
     hb_host_ = (char*)malloc(strlen(hb_host));
     hb_port_ = (char*)malloc(strlen(hb_port));
@@ -86,6 +87,7 @@ bool RpcHeartbeatServer::Stop() {
     if (NULL == dispatcher_thread_ptr_) {
         return false;
     }
+    hb_running_ = false;
     dispatcher_thread_ptr_->Stop();
     return true;
 }
@@ -100,13 +102,18 @@ void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
         PrintErrorInfo("Get client address error!");
         return;
     }
-    string recv_info;
-    if (RpcRecv(fd, recv_info, false) < 0) {
-        PrintErrorInfo("HeartBeatSeerver recv info error!");
-        return;
+    while (rhs->hb_running_) {
+        string recv_info;
+        if (RpcRecv(fd, recv_info, false) < 0) {
+            PrintErrorInfo("HeartBeatSeerver recv info error!");
+            break;
+        }
+        if (recv_info.empty()) {
+            break;
+        }
+        ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance(rhs->config_file_);
+        ctm_instance.InsertRefreshConnectionInfo(clien_addr);
     }
-    ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance(rhs->config_file_);
-    ctm_instance.InsertRefreshConnectionInfo(clien_addr);
 }
 
 

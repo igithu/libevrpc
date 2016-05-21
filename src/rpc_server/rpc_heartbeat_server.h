@@ -20,6 +20,8 @@
 #ifndef __RPC_HEARTBEAT_SERVER_H
 #define __RPC_HEARTBEAT_SERVER_H
 
+// #include <atmoic>
+
 #include "dispatch_thread.h"
 #include "util/thread.h"
 
@@ -51,6 +53,7 @@ class RpcHeartbeatServer {
         char* config_file_;
 
         int32_t listenfd_;
+        bool hb_running_;
 
 };
 
