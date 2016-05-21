@@ -17,15 +17,27 @@
 #include <unistd.h>
 
 #include "util/rpc_util.h"
+#include "util/rpc_communication.h"
 #include "rpc_client/rpc_heartbeat_client.h"
 
 using namespace libevrpc;
 
 int main() {
+    int32_t conn_fd = TcpConnect(GetLocalAddress(), "7777", 10000);
+
+    if (conn_fd < 0) {
+        printf("Tcp conncect error!\n");
+        return 0;
+    }
     RpcHeartbeatClient rhc(GetLocalAddress() ,"9999", 1000);
     rhc.Start();
 
-    sleep(5);
+    std::string test_str = "123start12345678901234567890end123";
+
+    int32_t ret = RpcSend(conn_fd, 0, test_str, true);
+    printf("ret id is %d\n", ret);
+
+    sleep(50);
     rhc.Stop();
     rhc.Wait();
     return 0;

@@ -18,13 +18,36 @@
 
 #include "rpc_server/connection_timer_manager.h"
 #include "rpc_server/rpc_heartbeat_server.h"
+#include "util/rpc_util.h"
+#include "util/rpc_communication.h"
 
 using namespace libevrpc;
 
 int main() {
+    int32_t listen_fd = TcpListen(GetLocalAddress(), "7777", false);
+
+    struct sockaddr_in client_addr;
+    socklen_t len = sizeof(struct sockaddr_in);
+    printf("Test the listen_fd is : %d\n", listen_fd);
+    int32_t cfd = Accept(listen_fd, client_addr, len, false);
+    if (cfd < 0) {
+        printf("accpet eror!\n");
+        return 0;
+    }
+
     ConnectionTimerManager& ctm = ConnectionTimerManager::GetInstance("test_conf/test.ini");
+    int32_t buf_index = ctm.InitTimerBuf();
+
+    std::string guest_addr;
+    GetPeerAddr(cfd, guest_addr);
+    ctm.InsertConnectionTimer(guest_addr, cfd, buf_index);
 
     ctm.Start();
+
+    sleep(200);
+    std::string  recv_msg;
+    int id = RpcRecv(cfd, recv_msg, true);
+    printf("Test string is :%s\n", recv_msg.c_str());
 
     sleep(1000);
 

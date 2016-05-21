@@ -75,7 +75,15 @@ class ConnectionTimerManager : public Thread {
         ~ConnectionTimerManager();
 
         static ConnectionTimerManager& GetInstance(const char* config_file);
+        /*
+         * every thread call InitTimerBuf once best,
+         * otherwise make the connection_buf heavy!
+         */
         int32_t InitTimerBuf();
+        /*
+         * every connection has come, PLEASE call,
+         * otherwise the hearbeat is nothing to work
+         */
         int32_t InsertConnectionTimer(
                 const std::string& ip_addr,
                 int32_t fd,

@@ -254,7 +254,6 @@ int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen, bool non_block) 
         close(new_fd);
         return -1;
     }
-    PrintErrorInfo("Test in Accept");
 
     return new_fd;
 }

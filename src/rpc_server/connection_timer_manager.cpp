@@ -150,7 +150,7 @@ void ConnectionTimerManager::Run() {
         HASH_SET_PTR refresh_set_ptr = NULL;
         {
             MutexLockGuard guard(refresh_client_list_mutex_);
-            refresh_client_list_ptr_ = refresh_client_list_ptr_;
+            refresh_set_ptr = refresh_client_list_ptr_;
             refresh_client_list_ptr_.reset();
         }
         /*
