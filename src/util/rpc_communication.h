@@ -57,11 +57,17 @@ int32_t TcpListen(const char *host, const char *port, bool non_block = true, int
 
 int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overtime, int32_t family = AF_UNSPEC);
 
+int32_t UdpConnect(const char *host, const char *port, int32_t family = AF_UNSPEC);
+
 int32_t Accept(int fd, struct sockaddr_in& sa, int32_t addrlen, bool non_block = true);
 
 int32_t RpcRecv(int32_t fd, std::string& recv_info_str, bool need_closed = false);
 
 int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, bool need_closed = false);
+
+int32_t RpcRecvFrom(int32_t fd, std::string& recv_info_str, bool need_closed = false);
+
+int32_t RpcSendTo(int32_t fd, std::string& send_info_str, bool need_closed = false);
 
 int32_t GetPeerAddr(int32_t fd, std::string& guest_addr);
 
