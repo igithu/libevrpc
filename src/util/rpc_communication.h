@@ -65,9 +65,9 @@ int32_t RpcRecv(int32_t fd, std::string& recv_info_str, bool need_closed = false
 
 int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, bool need_closed = false);
 
-int32_t RpcRecvFrom(int32_t fd, std::string& recv_info_str, bool need_closed = false);
+int32_t RpcRecvFrom(int32_t fd, std::string& recv_info_str, struct sockaddr *from, bool need_closed = false);
 
-int32_t RpcSendTo(int32_t fd, std::string& send_info_str, bool need_closed = false);
+int32_t RpcSendTo(int32_t fd, std::string& send_info_str, const struct sockaddr *to, bool need_closed = false);
 
 int32_t GetPeerAddr(int32_t fd, std::string& guest_addr);
 

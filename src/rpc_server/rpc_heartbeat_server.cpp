@@ -102,18 +102,12 @@ void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
         PrintErrorInfo("Get client address error!");
         return;
     }
-    while (rhs->hb_running_) {
-        string recv_info;
-        if (RpcRecv(fd, recv_info, false) < 0) {
-            PrintErrorInfo("HeartBeatSeerver recv info error!");
-            break;
-        }
-        if (recv_info.empty()) {
-            break;
-        }
-        ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance(rhs->config_file_);
-        ctm_instance.InsertRefreshConnectionInfo(clien_addr);
+    string recv_info;
+    if (RpcRecvFrom(fd, recv_info, false) < 0) {
+        PrintErrorInfo("HeartBeatSeerver recv info error!");
     }
+    ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance(rhs->config_file_);
+    ctm_instance.InsertRefreshConnectionInfo(clien_addr);
 }
 
 

@@ -382,11 +382,76 @@ int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, boo
     return 0;
 }
 
-int32_t RpcRecvFrom(int32_t fd, string& recv_info_str, bool need_closed) {
-    return 0;
+int32_t RpcRecvFrom(int32_t fd, string& recv_info_str, struct sockaddr *from, bool need_closed) {
+    char recv_buf[MetaSize];
+    int32_t transfer_id;
+    socklen_t len = sizeof(from);
+
+    do {
+        memset(recv_buf, 0, sizeof(recv_buf));
+        int32_t buf_len = recvfrom(fd, recv_buf, MetaSize, 0, from, &len);
+        if (-1 == buf_len && EAGAIN == errno) {
+            /*
+             * Resource temporarily unavailable! wait and recv again!
+             */
+            usleep(1);
+            continue;
+        } else if (buf_len < 0) {
+            fprintf(stderr, "Call RpcRecv func error!, buf len is %d, the errno is %s.\n", buf_len, strerror(errno));
+            transfer_id = ERROR_RECV;
+            break;
+        } else if (0 == buf_len) {
+            transfer_id = 0;
+            break;
+        }
+        MetaData* md_ptr = (MetaData*)recv_buf;
+        recv_info_str.append(md_ptr->body, strlen(md_ptr->body));
+        if (md_ptr->h_code < 0) {
+            transfer_id = md_ptr->h_code * -1;
+            break;
+        }
+    } while(true);
+
+    if (need_closed) {
+        close(fd);
+    }
+
+    return transfer_id;
 }
 
-int32_t RpcSendTo(int32_t fd, string& send_info_str, bool need_closed) {
+int32_t RpcSendTo(int32_t fd, string& send_info_str, const struct sockaddr *to, bool need_closed) {
+    const char* send_ptr = send_info_str.c_str();
+    int32_t block_num = send_info_str.size() / (BODY_SIZE - 1) + 1;
+
+    MetaData meta_data;
+    for (int i = 0; i < block_num - 1; ++i) {
+        memset(&meta_data, 0, sizeof(meta_data));
+        memcpy(meta_data.body, send_ptr + i * (BODY_SIZE - 1), BODY_SIZE - 1);
+        (meta_data.body)[BODY_SIZE - 1] = '\0';
+        meta_data.h_code = i;
+        if (sendto(fd, &meta_data, MetaSize, 0, to, sizeof(to)) < 0) {
+            PrintErrorInfo("Send Meta Data failed!\n");
+            close(fd);
+            return -1;
+        }
+    }
+
+    int32_t rest_len = send_info_str.size() % (BODY_SIZE - 1) ;
+    if (0 != rest_len) {
+        memset(&meta_data, 0, sizeof(meta_data));
+        memcpy(meta_data.body, send_ptr + (block_num - 1)* (BODY_SIZE  - 1), rest_len);
+        (meta_data.body)[rest_len] = '\0';
+        meta_data.h_code = 1;
+        if (sendto(fd, &meta_data, MetaSize, 0, to, sizeof(to)) < 0) {
+            PrintErrorInfo("Send Meta Data failed!\n");
+            close(fd);
+            return -1;
+        }
+    }
+
+    if (need_closed) {
+        close(fd);
+    }
     return 0;
 }
 
