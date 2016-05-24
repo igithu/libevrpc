@@ -74,7 +74,7 @@ void RpcHeartbeatClient::Run() {
             PrintErrorInfo("Create the rpc heartbeat connection failed! Heartbeat thread exit!");
             return;
         }
-        if (RpcSendTo(connect_fd_, 0, ping, false) < 0) {
+        if (RpcSendTo(connect_fd_, ping, false) < 0) {
             PrintErrorInfo("Rpc Heartbeat send info failed!");
             sleep(3);
             continue;

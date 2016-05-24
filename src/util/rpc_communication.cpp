@@ -78,6 +78,7 @@ int32_t Socket(int32_t family, int32_t type, int32_t protocol) {
     return fd;
 }
 
+
 int32_t TcpListen(const char *host, const char *port, bool non_block, int32_t family) {
     struct addrinfo hints, *res = NULL, *ressave = NULL;
 
@@ -232,6 +233,26 @@ int32_t UdpConnect(const char *host, const char *port, int32_t family) {
     }
     freeaddrinfo(ressave);
     return(sockfd);
+}
+
+int32_t UdpServerInit(const char *host, const char *port) {
+    int32_t sockfd = Socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) {
+        fprintf(stderr, "Socket error! the errno is: %s\n", strerror(errno));
+        return -1;
+    }
+
+    struct sockaddr_in servaddr;
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(host);
+    servaddr.sin_port = inet_addr(port);
+
+    if (bind(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
+        fprintf(stderr, "Socket error! the errno is: %s\n", strerror(errno));
+        return -1;
+    }
+    return sockfd;
 }
 
 int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen, bool non_block) {
@@ -419,7 +440,8 @@ int32_t RpcRecvFrom(int32_t fd, string& recv_info_str, struct sockaddr *from, bo
     return transfer_id;
 }
 
-int32_t RpcSendTo(int32_t fd, string& send_info_str, const struct sockaddr *to, bool need_closed) {
+int32_t RpcSendTo(int32_t fd, string& send_info_str, bool need_closed) {
+    struct sockaddr_in  to;
     const char* send_ptr = send_info_str.c_str();
     int32_t block_num = send_info_str.size() / (BODY_SIZE - 1) + 1;
 
@@ -429,7 +451,7 @@ int32_t RpcSendTo(int32_t fd, string& send_info_str, const struct sockaddr *to, 
         memcpy(meta_data.body, send_ptr + i * (BODY_SIZE - 1), BODY_SIZE - 1);
         (meta_data.body)[BODY_SIZE - 1] = '\0';
         meta_data.h_code = i;
-        if (sendto(fd, &meta_data, MetaSize, 0, to, sizeof(to)) < 0) {
+        if (sendto(fd, &meta_data, MetaSize, 0, (struct sockaddr *)&to, sizeof(to)) < 0) {
             PrintErrorInfo("Send Meta Data failed!\n");
             close(fd);
             return -1;
@@ -442,7 +464,7 @@ int32_t RpcSendTo(int32_t fd, string& send_info_str, const struct sockaddr *to, 
         memcpy(meta_data.body, send_ptr + (block_num - 1)* (BODY_SIZE  - 1), rest_len);
         (meta_data.body)[rest_len] = '\0';
         meta_data.h_code = 1;
-        if (sendto(fd, &meta_data, MetaSize, 0, to, sizeof(to)) < 0) {
+        if (sendto(fd, &meta_data, MetaSize, 0, (struct sockaddr *)&to, sizeof(to)) < 0) {
             PrintErrorInfo("Send Meta Data failed!\n");
             close(fd);
             return -1;
