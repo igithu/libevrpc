@@ -255,6 +255,25 @@ int32_t UdpServerInit(const char *host, const char *port) {
     return sockfd;
 }
 
+int32_t UdpClientInit(const char *server_host, const char *port, struct sockaddr_in *servaddr) {
+    int32_t sockfd = Socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) {
+        fprintf(stderr, "Socket error! the errno is: %s\n", strerror(errno));
+        return -1;
+    }
+
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr->sin_family = AF_INET;
+    servaddr->sin_port = inet_addr(port);
+
+    if (inet_pton(AF_INET, server_host, &servaddr->sin_addr) <= 0) {
+        fprintf(stderr, "inet_pton error! the errno is: %s\n", strerror(errno));
+        return -1;
+    }
+
+    return sockfd;
+}
+
 int32_t Accept(int fd, struct sockaddr_in &sa, int32_t addrlen, bool non_block) {
     int32_t new_fd;
     do {
@@ -403,14 +422,15 @@ int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, boo
     return 0;
 }
 
-int32_t RpcRecvFrom(int32_t fd, string& recv_info_str, struct sockaddr *from, bool need_closed) {
+int32_t RpcRecvFrom(int32_t fd, string& recv_info_str, bool need_closed) {
     char recv_buf[MetaSize];
     int32_t transfer_id;
+    struct sockaddr_in from;
     socklen_t len = sizeof(from);
 
     do {
         memset(recv_buf, 0, sizeof(recv_buf));
-        int32_t buf_len = recvfrom(fd, recv_buf, MetaSize, 0, from, &len);
+        int32_t buf_len = recvfrom(fd, recv_buf, MetaSize, 0, (struct sockaddr *)&from, &len);
         if (-1 == buf_len && EAGAIN == errno) {
             /*
              * Resource temporarily unavailable! wait and recv again!
@@ -440,8 +460,7 @@ int32_t RpcRecvFrom(int32_t fd, string& recv_info_str, struct sockaddr *from, bo
     return transfer_id;
 }
 
-int32_t RpcSendTo(int32_t fd, string& send_info_str, bool need_closed) {
-    struct sockaddr_in  to;
+int32_t RpcSendTo(int32_t fd, struct sockaddr_in *to, string& send_info_str, bool need_closed) {
     const char* send_ptr = send_info_str.c_str();
     int32_t block_num = send_info_str.size() / (BODY_SIZE - 1) + 1;
 

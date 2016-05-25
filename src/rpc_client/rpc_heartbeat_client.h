@@ -21,6 +21,7 @@
 #define __RPC_HEARTBEAT_CLIENT_H
 
 #include <stdint.h>
+#include <netinet/in.h>
 
 #include "util/thread.h"
 
@@ -41,6 +42,7 @@ class RpcHeartbeatClient : public Thread {
         char* hb_server_port_;
         int32_t timeout_;
         int32_t connect_fd_;
+        struct sockaddr_in to_;
 
         volatile bool running_;
 };

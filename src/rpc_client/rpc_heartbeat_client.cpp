@@ -50,6 +50,7 @@ RpcHeartbeatClient::~RpcHeartbeatClient() {
 }
 
 bool RpcHeartbeatClient::CreateRpcConnection() {
+    /*
     int32_t try_times = 3;
     do {
         connect_fd_ = TcpConnect(hb_server_addr_, hb_server_port_, timeout_);
@@ -63,6 +64,11 @@ bool RpcHeartbeatClient::CreateRpcConnection() {
     if (connect_fd_ < 0) {
         return false;
     }
+    */
+    /*
+     * UDP connection
+     */
+    connect_fd_ = UdpClientInit(hb_server_addr_, hb_server_port_, &to_);
 
     return true;
 }
@@ -74,7 +80,7 @@ void RpcHeartbeatClient::Run() {
             PrintErrorInfo("Create the rpc heartbeat connection failed! Heartbeat thread exit!");
             return;
         }
-        if (RpcSendTo(connect_fd_, ping, false) < 0) {
+        if (RpcSendTo(connect_fd_, &to_, ping, false) < 0) {
             PrintErrorInfo("Rpc Heartbeat send info failed!");
             sleep(3);
             continue;
