@@ -24,7 +24,19 @@
 #include "test_def.h"
 #include "../util/rpc_communication.h"
 
+using namespace libevrpc;
+
 int main() {
+
+    struct sockaddr_in to;
+    int32_t conn_fd = UdpClientInit(ADDR, PORT, &to);
+
+    printf("Test UdpClientInit done! conn_fd is %d error no is %s\n", conn_fd, strerror(errno));
+
+    std::string send_info = "udp Test";
+    if (RpcSendTo(conn_fd, &to, send_info, true) < 0) {
+        printf("RpcSendTo error\n");
+    }
 
     return 0;
 }

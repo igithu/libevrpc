@@ -246,9 +246,10 @@ int32_t UdpServerInit(const char *host, const char *port) {
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = inet_addr(host);
-    servaddr.sin_port = inet_addr(port);
+    // servaddr.sin_port = inet_addr(port);
+    servaddr.sin_port = htons(8899);
 
-    if (bind(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
+    if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
         fprintf(stderr, "Socket error! the errno is: %s\n", strerror(errno));
         return -1;
     }
@@ -262,11 +263,12 @@ int32_t UdpClientInit(const char *server_host, const char *port, struct sockaddr
         return -1;
     }
 
-    bzero(&servaddr, sizeof(servaddr));
+    bzero(servaddr, sizeof(servaddr));
     servaddr->sin_family = AF_INET;
-    servaddr->sin_port = inet_addr(port);
+    // servaddr->sin_port = inet_addr(port);
+    servaddr->sin_port = htons(8899);
 
-    if (inet_pton(AF_INET, server_host, &servaddr->sin_addr) <= 0) {
+    if (inet_pton(AF_INET, server_host, &(servaddr->sin_addr)) <= 0) {
         fprintf(stderr, "inet_pton error! the errno is: %s\n", strerror(errno));
         return -1;
     }
@@ -470,8 +472,8 @@ int32_t RpcSendTo(int32_t fd, struct sockaddr_in *to, string& send_info_str, boo
         memcpy(meta_data.body, send_ptr + i * (BODY_SIZE - 1), BODY_SIZE - 1);
         (meta_data.body)[BODY_SIZE - 1] = '\0';
         meta_data.h_code = i;
-        if (sendto(fd, &meta_data, MetaSize, 0, (struct sockaddr *)&to, sizeof(to)) < 0) {
-            PrintErrorInfo("Send Meta Data failed!\n");
+        if (sendto(fd, &meta_data, MetaSize, 0, (struct sockaddr *)to, sizeof(to)) < 0) {
+            fprintf(stderr, "Send Meta Data failed!, the errno is %s.\n", strerror(errno));
             close(fd);
             return -1;
         }
@@ -483,8 +485,8 @@ int32_t RpcSendTo(int32_t fd, struct sockaddr_in *to, string& send_info_str, boo
         memcpy(meta_data.body, send_ptr + (block_num - 1)* (BODY_SIZE  - 1), rest_len);
         (meta_data.body)[rest_len] = '\0';
         meta_data.h_code = 1;
-        if (sendto(fd, &meta_data, MetaSize, 0, (struct sockaddr *)&to, sizeof(to)) < 0) {
-            PrintErrorInfo("Send Meta Data failed!\n");
+        if (sendto(fd, &meta_data, MetaSize, 0, (struct sockaddr *)to, sizeof(to)) < 0) {
+            fprintf(stderr, "Send Meta Data failed!, the errno is %s.\n", strerror(errno));
             close(fd);
             return -1;
         }

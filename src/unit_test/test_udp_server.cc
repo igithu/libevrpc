@@ -24,10 +24,11 @@
 #include "test_def.h"
 #include "../util/rpc_communication.h"
 
+using namespace libevrpc;
 
 int main() {
 
-    int32_t server_fd = UdpServerInit(ADDR, POR);
+    int32_t server_fd = UdpServerInit(ADDR, PORT);
 
     std::string recv_info;
     RpcRecvFrom(server_fd, recv_info, true);
