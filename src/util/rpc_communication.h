@@ -36,7 +36,7 @@ namespace libevrpc {
 #define TCP_CONN_TIMEOUT -999
 
 #define MAX_INFO_LEN 512
-#define BODY_SIZE 16
+#define BODY_SIZE 1024
 
 typedef struct MetaDataStruct {
     int32_t h_code;
@@ -61,7 +61,7 @@ int32_t UdpConnect(const char *host, const char *port, int32_t family = AF_UNSPE
 
 int32_t UdpServerInit(const char *host, const char *port);
 
-int32_t UdpClientInit(const char *server_host, const char *port, struct sockaddr_in *servaddr);
+int32_t UdpClientInit(const char *server_host, const char *port, struct sockaddr_in &servaddr);
 
 int32_t Accept(int fd, struct sockaddr_in& sa, int32_t addrlen, bool non_block = true);
 
@@ -71,7 +71,7 @@ int32_t RpcSend(int32_t fd, int32_t transfer_id, std::string& send_info_str, boo
 
 int32_t RpcRecvFrom(int32_t fd, std::string& recv_info_str, bool need_closed = false);
 
-int32_t RpcSendTo(int32_t fd, struct sockaddr_in *to, std::string& send_info_str, bool need_closed);
+int32_t RpcSendTo(int32_t fd, struct sockaddr_in &to, std::string& send_info_str, bool need_closed);
 
 int32_t GetPeerAddr(int32_t fd, std::string& guest_addr);
 

@@ -29,13 +29,16 @@ using namespace libevrpc;
 int main() {
 
     struct sockaddr_in to;
-    int32_t conn_fd = UdpClientInit(ADDR, PORT, &to);
+    int32_t conn_fd = UdpClientInit(ADDR, PORT, to);
 
     printf("Test UdpClientInit done! conn_fd is %d error no is %s\n", conn_fd, strerror(errno));
 
-    std::string send_info = "udp Test";
-    if (RpcSendTo(conn_fd, &to, send_info, true) < 0) {
+    std::string send_info = "udp Test123456789";
+    int32_t ret = RpcSendTo(conn_fd, to, send_info, true);
+    if (ret < 0) {
         printf("RpcSendTo error\n");
+    } else {
+        printf("RpcSendTo sucessful ret is %d\n", ret);
     }
 
     return 0;

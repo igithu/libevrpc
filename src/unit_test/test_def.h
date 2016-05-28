@@ -5,7 +5,7 @@
 #define PORT "8899"
 
 #define MAX_BUFFER 1024
-#define BODY_SIZE 16
+#define BODY_SIZE 8
 
 typedef struct MetaDataStruct {
     int32_t code;
