@@ -31,9 +31,14 @@ int main() {
     int32_t server_fd = UdpServerInit(ADDR, PORT);
 
     std::string recv_info;
-    RpcRecvFrom(server_fd, recv_info, true);
+    while (true) {
+        if (RpcRecvFrom(server_fd, recv_info, false) < 0) {
+            break;
+        }
+        sleep(2);
+    }
 
-    printf("Test recv_info is :%s\n", recv_info.c_str());
+    // printf("Test recv_info is :%s\n", recv_info.c_str());
 
     return 0;
 }

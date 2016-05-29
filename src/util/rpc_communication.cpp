@@ -236,7 +236,7 @@ int32_t UdpConnect(const char *host, const char *port, int32_t family) {
 }
 
 int32_t UdpServerInit(const char *host, const char *port) {
-    int32_t sockfd = Socket(AF_INET, SOCK_DGRAM, 0);
+    int32_t sockfd = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd < 0) {
         fprintf(stderr, "Socket error! the errno is: %s\n", strerror(errno));
         return -1;
@@ -257,7 +257,7 @@ int32_t UdpServerInit(const char *host, const char *port) {
 }
 
 int32_t UdpClientInit(const char *server_host, const char *port, struct sockaddr_in &servaddr) {
-    int32_t sockfd = Socket(AF_INET, SOCK_DGRAM, 0);
+    int32_t sockfd = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd < 0) {
         fprintf(stderr, "Socket error! the errno is: %s\n", strerror(errno));
         return -1;

@@ -36,7 +36,7 @@ namespace libevrpc {
 #define TCP_CONN_TIMEOUT -999
 
 #define MAX_INFO_LEN 512
-#define BODY_SIZE 1024
+#define BODY_SIZE 512
 
 typedef struct MetaDataStruct {
     int32_t h_code;

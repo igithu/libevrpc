@@ -41,6 +41,8 @@ int main() {
         printf("RpcSendTo sucessful ret is %d\n", ret);
     }
 
+    sleep(200);
+
     return 0;
 }
 

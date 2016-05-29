@@ -70,15 +70,32 @@ bool RpcHeartbeatServer::InitHeartbeatServer() {
 }
 
 void RpcHeartbeatServer::Run() {
-    InitHeartbeatServer();
-    if (NULL == epoller_) {
-        PrintErrorInfo("The epoller ptr is null!\n");
-        return;
-    }
+    // InitHeartbeatServer();
+    // if (NULL == epoller_) {
+    //     PrintErrorInfo("The epoller ptr is null!\n");
+    //     return;
+    // }
 
-    ev_run(epoller_, 0);
-    ev_loop_destroy(epoller_);
-    epoller_ = NULL;
+    // ev_run(epoller_, 0);
+    // ev_loop_destroy(epoller_);
+    // epoller_ = NULL;
+
+    int32_t server_fd = UdpServerInit(hb_host_, hb_port_);
+    while(hb_running_) {
+        string clien_addr;
+        if (RpcRecvFrom(server_fd, clien_addr, false) < 0) {
+            PrintErrorInfo("HeartBeatSeerver recv info error!");
+        }
+        /*
+        if (GetPeerAddr(server_fd, clien_addr) < 0) {
+            PrintErrorInfo("Get client address error!");
+            break;
+        }
+        */
+        ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance(config_file_);
+        ctm_instance.InsertRefreshConnectionInfo(clien_addr);
+    }
+    close(server_fd);
 }
 
 void RpcHeartbeatServer::HeartBeatProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents) {

@@ -78,14 +78,17 @@ void RpcHeartbeatClient::Run() {
         PrintErrorInfo("Create the rpc heartbeat connection failed! Heartbeat thread exit!");
         return;
     }
-    string ping = "ping";
+    /*
+     * send local address to server
+     */
+    string ping = GetLocalAddress();
     while (running_) {
         if (RpcSendTo(connect_fd_, to_, ping, false) < 0) {
             PrintErrorInfo("Rpc Heartbeat send info failed!");
             sleep(3);
             continue;
         }
-        sleep(3);
+        sleep(10);
     }
     close(connect_fd_);
 }
