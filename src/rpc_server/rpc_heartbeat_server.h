@@ -21,13 +21,13 @@
 #define __RPC_HEARTBEAT_SERVER_H
 
 // #include <atmoic>
+#include <ev.h>
 
-#include "dispatch_thread.h"
 #include "util/thread.h"
 
 namespace libevrpc {
 
-class RpcHeartbeatServer {
+class RpcHeartbeatServer : public Thread {
     public:
         RpcHeartbeatServer(
                 const char* hb_host,
@@ -36,24 +36,24 @@ class RpcHeartbeatServer {
         ~RpcHeartbeatServer();
 
         bool InitHeartbeatServer();
-        bool Start();
-        bool Wait();
-        bool Stop();
+
+        virtual void Run();
 
         /*
          * recv the hearbeat in libev and put the hb info
          * into connectin timer manager
          */
-        static void HeartBeatProcessor(int32_t fd, void *arg);
+        static void HeartBeatProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents);
 
     private:
-        DispatchThread*  dispatcher_thread_ptr_;
         char* hb_host_;
         char* hb_port_;
         char* config_file_;
 
-        int32_t listenfd_;
         bool hb_running_;
+
+        struct ev_loop *epoller_;
+        struct ev_io socket_watcher_;
 
 };
 

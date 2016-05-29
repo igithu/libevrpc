@@ -69,7 +69,7 @@ bool DispatchThread::InitializeService(
     }
 
     epoller_ = ev_loop_new(EVBACKEND_EPOLL | EVFLAG_NOENV);
-    epoller_ = ev_loop_new(0);
+    // epoller_ = ev_loop_new(0);
 
     if (NULL == epoller_) {
         PrintErrorInfo("Call ev_loop_new failed!\n");

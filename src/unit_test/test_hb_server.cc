@@ -28,7 +28,11 @@ int main() {
     int32_t buf_index = ctm.InitTimerBuf();
     ctm.Start();
 
-    int32_t listen_fd = TcpListen(GetLocalAddress(), "7777", false);
+    printf("Test start connect\n");
+    // const char* addr = GetLocalAddress();
+    // printf("Test the addr is : %d\n", addr);
+
+    int32_t listen_fd = TcpListen("127.0.0.1", "7777", false);
 
     struct sockaddr_in client_addr;
     socklen_t len = sizeof(struct sockaddr_in);
@@ -38,10 +42,9 @@ int main() {
         printf("accpet eror!\n");
         return 0;
     }
-
     std::string guest_addr;
     GetPeerAddr(cfd, guest_addr);
-    ctm.InsertConnectionTimer(guest_addr, cfd, buf_index);
+    // ctm.InsertConnectionTimer(guest_addr, cfd, buf_index);
     printf("InsertConnectionTimer done!\n");
 
     printf("Start done!\n");
@@ -50,7 +53,6 @@ int main() {
     std::string  recv_msg;
     int id = RpcRecv(cfd, recv_msg, true);
     printf("Test string is :%s\n", recv_msg.c_str());
-
     sleep(1000);
 
     ctm.Stop();

@@ -68,26 +68,26 @@ bool RpcHeartbeatClient::CreateRpcConnection() {
     /*
      * UDP connection
      */
-    connect_fd_ = UdpClientInit(hb_server_addr_, hb_server_port_, &to_);
+    connect_fd_ = UdpClientInit(hb_server_addr_, hb_server_port_, to_);
 
     return true;
 }
 
 void RpcHeartbeatClient::Run() {
+    if (!CreateRpcConnection()) {
+        PrintErrorInfo("Create the rpc heartbeat connection failed! Heartbeat thread exit!");
+        return;
+    }
     string ping = "ping";
     while (running_) {
-        if (!CreateRpcConnection()) {
-            PrintErrorInfo("Create the rpc heartbeat connection failed! Heartbeat thread exit!");
-            return;
-        }
-        if (RpcSendTo(connect_fd_, &to_, ping, false) < 0) {
+        if (RpcSendTo(connect_fd_, to_, ping, false) < 0) {
             PrintErrorInfo("Rpc Heartbeat send info failed!");
             sleep(3);
             continue;
         }
         sleep(3);
-        close(connect_fd_);
     }
+    close(connect_fd_);
 }
 
 

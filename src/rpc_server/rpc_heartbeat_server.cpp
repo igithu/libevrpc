@@ -33,7 +33,6 @@ RpcHeartbeatServer::RpcHeartbeatServer(
         const char* hb_host,
         const char* hb_port,
         const char* config_file) :
-    dispatcher_thread_ptr_(NULL),
     hb_host_(NULL),
     hb_port_(NULL),
     config_file_(NULL),
@@ -57,54 +56,47 @@ RpcHeartbeatServer::~RpcHeartbeatServer() {
     if (NULL != hb_port_) {
         free(hb_port_);
     }
-    if (NULL != dispatcher_thread_ptr_) {
-        delete dispatcher_thread_ptr_;
-    }
 }
 
 bool RpcHeartbeatServer::InitHeartbeatServer() {
+    int32_t server_fd = UdpServerInit(hb_host_, hb_port_);
+
+    // epoller_ = ev_loop_new(EVBACKEND_EPOLL | EVFLAG_NOENV);
+    epoller_ = ev_loop_new(0);
+    socket_watcher_.data = this;
+    ev_io_init(&socket_watcher_, RpcHeartbeatServer::HeartBeatProcessor, server_fd, EV_READ);
+    ev_io_start(epoller_, &socket_watcher_);
     return true;
 }
 
-bool RpcHeartbeatServer::Start() {
-    dispatcher_thread_ptr_ = new DispatchThread();
-    dispatcher_thread_ptr_->InitializeService(hb_host_, hb_port_, &RpcHeartbeatServer::HeartBeatProcessor, (void*)this);
-    if (NULL == dispatcher_thread_ptr_) {
-        return false;
-    }
-    dispatcher_thread_ptr_->Start();
-}
-
-bool RpcHeartbeatServer::Wait() {
-    if (NULL == dispatcher_thread_ptr_) {
-        return false;
-    }
-    dispatcher_thread_ptr_->Wait();
-    return true;
-}
-
-bool RpcHeartbeatServer::Stop() {
-    if (NULL == dispatcher_thread_ptr_) {
-        return false;
-    }
-    hb_running_ = false;
-    dispatcher_thread_ptr_->Stop();
-    return true;
-}
-
-void RpcHeartbeatServer::HeartBeatProcessor(int32_t fd, void *arg) {
-    RpcHeartbeatServer* rhs = (RpcHeartbeatServer*)arg;
-    if (NULL == rhs) {
+void RpcHeartbeatServer::Run() {
+    InitHeartbeatServer();
+    if (NULL == epoller_) {
+        PrintErrorInfo("The epoller ptr is null!\n");
         return;
+    }
+
+    ev_run(epoller_, 0);
+    ev_loop_destroy(epoller_);
+    epoller_ = NULL;
+}
+
+void RpcHeartbeatServer::HeartBeatProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents) {
+    if (NULL == loop) {
+        return;
+    }
+    if (EV_ERROR & revents) {
+        return;
+    }
+    RpcHeartbeatServer* rhs = (RpcHeartbeatServer*)(watcher->data);
+    string recv_info;
+    if (RpcRecvFrom(watcher->fd, recv_info, false) < 0) {
+        PrintErrorInfo("HeartBeatSeerver recv info error!");
     }
     string clien_addr;
-    if (GetPeerAddr(fd, clien_addr) < 0) {
+    if (GetPeerAddr(watcher->fd, clien_addr) < 0) {
         PrintErrorInfo("Get client address error!");
         return;
-    }
-    string recv_info;
-    if (RpcRecvFrom(fd, recv_info, false) < 0) {
-        PrintErrorInfo("HeartBeatSeerver recv info error!");
     }
     ConnectionTimerManager& ctm_instance = ConnectionTimerManager::GetInstance(rhs->config_file_);
     ctm_instance.InsertRefreshConnectionInfo(clien_addr);

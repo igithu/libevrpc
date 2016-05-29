@@ -23,13 +23,15 @@
 using namespace libevrpc;
 
 int main() {
-    int32_t conn_fd = TcpConnect(GetLocalAddress(), "7777", 10000);
+    // int32_t conn_fd = TcpConnect(GetLocalAddress(), "7777", 10000);
+    int32_t conn_fd = TcpConnect("127.0.0.1", "7777", 10000);
 
     if (conn_fd < 0) {
         printf("Tcp conncect error!\n");
         return 0;
     }
-    RpcHeartbeatClient rhc(GetLocalAddress() ,"9999", 1000);
+    // RpcHeartbeatClient rhc(GetLocalAddress() ,"9999", 1000);
+    RpcHeartbeatClient rhc("127.0.0.1", "9999", 1000);
     rhc.Start();
 
     std::string test_str = "123start12345678901234567890end123";
