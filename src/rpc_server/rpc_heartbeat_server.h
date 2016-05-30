@@ -41,7 +41,7 @@ class RpcHeartbeatServer : public Thread {
 
         /*
          * recv the hearbeat in libev and put the hb info
-         * into connectin timer manager
+         * into connection timer manager
          */
         static void HeartBeatProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents);
 

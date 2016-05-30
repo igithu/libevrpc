@@ -29,10 +29,10 @@ int main() {
     ctm.Start();
 
     printf("Test start connect\n");
-    // const char* addr = GetLocalAddress();
-    // printf("Test the addr is : %d\n", addr);
+    const char* addr = GetLocalAddress();
+    printf("Test the addr is : %s\n", addr);
 
-    int32_t listen_fd = TcpListen("127.0.0.1", "7777", false);
+    int32_t listen_fd = TcpListen(addr, "7777", false);
 
     struct sockaddr_in client_addr;
     socklen_t len = sizeof(struct sockaddr_in);

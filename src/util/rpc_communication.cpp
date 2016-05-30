@@ -203,38 +203,6 @@ int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overti
     return sockfd;
 }
 
-int32_t UdpConnect(const char *host, const char *port, int32_t family) {
-    struct addrinfo hints, *res, *ressave;
-    bzero(&hints, sizeof(struct addrinfo));
-    hints.ai_family = family;
-    hints.ai_socktype = SOCK_DGRAM;
-
-    int32_t sockfd, n;
-    if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
-        fprintf(stderr, "Tcp_connect error for %s, %s\n", host, port);
-        return -1;
-    }
-    ressave = res;
-    do {
-        sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-        if (sockfd < 0) {
-            continue;   /* ignore this one */
-        }
-        if (connect(sockfd, res->ai_addr, res->ai_addrlen) == 0) {
-            break;      /* success */
-        }
-        close(sockfd);  /* ignore this one */
-    } while ( (res = res->ai_next) != NULL);
-
-    if (NULL == res) {
-        fprintf(stderr, "UDP  connection error! the errno is: %s\n", strerror(errno));
-        freeaddrinfo(ressave);
-        return -1;
-    }
-    freeaddrinfo(ressave);
-    return(sockfd);
-}
-
 int32_t UdpServerInit(const char *host, const char *port) {
     int32_t sockfd = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd < 0) {

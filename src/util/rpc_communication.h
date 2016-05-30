@@ -57,8 +57,6 @@ int32_t TcpListen(const char *host, const char *port, bool non_block = true, int
 
 int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overtime, int32_t family = AF_UNSPEC);
 
-int32_t UdpConnect(const char *host, const char *port, int32_t family = AF_UNSPEC);
-
 int32_t UdpServerInit(const char *host, const char *port);
 
 int32_t UdpClientInit(const char *server_host, const char *port, struct sockaddr_in &servaddr);
