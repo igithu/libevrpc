@@ -67,6 +67,7 @@ typedef struct {
     int32_t notify_receive_fd;
     int32_t notify_send_fd;
     int32_t pool_index;
+    long cur_version;
     RQ* new_request_queue;
     LibevThreadPool* lt_pool;
 } LIBEV_THREAD;

@@ -244,7 +244,7 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
             for (int32_t del_index = 0; del_index < ilp->size(); ++del_index) {
                 string& del_key = ilp->at(del_index);
                 /*
-                 * delete the connction from buffer first
+                 * delete the connection from buffer first
                  */
                 if (NULL != local_ctm_ptr) {
                     CT_HASH_MAP::iterator ct_iter = local_ctm_ptr->find(del_key);
@@ -253,7 +253,7 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
                     }
                 }
                 /*
-                 * delete the connction from connection pool
+                 * delete the connection from connection pool
                  */
                 int32_t bucket_num = GenerateBucketNum(del_key);
                 Mutex& bucket_mutex = connection_bucket_mutex_ptr_->at(bucket_num);

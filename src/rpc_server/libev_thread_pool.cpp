@@ -72,7 +72,7 @@ bool LibevThreadPool::LibevThreadInitialization(int32_t num_threads) {
                 EV_READ | EV_WRITE);
         ev_io_start(cur_thread->epoller, &cur_thread->libev_watcher);
 
-        cur_thread->new_request_queue = new RQ();;
+        cur_thread->new_request_queue = new RQ();
         if (NULL == cur_thread->new_request_queue) {
             PrintErrorInfo("Failed to allocate memory for request queue");
             exit(-1);
@@ -189,11 +189,9 @@ bool LibevThreadPool::ResartThread(pthread_t thread_id) {
     }
     LIBEV_THREAD* new_thread = libev_threads_ + index;
 
-    // char buf[1] = {'q'};
-    // if (write(new_thread->notify_send_fd, buf, 1) != 1) {
-    //     PrintErrorInfo("Restart, Write to thread notify pipe failed!");
-    //     return false;
-    // }
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+    pthread_cancel(thread_id);
+
     ev_resume(new_thread->epoller);
 
     return true;

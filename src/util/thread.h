@@ -50,9 +50,12 @@ class Thread {
         }
 
         // return false: cancel the thread failed.
-        bool Stop() {
+        bool Stop(bool immediately = true) {
             if (!IsAlive() || !running_) {
                 return true;
+            }
+            if (immediately) {
+                pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
             }
             if (pthread_cancel(tid_) != 0) {
                 return false;
