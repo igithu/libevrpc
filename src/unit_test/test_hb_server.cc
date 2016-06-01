@@ -44,7 +44,7 @@ int main() {
     }
     std::string guest_addr;
     GetPeerAddr(cfd, guest_addr);
-    ctm.InsertConnectionTimer(guest_addr, cfd, buf_index);
+    ctm.InsertConnectionTimer(guest_addr, cfd, buf_index, 1, pthread_self());
     printf("InsertConnectionTimer done!\n");
 
     printf("Start done!\n");

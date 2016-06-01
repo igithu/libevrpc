@@ -55,6 +55,7 @@ bool LibevThreadPool::LibevThreadInitialization(int32_t num_threads) {
          * start to init the libev info in every thread
          */
         LIBEV_THREAD* cur_thread = &libev_threads_[i];
+        cur_thread->running_version = 0;
         cur_thread->notify_receive_fd = fds[0];
         cur_thread->notify_send_fd = fds[1];
 
@@ -265,6 +266,7 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
         exit(-1);
         return;
     }
+    ++me->running_version;
 
     char buf[1];
     if (read(watcher->fd, buf, 1) != 1) {

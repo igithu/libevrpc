@@ -186,6 +186,14 @@ bool RpcServer::Wait() {
     return true;
 }
 
+bool RpcServer::RestartWorkerThread(pthread_t thread_id) {
+    if (NULL == worker_threads_ptr_) {
+        return false;
+    }
+    worker_threads_ptr_->ResartThread(thread_id);
+    return true;
+}
+
 void RpcServer::RpcCall(int32_t event_fd, void *arg) {
     RpcServer* rs = (RpcServer*)arg;
     if (NULL == rs || NULL == rs->worker_threads_ptr_) {

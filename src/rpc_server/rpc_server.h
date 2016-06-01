@@ -66,8 +66,12 @@ class RpcServer {
 
         bool RegisteService(Service* reg_service);
         bool Start();
-
         bool Wait();
+
+        /*
+         * in fact, terminate the current thread, and new one thread replace it.
+         */
+        bool RestartWorkerThread(pthread_t thread_id);
 
         static void RpcCall(int32_t event_fd, void *arg);
         static void* RpcProcessor(void *arg);

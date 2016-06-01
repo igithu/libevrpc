@@ -40,6 +40,8 @@ struct ConnectionTimer {
     time_t start_time;
     time_t expire_time;
     int32_t fd;
+    long running_version;
+    pthread_t thread_id;
     std::string client_addr;
 
     ConnectionTimer* next;
@@ -87,7 +89,9 @@ class ConnectionTimerManager : public Thread {
         int32_t InsertConnectionTimer(
                 const std::string& ip_addr,
                 int32_t fd,
-                int32_t buf_index);
+                int32_t buf_index,
+                long version,
+                pthread_t thread_id);
 
         void DeleteConnectionTimer(
                 const std::string& ip_addr,

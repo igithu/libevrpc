@@ -87,9 +87,13 @@ int32_t ConnectionTimerManager::InitTimerBuf() {
 int32_t ConnectionTimerManager::InsertConnectionTimer(
         const string& ip_addr,
         int32_t fd,
-        int32_t buf_index) {
+        int32_t buf_index,
+        long version,
+        pthread_t thread_id) {
     CT_PTR ct_ptr(new ConnectionTimer());
     ct_ptr->fd = fd;
+    ct_ptr->thread_id = thread_id;
+    ct_ptr->running_version = version;
     ct_ptr->client_addr = std::move(ip_addr);
     ct_ptr->expire_time = time(NULL) + refresh_interval_;
 
