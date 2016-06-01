@@ -83,7 +83,7 @@ void RpcHeartbeatServer::Run() {
     epoller_ = NULL;
 
     /**
-     * UDP common verion
+     * UDP common version
      */
     /*
     int32_t server_fd = UdpServerInit(hb_host_, hb_port_);
