@@ -42,8 +42,8 @@ ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     running_(false) {
     for (int32_t i = 0; i < buckets_size; ++i) {
         connection_pool_buckets_[i] = NULL;
-         Mutex bucket_mutex;
-         connection_bucket_mutex_ptr_->push_back(std::move(bucket_mutex));
+        Mutex bucket_mutex;
+        connection_bucket_mutex_ptr_->push_back(std::move(bucket_mutex));
     }
     const char* server_addr = config_parser_instance_.IniGetString("rpc_server:addr", GetLocalAddress());
     const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", "9999");

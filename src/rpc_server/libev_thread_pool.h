@@ -72,6 +72,14 @@ typedef struct {
     LibevThreadPool* lt_pool;
 } LIBEV_THREAD;
 
+/*
+ * use to retrieve data when the thread to be terminated
+ */
+struct RetrieveData {
+    LibevThreadPool* retrieve_ltp;
+    RQ_ITEM* retrieve_item;
+};
+
 class LibevThreadPool {
     public:
         LibevThreadPool();
@@ -85,7 +93,7 @@ class LibevThreadPool {
          * kill the current thread and restart a new thread to
          * replace it
          */
-        bool ResartThread(pthread_t thread_id);
+        bool RestartThread(pthread_t thread_id);
 
         /*
          * nonblock call the processor and return shortly
@@ -108,6 +116,10 @@ class LibevThreadPool {
          */
         static void LibevProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents);
         static void *LibevWorker(void *arg);
+        /*
+         * where the thread exit exceedingly, do retrieve the data!
+         */
+        static void RetrieveDataAction(void *arg);
 
         bool Destroy();
 

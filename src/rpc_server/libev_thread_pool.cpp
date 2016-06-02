@@ -97,6 +97,19 @@ void *LibevThreadPool::LibevWorker(void *arg) {
     ev_loop_destroy(me->epoller);
 }
 
+void LibevThreadPool::RetrieveDataAction(void *arg) {
+    RetrieveData* rd = (RetrieveData*)arg;
+    if (NULL == rd) {
+        return;
+    }
+    LibevThreadPool* ltp = rd->retrieve_ltp;
+    RQ_ITEM* item = rd->retrieve_item;
+    if (NULL == ltp || NULL == item) {
+        return;
+    }
+    ltp->RQItemFree(item);
+}
+
 RQ_ITEM* LibevThreadPool::RQItemNew() {
     RQ_ITEM *rq_item = NULL;
     {
@@ -173,7 +186,7 @@ bool LibevThreadPool::Wait() {
     }
 }
 
-bool LibevThreadPool::ResartThread(pthread_t thread_id) {
+bool LibevThreadPool::RestartThread(pthread_t thread_id) {
     /*
      * notify the one thread exit
      */
@@ -276,7 +289,10 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
     switch (buf[0]) {
         case 'c': {
             RQ_ITEM* item = ltp->RQItemPop(me->new_request_queue);
+            struct RetrieveData rd = {ltp, item};
+            pthread_cleanup_push(LibevThreadPool::RetrieveDataAction, &rd);
             (*(item->processor))(item->param);
+            pthread_cleanup_pop(0);
             ltp->RQItemFree(item);
             break;
         }

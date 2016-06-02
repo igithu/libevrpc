@@ -190,7 +190,7 @@ bool RpcServer::RestartWorkerThread(pthread_t thread_id) {
     if (NULL == worker_threads_ptr_) {
         return false;
     }
-    worker_threads_ptr_->ResartThread(thread_id);
+    worker_threads_ptr_->RestartThread(thread_id);
     return true;
 }
 
