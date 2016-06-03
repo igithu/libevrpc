@@ -2,6 +2,12 @@
 基于protobuf，线程池机制，libev封装，实现的RPC框架(现阶段只限于C++)
 
 
+原理说明
+
+    1.现阶段使用memcached线程模型，实现IO接收机制和线程池机制，其中用libev代替libevent，
+    2.客户端服务端通信序列化使用protobuf框架进行实现
+
+
 编译说明：
 
     需要安装automake，并下载目录文件third-64,pub_util目录并放在与libevrpc目录平行处，然后在libevrpc下目录下 执行build.sh脚本
