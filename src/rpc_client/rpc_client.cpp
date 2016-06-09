@@ -16,22 +16,76 @@
 
 #include <rpc_client.h>
 
+#include "client_rpc_controller.h"
+#include "util/rpc_util.h"
+
 namespace libevrpc {
 
-RpcClient::RpcClient() :
-    rpc_channel_ptr_(NULL) {
+using std::string;
+
+RpcClient::RpcClient(const string& config_file) :
+    rpc_channel_ptr_(NULL),
+    rpc_controller_ptr_(NULL),
+    rpc_heartbeat_ptr_(NULL),
+    config_parser_instance_(ConfigParser::GetInstance(config_file)){
+
+    InitClient();
 }
 
 RpcClient::~RpcClient() {
+    if (NULL != rpc_heartbeat_ptr_) {
+        rpc_heartbeat_ptr_->Stop();
+        rpc_heartbeat_ptr_->Wait();
+        delete rpc_heartbeat_ptr_;
+    }
     if (NULL != rpc_channel_ptr_) {
         delete rpc_channel_ptr_;
     }
+
+    if (NULL != rpc_controller_ptr_) {
+        delete rpc_controller_ptr_;
+    }
 }
 
-bool RpcClient::InitClient(const char* addr, const char* port) {
-    rpc_channel_ptr_ = new Channel(addr, port);
+bool RpcClient::InitClient() {
+    const char* rpc_server_addr = config_parser_instance_.IniGetString("rpc_server:addr", NULL);
+    const char* rpc_server_port = config_parser_instance_.IniGetString("rpc_server:port", NULL);
+    const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", NULL);
+    bool hb_open = config_parser_instance_.IniGetBool("heartbeat:open", true);
+    int32_t rpc_connection_timeout = config_parser_instance_.IniGetInt("connection:timeout", 10);
+
+    if (NULL != rpc_server_addr && NULL != rpc_server_port) {
+        rpc_channel_ptr_ = new Channel(rpc_server_addr, rpc_server_port);
+    } else {
+        rpc_channel_ptr_ = new Channel("127.0.0.1", "8899");
+        PrintErrorInfo("Attention! rpc client cann't read config file!");
+        PrintErrorInfo("Init with local server address and default port:8899!");
+    }
+    if (hb_open) {
+        rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port, rpc_connection_timeout);
+        rpc_heartbeat_ptr_->Start();
+    }
+    rpc_controller_ptr_ = new ClientRpcController();
     SetRpcConnectionInfo(1000, 1);
     return true;
+}
+
+RpcController* RpcClient::Status() {
+    return rpc_controller_ptr_;
+}
+
+bool RpcClient::IsCallOk() {
+    if (NULL == rpc_controller_ptr_) {
+        return true;
+    }
+    return !rpc_controller_ptr_->Failed();
+}
+
+string RpcClient::GetErrorInfo() const {
+    if (NULL == rpc_controller_ptr_) {
+        return "";
+    }
+    return rpc_controller_ptr_->ErrorText();
 }
 
 Channel* RpcClient::GetRpcChannel() {
@@ -40,7 +94,7 @@ Channel* RpcClient::GetRpcChannel() {
 
 bool RpcClient::OpenRpcAsyncMode() {
     if (NULL == rpc_channel_ptr_) {
-        perror("Maybe YOU DIDNOT call InitClient first! open the async failed!");
+        PrintErrorInfo("Maybe YOU DIDNOT call InitClient first! open the async failed!");
         exit(0);
     }
     rpc_channel_ptr_->OpenRpcAsyncMode();

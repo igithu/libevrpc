@@ -1,7 +1,7 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
- * 
+ *
  **************************************************************************/
 
 
@@ -10,8 +10,8 @@
  * @file rpc_client.cpp
  * @author aishuyu(asy5178@163.com)
  * @date 2014/12/02 14:41:35
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 #include <stdio.h>
@@ -36,7 +36,7 @@ class RpcClientImp : public RpcClient {
 };
 
 RpcClientImp::RpcClientImp() {
-    InitClient("127.0.0.1", "9999");
+    // InitClient("127.0.0.1", "9999");
     service_call_ptr_ = new EchoService_Stub(GetRpcChannel());
 }
 
@@ -55,6 +55,9 @@ void SysncCall() {
     EchoResponse echo_response;
     RpcClientImp rpc_client;
     rpc_client.RpcCall().Echo(NULL, &echo_request, &echo_response, NULL);;
+    if (!rpc_client.IsCallOk()) {
+        printf("error call in rpc client! error info is %d\n", rpc_client.GetErrorInfo().c_str());
+    }
     echo_response.PrintDebugString();
     string ret = echo_response.response();
     printf("echo recv msg is %s\n", ret.c_str());
@@ -68,10 +71,13 @@ void AsyscCall() {
     RpcClientImp rpc_client;
     rpc_client.OpenRpcAsyncMode();
     EchoResponse echo_response;
-    rpc_client.RpcCall().Echo(NULL, &echo_request, &echo_response, NULL);
+    rpc_client.RpcCall().Echo(rpc_client.Status(), &echo_request, &echo_response, NULL);
 
     sleep(5);
     rpc_client.RpcClient::GetAsyncResponse("Echo", &echo_response);
+    if (!rpc_client.IsCallOk()) {
+        printf("error call in rpc client! error info is %d\n", rpc_client.GetErrorInfo().c_str());
+    }
     echo_response.PrintDebugString();
     string ret = echo_response.response();
     printf("Async call echo recv msg is %s\n", ret.c_str());

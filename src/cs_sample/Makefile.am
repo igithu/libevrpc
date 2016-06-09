@@ -6,13 +6,15 @@ third_dir = ${top_dir}/third-64
 
 SUBDIRS = proto
 
-AM_CPPFLAGS = -I${top_srcdir}/src \
-			  -I${third_dir}/protobuf/include/ \
-			  -I${third_dir}/libev/include/
+INCLUDES = -I${top_srcdir}/src \
+		   -I${third_dir}/protobuf/include/ \
+		   -I${third_dir}/libev/include/
 
 
 #AM_LDFLAGS = -rdynamic -lpthread -lz -lm -lrt
-AM_LDFLAGS = -lpthread -lz -lm
+rpc_client_LDFLAGS = -lpthread -lz -lm
+
+#$(top_builddir)/src/rpc_server/librpc_server.a
 
 
 LDADD = $(top_builddir)/src/rpc_client/librpc_client.a \
@@ -28,3 +30,13 @@ rpc_server_SOURCES = ${SERVER_SRC}
 
 CLIENT_SRC = ${cs_rootdir}/libev_client.cc
 rpc_client_SOURCES = ${CLIENT_SRC}
+
+# rpc_client_LDADD = $(top_builddir)/src/rpc_client/librpc_client.a \
+# 		$(top_builddir)/src/cs_sample/proto/libproto.a \
+# 		${third_dir}/protobuf/lib/*.a \
+# 		${third_dir}/libev/lib/*.a
+#
+# bin_PROGRAMS = rpc_client
+#
+# CLIENT_SRC = ${cs_rootdir}/libev_client.cc
+# rpc_client_SOURCES = ${CLIENT_SRC}

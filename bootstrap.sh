@@ -10,7 +10,9 @@ if [ "$1" == "clean" ]; then
     exit;
 fi
 
-libtoolize --force
 aclocal
+libtoolize --force
 autoconf
 automake --add-missing --force --warnings=no-portability
+autoheader
+make clean

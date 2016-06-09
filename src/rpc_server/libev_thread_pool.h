@@ -3,15 +3,15 @@
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
  * 
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file libev_thread_pool.h
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/07 15:32:07
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -41,6 +41,7 @@ struct RequestQueueItem {
     void *param;
     RQ_ITEM *prev;
     RQ_ITEM *next;
+    int32_t connection_id;
 };
 
 /*
@@ -52,7 +53,7 @@ class RequestQueue {
     public:
         RQ_ITEM* head;
         RQ_ITEM* tail;
-        PUBLIC_UTIL::Mutex q_mutex;
+        Mutex q_mutex;
 };
 
 /*
@@ -65,9 +66,19 @@ typedef struct {
     struct ev_io libev_watcher;
     int32_t notify_receive_fd;
     int32_t notify_send_fd;
+    int32_t pool_index;
+    long running_version;
     RQ* new_request_queue;
     LibevThreadPool* lt_pool;
 } LIBEV_THREAD;
+
+/*
+ * use to retrieve data when the thread to be terminated
+ */
+struct RetrieveData {
+    LibevThreadPool* retrieve_ltp;
+    RQ_ITEM* retrieve_item;
+};
 
 class LibevThreadPool {
     public:
@@ -76,8 +87,13 @@ class LibevThreadPool {
         virtual ~LibevThreadPool();
 
         bool Start(int32_t num_threads = 10);
-
         bool Wait();
+
+        /*
+         * kill the current thread and restart a new thread to
+         * replace it
+         */
+        bool RestartThread(pthread_t thread_id);
 
         /*
          * nonblock call the processor and return shortly
@@ -100,6 +116,10 @@ class LibevThreadPool {
          */
         static void LibevProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents);
         static void *LibevWorker(void *arg);
+        /*
+         * where the thread exit exceedingly, do retrieve the data!
+         */
+        static void RetrieveDataAction(void *arg);
 
         bool Destroy();
 
@@ -113,7 +133,7 @@ class LibevThreadPool {
         LIBEV_THREAD* libev_threads_;
         RQ_ITEM*  rqi_freelist_;
 
-        PUBLIC_UTIL::Mutex rqi_freelist_mutex_;
+        Mutex rqi_freelist_mutex_;
 
         static int32_t item_per_alloc_;
         //static atomic_bool running_;

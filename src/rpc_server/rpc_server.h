@@ -1,7 +1,7 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
- * 
+ *
  **************************************************************************/
 
 
@@ -10,8 +10,8 @@
  * @file rpc_server.h
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/23 16:49:42
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -24,15 +24,16 @@
 
 #include <google/protobuf/service.h>
 
+#include "dispatch_thread.h"
+#include "connection_timer_manager.h"
+#include "libev_thread_pool.h"
+#include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_mutex.h"
-#include "dispatch_thread.h"
-#include "libev_thread_pool.h"
 
 
 namespace libevrpc {
 
-using namespace PUBLIC_UTIL;
 using namespace google::protobuf;
 using __gnu_cxx::hash_map;
 
@@ -61,28 +62,27 @@ class RpcServer {
         ~RpcServer();
 
         static RpcServer& GetInstance();
+        static RpcServer& GetInstance(const std::string& config_file);
 
         bool RegisteService(Service* reg_service);
-
-        bool Start(const char* addr = "",
-                   const char* port = "",
-                   int32_t thread_num = 20,
-                   int32_t reader_num = 0,
-                   int32_t writer_num = 0);
-
+        bool Start();
         bool Wait();
 
+        /*
+         * in fact, terminate the current thread, and new one thread replace it.
+         */
+        bool RestartWorkerThread(pthread_t thread_id);
+
         static void RpcCall(int32_t event_fd, void *arg);
-
         static void* RpcProcessor(void *arg);
-
         static void* RpcReader(void *arg);
-
         static void* RpcWriter(void *arg);
+
+        bool OpenConnectionTimer();
 
 
     private:
-        RpcServer();
+        RpcServer(const std::string& config_file = "../rpc_conf/rpc_server.ini");
 
         bool Initialize();
 
@@ -92,8 +92,7 @@ class RpcServer {
 
 
     private:
-
-        PUBLIC_UTIL::Mutex hashmap_mutex_;
+        Mutex hashmap_mutex_;
 
         HashMap method_hashmap_;
 
@@ -101,6 +100,12 @@ class RpcServer {
         LibevThreadPool* worker_threads_ptr_;
         LibevThreadPool* reader_threads_ptr_;
         LibevThreadPool* writer_threads_ptr_;
+        RpcController* rpc_controller_ptr_;
+        ConfigParser& config_parser_instance_;
+        ConnectionTimerManager& connection_timer_manager_;
+
+        int32_t active_wtd_num_;
+        bool connection_timer_open_;
 
         struct CallBackParams {
             CallBackParams() :
@@ -116,11 +121,14 @@ class RpcServer {
 
             int32_t event_fd;
             int32_t call_id;
-            // current rpc server ptr
+            /*
+             * current rpc server ptr
+             */
             RpcServer* rpc_server_ptr;
 
             std::string recv_info;
             Message* response_ptr;
+            RpcController* rpc_controller_ptr;
         };
 
 };

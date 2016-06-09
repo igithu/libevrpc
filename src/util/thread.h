@@ -1,17 +1,17 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
- * 
+ *
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file thread.h
  * @author aishuyu(asy5178@163.com)
  * @date 2014/10/30 21:39:40
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -22,10 +22,10 @@
 
 #include <pthread.h>
 #include <errno.h>
-
+#include <signal.h>
 #include <stdio.h>
 
-namespace PUBLIC_UTIL {
+namespace libevrpc {
 
 class Thread {
     public:
@@ -50,9 +50,12 @@ class Thread {
         }
 
         // return false: cancel the thread failed.
-        bool Stop() {
+        bool Stop(bool immediately = true) {
             if (!IsAlive() || !running_) {
                 return true;
+            }
+            if (immediately) {
+                pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
             }
             if (pthread_cancel(tid_) != 0) {
                 return false;

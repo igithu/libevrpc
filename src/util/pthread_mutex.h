@@ -1,17 +1,17 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
- * 
+ *
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file pthread_mutex.h
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/16 22:45:00
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 
-namespace PUBLIC_UTIL {
+namespace libevrpc {
 
 class Mutex {
     public:

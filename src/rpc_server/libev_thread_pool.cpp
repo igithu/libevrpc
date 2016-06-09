@@ -1,26 +1,27 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
- * 
+ *
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file thread_pool.cpp
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/07 18:44:20
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 #include "libev_thread_pool.h"
 
 #include <stdlib.h>
 
-namespace libevrpc {
+#include "rpc_server.h"
+#include "util/rpc_util.h"
 
-using namespace PUBLIC_UTIL;
+namespace libevrpc {
 
 int32_t LibevThreadPool::item_per_alloc_ = 64;
 
@@ -47,19 +48,20 @@ bool LibevThreadPool::LibevThreadInitialization(int32_t num_threads) {
     for (int32_t i = 0; i < num_threads_; ++i) {
         int32_t fds[2];
         if (pipe(fds)) {
-            perror("Create notify pipe failed!");
+            PrintErrorInfo("Create notify pipe failed!");
             exit(1);
         }
         /*
          * start to init the libev info in every thread
          */
         LIBEV_THREAD* cur_thread = &libev_threads_[i];
+        cur_thread->running_version = 0;
         cur_thread->notify_receive_fd = fds[0];
         cur_thread->notify_send_fd = fds[1];
 
         cur_thread->epoller = ev_loop_new(0);
         if (NULL == cur_thread->epoller) {
-            perror("Ev loop new failed!");
+            PrintErrorInfo("Ev loop new failed!");
             exit(-1);
         }
         cur_thread->lt_pool = this;
@@ -71,9 +73,9 @@ bool LibevThreadPool::LibevThreadInitialization(int32_t num_threads) {
                 EV_READ | EV_WRITE);
         ev_io_start(cur_thread->epoller, &cur_thread->libev_watcher);
 
-        cur_thread->new_request_queue = new RQ();;
+        cur_thread->new_request_queue = new RQ();
         if (NULL == cur_thread->new_request_queue) {
-            perror("Failed to allocate memory for request queue");
+            PrintErrorInfo("Failed to allocate memory for request queue");
             exit(-1);
         }
         cur_thread->new_request_queue->head = NULL;
@@ -95,6 +97,19 @@ void *LibevThreadPool::LibevWorker(void *arg) {
     ev_loop_destroy(me->epoller);
 }
 
+void LibevThreadPool::RetrieveDataAction(void *arg) {
+    RetrieveData* rd = (RetrieveData*)arg;
+    if (NULL == rd) {
+        return;
+    }
+    LibevThreadPool* ltp = rd->retrieve_ltp;
+    RQ_ITEM* item = rd->retrieve_item;
+    if (NULL == ltp || NULL == item) {
+        return;
+    }
+    ltp->RQItemFree(item);
+}
+
 RQ_ITEM* LibevThreadPool::RQItemNew() {
     RQ_ITEM *rq_item = NULL;
     {
@@ -108,7 +123,7 @@ RQ_ITEM* LibevThreadPool::RQItemNew() {
     if (NULL == rq_item) {
         rq_item = (RQ_ITEM*)malloc(sizeof(RQ_ITEM) * item_per_alloc_);
         if (NULL == rq_item) {
-            perror("Alloc the item mem failed!");
+            PrintErrorInfo("Alloc the item mem failed!");
             return NULL;
         }
         for (int i = 0; i < item_per_alloc_; ++i) {
@@ -171,6 +186,32 @@ bool LibevThreadPool::Wait() {
     }
 }
 
+bool LibevThreadPool::RestartThread(pthread_t thread_id) {
+    /*
+     * notify the one thread exit
+     */
+    int32_t index = 0;
+    for (int32_t i = 0; i < num_threads_; ++i) {
+        pthread_t tid = (libev_threads_ + i)->thread_id;
+        if (thread_id == tid) {
+            /*
+             * get the index of thread need to exit
+             */
+            index = i;
+            break;
+        }
+    }
+    LIBEV_THREAD* new_thread = libev_threads_ + index;
+
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+    pthread_cancel(thread_id);
+
+    ev_resume(new_thread->epoller);
+
+    return true;
+}
+
+
 bool LibevThreadPool::Destroy() {
     /*
      * notify all thread exit
@@ -178,7 +219,7 @@ bool LibevThreadPool::Destroy() {
     char buf[1] = {'q'};
     for (int32_t i = 0; i < num_threads_; ++i) {
         if (write((libev_threads_ + i)->notify_send_fd, buf, 1) != 1) {
-            perror("Destroy, Write to thread notify pipe failed!");
+            PrintErrorInfo("Destroy, Write to thread notify pipe failed!");
         }
     }
     /*
@@ -200,13 +241,13 @@ bool LibevThreadPool::Destroy() {
 
 bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) {
     if (NULL == libev_threads_) {
-        perror("Dispatch rpc call failed! libev_threads ptr is null.");
+        PrintErrorInfo("Dispatch rpc call failed! libev_threads ptr is null.");
         return false;
     }
 
     RQ_ITEM* rq_item = RQItemNew();
     if (NULL == rq_item) {
-        perror("New RQ Item failed!");
+        PrintErrorInfo("New RQ Item failed!");
         return false;
     }
 
@@ -220,13 +261,13 @@ bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) 
     rq_item->processor = rpc_call;
     rq_item->param = arg;
     if (!RQItemPush(cur_thread->new_request_queue, rq_item)) {
-        perror("Push RQ Item failed!");
+        PrintErrorInfo("Push RQ Item failed!");
         return false;
     }
 
     char buf[1] = {'c'};
     if (write(cur_thread->notify_send_fd, buf, 1) != 1) {
-        perror("Write to thread notify pipe failed!");
+        PrintErrorInfo("Write to thread notify pipe failed!");
     }
     return true;
 }
@@ -234,20 +275,24 @@ bool LibevThreadPool::DispatchRpcCall(void *(*rpc_call) (void *arg), void *arg) 
 void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher, int revents) {
     LIBEV_THREAD *me = (LIBEV_THREAD*)(watcher->data);
     if (NULL == me) {
-        perror("LIBEV_THREAD data is NULL!");
+        PrintErrorInfo("LIBEV_THREAD data is NULL!");
         exit(-1);
         return;
     }
+    ++me->running_version;
 
     char buf[1];
     if (read(watcher->fd, buf, 1) != 1) {
-        perror("Can't read from libevent pipe!");
+        PrintErrorInfo("Can't read from libevent pipe!");
     }
     LibevThreadPool* ltp = me->lt_pool;
     switch (buf[0]) {
         case 'c': {
             RQ_ITEM* item = ltp->RQItemPop(me->new_request_queue);
+            struct RetrieveData rd = {ltp, item};
+            pthread_cleanup_push(LibevThreadPool::RetrieveDataAction, &rd);
             (*(item->processor))(item->param);
+            pthread_cleanup_pop(0);
             ltp->RQItemFree(item);
             break;
         }

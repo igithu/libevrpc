@@ -1,17 +1,17 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
- * 
+ *
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file rpc_server.cc
  * @author aishuyu(asy5178@163.com)
  * @date 2014/12/02 17:01:36
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -51,7 +51,7 @@ int main() {
     EchoServiceImpl service;
     rpc_server.RegisteService(&service);
     printf("Start the rpc sevice....\n");
-    rpc_server.Start("127.0.0.1", "9999", 10);
+    rpc_server.Start();
 
     printf("Start wait.........\n");
     rpc_server.Wait();

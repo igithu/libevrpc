@@ -1,2 +1,2 @@
-AUTOMAKE_OPTIONS=foreign
+AUTOMAKE_OPTIONS=foreign subdir-objects
 SUBDIRS=rpc_client rpc_server cs_sample

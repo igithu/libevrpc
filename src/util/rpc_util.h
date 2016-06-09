@@ -1,17 +1,17 @@
 /***************************************************************************
- * 
+ *
  * Copyright (c) 2014 Aishuyu. All Rights Reserved
- * 
+ *
  **************************************************************************/
- 
- 
- 
+
+
+
 /**
  * @file rpc_util.h
  * @author aishuyu(asy5178@163.com)
  * @date 2014/11/30 17:47:28
- * @brief 
- *  
+ * @brief
+ *
  **/
 
 
@@ -25,6 +25,10 @@
 namespace libevrpc {
 
 uint32_t BKDRHash(const char *orig_str);
+
+void PrintErrorInfo(const char* error_info);
+
+const char* GetLocalAddress();
 
 }  // end of namespace libevrpc
 

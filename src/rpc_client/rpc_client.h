@@ -22,31 +22,66 @@
 
 #include "rpc_channel.h"
 
+#include <string>
+
+#include "rpc_heartbeat_client.h"
+#include "config_parser/config_parser.h"
+
 namespace libevrpc {
 
-using namespace google::protobuf;
-
 class RpcClient {
-
     public:
-        RpcClient();
-
+        RpcClient(const std::string& config_file = "../rpc_conf/rpc_client.ini");
         virtual ~RpcClient();
 
+        /*
+         * open the async rpc call
+         */
         bool OpenRpcAsyncMode();
-
-        bool GetAsyncResponse(const std::string& method_name, Message* response);
-
+        /*
+         * in async call, get the result from local memory
+         * if the async call is not finnished, will be blocked!!
+         */
+        bool GetAsyncResponse(const std::string& method_name, google::protobuf::Message* response);
+        /*
+         * set the rpc connection timeout and if connection failed, tye times
+         */
         bool SetRpcConnectionInfo(int32_t rpc_timeout, int32_t try_time = 1);
+        google::protobuf::RpcController* Status();
+
+        /*
+         * is the rpc call ok?
+         */
+        bool IsCallOk();
+        /*
+         * if the rpc failed, YOU may get error info
+         */
+        std::string GetErrorInfo() const;
 
     protected:
-
-        bool InitClient(const char* addr = "127.0.0.1", const char* port = "8899");
+        bool InitClient();
 
         Channel* GetRpcChannel();
 
     private:
+        /*
+         * rpc channel: communication with server
+         */
         Channel* rpc_channel_ptr_;
+        /*
+         *controll the rpc client action
+         */
+        google::protobuf::RpcController* rpc_controller_ptr_;
+        /*
+         * heartbeat in client
+         */
+        RpcHeartbeatClient* rpc_heartbeat_ptr_;;
+        /*
+         * when init, read config from config file
+         */
+        ConfigParser& config_parser_instance_;
+
+
 
 };
 

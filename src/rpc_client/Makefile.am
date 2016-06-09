@@ -1,9 +1,11 @@
 AUTOMAKE_OPTIONS=foreign subdir-objects
 
 top_dir = ${top_srcdir}/..
-util_dir = ${top_srcdir}/src/util
-client_rootdir = ${top_srcdir}/src/rpc_client
+src_dir = ${top_srcdir}/src
+util_dir = ${src_dir}/util
+client_rootdir = ${src_dir}/rpc_client
 third_dir = ${top_dir}/third-64
+config_dir = ${src_dir}/config_parser
 
 AM_CPPFLAGS = -I${top_srcdir}/src \
 			  -I${third_dir}/gperftools/include/ \
@@ -18,7 +20,17 @@ LDADD = ${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
 RPC_SRC = ${client_rootdir}/rpc_client.h \
 		  ${client_rootdir}/rpc_client.cpp \
 		  ${client_rootdir}/rpc_channel.h \
-		  ${client_rootdir}/rpc_channel.cpp
+		  ${client_rootdir}/rpc_channel.cpp \
+		  ${client_rootdir}/client_rpc_controller.h \
+		  ${client_rootdir}/client_rpc_controller.cpp \
+		  ${client_rootdir}/rpc_heartbeat_client.h \
+		  ${client_rootdir}/rpc_heartbeat_client.cpp \
+		  ${config_dir}/config_parser.h \
+		  ${config_dir}/config_parser.cpp \
+		  ${config_dir}/dictionary.h \
+		  ${config_dir}/dictionary.cpp \
+		  ${config_dir}/iniparser.h \
+		  ${config_dir}/iniparser.cpp \
 		  ${util_dir}/rpc_util.h \
 		  ${util_dir}/rpc_util.cpp \
 		  ${util_dir}/pthread_rwlock.h \

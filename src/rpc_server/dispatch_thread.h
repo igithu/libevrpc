@@ -27,7 +27,6 @@
 
 namespace libevrpc {
 
-using namespace PUBLIC_UTIL;
 
 /*
  * callback in dispatch_thread
@@ -59,7 +58,11 @@ class DispatchThread : public Thread {
 
         ~DispatchThread();
 
-        bool InitializeService(const char *host, const char *port, RpcCallBackPtr cb, void *arg);
+        bool InitializeService(
+                const char *host,
+                const char *port,
+                RpcCallBackPtr cb,
+                void *arg);
 
         virtual void Run();
 
