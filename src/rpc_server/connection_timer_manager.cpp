@@ -47,6 +47,11 @@ ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     }
     const char* server_addr = config_parser_instance_.IniGetString("rpc_server:addr", GetLocalAddress());
     const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", "9999");
+    int32_t thread_num = config_parser_instance_.IniGetInt("rpc_server:thread_num", 10);
+    /*
+     * stop reserve the space when push_back;
+     */
+    connection_buf_ptr_->reserve(thread_num * 1.5);
     rpc_heartbeat_server_ptr_ = new RpcHeartbeatServer(server_addr, hb_server_port, config_file);
 }
 
