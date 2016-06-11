@@ -44,7 +44,7 @@ struct ConnectionTimer {
     pthread_t thread_id;
     std::string client_addr;
 
-    ConnectionTimer* next;
+    // ConnectionTimer* next;
 };
 
 typedef std::shared_ptr<ConnectionTimer> CT_PTR;

@@ -78,13 +78,11 @@ class RpcServer {
         static void* RpcReader(void *arg);
         static void* RpcWriter(void *arg);
 
-        bool OpenConnectionTimer();
-
 
     private:
         RpcServer(const std::string& config_file = "../rpc_conf/rpc_server.ini");
 
-        bool Initialize();
+        bool Initialize(const std::string& config_file);
 
         bool ErrorSendMsg(int32_t event_fd, const string& error_msg);
 
