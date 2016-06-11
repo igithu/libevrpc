@@ -51,7 +51,12 @@ ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     /*
      * stop reserve the space when push_back;
      */
-    connection_buf_ptr_->reserve(thread_num * 1.5);
+    int32_t buf_capacity = thread_num * 1.5;
+    connection_buf_ptr_->reserve(buf_capacity);
+    connection_del_list_ptr_->reserve(buf_capacity);
+    connection_buf_mutex_ptr_->reserve(buf_capacity);
+    connection_bucket_mutex_ptr_->reserve(buckets_size * 1.5);
+    connection_dellist_mutex_ptr_->reserve(buf_capacity);
     rpc_heartbeat_server_ptr_ = new RpcHeartbeatServer(server_addr, hb_server_port, config_file);
 }
 
