@@ -93,7 +93,7 @@ class LibevThreadPool {
          * kill the current thread and restart a new thread to
          * replace it
          */
-        bool RestartThread(pthread_t thread_id);
+        bool RestartThread(pthread_t thread_id, long running_version);
 
         /*
          * nonblock call the processor and return shortly

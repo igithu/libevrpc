@@ -71,7 +71,7 @@ class RpcServer {
         /*
          * in fact, terminate the current thread, and new one thread replace it.
          */
-        bool RestartWorkerThread(pthread_t thread_id);
+        bool RestartWorkerThread(pthread_t thread_id, long running_version);
 
         static void RpcCall(int32_t event_fd, void *arg);
         static void* RpcProcessor(void *arg);

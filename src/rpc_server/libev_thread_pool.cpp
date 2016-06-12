@@ -186,7 +186,7 @@ bool LibevThreadPool::Wait() {
     }
 }
 
-bool LibevThreadPool::RestartThread(pthread_t thread_id) {
+bool LibevThreadPool::RestartThread(pthread_t thread_id, long running_version) {
     /*
      * notify the one thread exit
      */
@@ -205,6 +205,7 @@ bool LibevThreadPool::RestartThread(pthread_t thread_id) {
 
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     pthread_cancel(thread_id);
+    pthread_create(&(new_thread->thread_id), NULL, LibevThreadPool::LibevWorker, new_thread);
 
     ev_resume(new_thread->epoller);
 

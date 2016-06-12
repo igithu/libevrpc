@@ -190,11 +190,11 @@ bool RpcServer::Wait() {
     return true;
 }
 
-bool RpcServer::RestartWorkerThread(pthread_t thread_id) {
+bool RpcServer::RestartWorkerThread(pthread_t thread_id, long running_version) {
     if (NULL == worker_threads_ptr_) {
         return false;
     }
-    worker_threads_ptr_->RestartThread(thread_id);
+    worker_threads_ptr_->RestartThread(thread_id, running_version);
     return true;
 }
 
