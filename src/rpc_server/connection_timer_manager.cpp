@@ -20,6 +20,7 @@
 #include <time.h>
 #include <algorithm>
 
+#include "rpc_server.h"
 #include "util/rpc_util.h"
 
 
@@ -173,9 +174,10 @@ void ConnectionTimerManager::Run() {
         /*
          * lookup every connection and process it
          */
-        for (CT_MAP::iterator iter = ctm_ptr->begin(); iter != ctm_ptr->end(); ++iter) {
+        for (CT_MAP::iterator iter = ctm_ptr->begin(); iter != ctm_ptr->end();) {
             CT_PTR& ct_ptr = iter->second;
             if (NULL == ct_ptr) {
+                ++iter;
                 continue;
             }
             /*
@@ -186,17 +188,17 @@ void ConnectionTimerManager::Run() {
                 int32_t spliter_location = (iter->first).find_first_of("_");
                 if (spliter_location < 0) {
                     iter = ctm_ptr->erase(iter);
-                    continue;
-                }
-                if (refresh_set_ptr->find((iter->first).substr(0, spliter_location)) != refresh_set_ptr->end()) {
+                } else if (refresh_set_ptr->find((iter->first).substr(0, spliter_location)) != refresh_set_ptr->end()) {
                     ct_ptr->expire_time = time(NULL) + refresh_interval_;
-                    continue;
                 }
             }
             if (ct_ptr->expire_time > time(NULL)) {
+                iter = ctm_ptr->erase(iter);
+                RpcServer::GetInstance().RestartWorkerThread(ct_ptr->thread_id, ct_ptr->running_version);
                 // TODO  if client is gone, disconnect it! and remove it
-                //       if client is fine, expire_time += refresh_interval_
+                continue;
             }
+            ++iter;
         }
         bucket_index_ = (bucket_index_ + 1) % buckets_size;
         sleep(1);

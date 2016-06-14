@@ -201,13 +201,17 @@ bool LibevThreadPool::RestartThread(pthread_t thread_id, long running_version) {
             break;
         }
     }
-    LIBEV_THREAD* new_thread = libev_threads_ + index;
-
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-    pthread_cancel(thread_id);
-    pthread_create(&(new_thread->thread_id), NULL, LibevThreadPool::LibevWorker, new_thread);
-
-    ev_resume(new_thread->epoller);
+    LIBEV_THREAD* cur_thread = libev_threads_ + index;
+    {
+        MutexLockGuard guard(cur_thread->version_mutex);
+        if (cur_thread->running_version > running_version) {
+            return true;
+        }
+        ev_break(cur_thread->epoller);
+        pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+        pthread_cancel(thread_id);
+    }
+    pthread_create(&(cur_thread->thread_id), NULL, LibevThreadPool::LibevWorker, cur_thread);
 
     return true;
 }
@@ -280,7 +284,6 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
         exit(-1);
         return;
     }
-    ++me->running_version;
 
     char buf[1];
     if (read(watcher->fd, buf, 1) != 1) {
@@ -293,6 +296,10 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
             struct RetrieveData rd = {ltp, item};
             pthread_cleanup_push(LibevThreadPool::RetrieveDataAction, &rd);
             (*(item->processor))(item->param);
+            {
+                MutexLockGuard guard(me->version_mutex);
+                ++me->running_version;
+            }
             pthread_cleanup_pop(0);
             ltp->RQItemFree(item);
             break;

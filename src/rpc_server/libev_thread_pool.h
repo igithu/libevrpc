@@ -70,6 +70,8 @@ typedef struct {
     long running_version;
     RQ* new_request_queue;
     LibevThreadPool* lt_pool;
+
+    Mutex version_mutex;
 } LIBEV_THREAD;
 
 /*
