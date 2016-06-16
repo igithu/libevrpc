@@ -1,7 +1,7 @@
 /***************************************************************************A
- * 
+ *
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
- * 
+ *
  **************************************************************************/
 
 
@@ -139,6 +139,14 @@ class LibevThreadPool {
 
         static int32_t item_per_alloc_;
         //static atomic_bool running_;
+
+    // public:
+    private:
+        /*
+         * for unit test
+         */
+        LIBEV_THREAD*  GetTestThreadInfo() const;
+
 };
 
 

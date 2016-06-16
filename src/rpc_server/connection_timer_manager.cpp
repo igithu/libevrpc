@@ -39,7 +39,6 @@ ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     rpc_heartbeat_server_ptr_(NULL),
     buf_index_(0),
     bucket_index_(0),
-    refresh_interval_(30),
     running_(false) {
     for (int32_t i = 0; i < buckets_size; ++i) {
         connection_pool_buckets_[i] = NULL;
@@ -49,8 +48,9 @@ ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     const char* server_addr = config_parser_instance_.IniGetString("rpc_server:addr", GetLocalAddress());
     const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", "9999");
     int32_t thread_num = config_parser_instance_.IniGetInt("rpc_server:thread_num", 10);
+    refresh_interval_ =  config_parser_instance_.IniGetInt("rpc_server:client_timeout", 30);
     /*
-     * stop reserve the space when push_back;
+     * reserve space earlier, for stoping to allocate the space when push_back;
      */
     int32_t buf_capacity = thread_num * 1.5;
     connection_buf_ptr_->reserve(buf_capacity);

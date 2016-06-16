@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 
-#include "rpc_server.h"
 #include "util/rpc_util.h"
 
 namespace libevrpc {
@@ -216,7 +215,6 @@ bool LibevThreadPool::RestartThread(pthread_t thread_id, long running_version) {
     return true;
 }
 
-
 bool LibevThreadPool::Destroy() {
     /*
      * notify all thread exit
@@ -310,6 +308,17 @@ void LibevThreadPool::LibevProcessor(struct ev_loop *loop, struct ev_io *watcher
             break;
         }
     }
+}
+
+/*
+ * Note: for unit test
+ */
+LIBEV_THREAD*  LibevThreadPool::GetTestThreadInfo() const {
+    if (num_threads_ <= 0) {
+        return NULL;
+    }
+    LIBEV_THREAD* lt = libev_threads_ + 0;
+    return lt;
 }
 
 
