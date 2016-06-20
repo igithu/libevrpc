@@ -15,10 +15,23 @@
 
 代码说明：
 
-    1.rpc目录下：
-        1）rpc_channel: 主要为提供客户端rpc访问，内部主要实现了socket 客户端实现
-        2）rpc_server: 供rpc服务端使用，主要负责接口的启动以及调用逻辑的实现者，注意：内部的单例模式还没有实现线程访问安全模式
+    1.config_parser：配置文件解析
     2.cs_sample: RPC客户端和RPC服务端实现实例
+    3.rpc_client：RPC客户端调相关实现目录，代码文件如下
+        1).rpc_client：对外实现RPC客户端接口，RPC客户端使用者实现RPC功能时，需要继承RpcClient后 实现自己的Rpc客户端逻辑
+        2).rpc_channel: 主要为提供客户端RPC访问，内部主要实现了socket 客户端实现
+        3).rpc_heartbeat_client：RPC心跳客户端，实际为一个后台普通线程，定时没隔一定时间，想RPC服务器发送心跳
+        4).client_rpc_controller：RPC客户端内部实现控制对象，现阶段只用于错误信息的输出
+    4.rpc_server：RPC服务端调相关实现目录，代码文件如下：
+        1).rpc_server: RPC服务端主程序实现，负责RPC服务端所有线程的启动和控制
+        2).dispatch_thread:libev IO线程，负责监听和接受网络请求，将网络请求分发给后台的libev线程池当中，期间无任何CPU密集型处理逻辑
+        3).libev_thread_pool：libev线程池.线程池中每个线程维护一个epoller，并负责RPC服务端逻辑的运行承载
+        4).connection_timer_manager：管理链接计时器，对超时的链接进行销毁处理
+        5).rpc_heartbeat_server：RPC服务端心跳线程，接受从客户端发送来的心跳，并将心跳信息更新到connection_timer_manager中
+        6).server_rpc_controller：RPC服务端内部实现控制对象，现阶段只用于错误信息的输出
+    5.unit_test：单元代码测试
+    6.util：工具类和函数
+        1).
 
 
 设计说明：
