@@ -71,20 +71,18 @@ class RpcServer {
         /*
          * in fact, terminate the current thread, and new one thread replace it.
          */
-        bool RestartWorkerThread(pthread_t thread_id);
+        bool RestartWorkerThread(pthread_t thread_id, long running_version);
 
         static void RpcCall(int32_t event_fd, void *arg);
         static void* RpcProcessor(void *arg);
         static void* RpcReader(void *arg);
         static void* RpcWriter(void *arg);
 
-        bool OpenConnectionTimer();
-
 
     private:
         RpcServer(const std::string& config_file = "../rpc_conf/rpc_server.ini");
 
-        bool Initialize();
+        bool Initialize(const std::string& config_file);
 
         bool ErrorSendMsg(int32_t event_fd, const string& error_msg);
 

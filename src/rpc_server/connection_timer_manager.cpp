@@ -20,6 +20,7 @@
 #include <time.h>
 #include <algorithm>
 
+#include "rpc_server.h"
 #include "util/rpc_util.h"
 
 
@@ -38,7 +39,6 @@ ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     rpc_heartbeat_server_ptr_(NULL),
     buf_index_(0),
     bucket_index_(0),
-    refresh_interval_(30),
     running_(false) {
     for (int32_t i = 0; i < buckets_size; ++i) {
         connection_pool_buckets_[i] = NULL;
@@ -47,6 +47,17 @@ ConnectionTimerManager::ConnectionTimerManager(const char* config_file) :
     }
     const char* server_addr = config_parser_instance_.IniGetString("rpc_server:addr", GetLocalAddress());
     const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", "9999");
+    int32_t thread_num = config_parser_instance_.IniGetInt("rpc_server:thread_num", 10);
+    refresh_interval_ =  config_parser_instance_.IniGetInt("rpc_server:client_timeout", 30);
+    /*
+     * reserve space earlier, for stoping to allocate the space when push_back;
+     */
+    int32_t buf_capacity = thread_num * 1.5;
+    connection_buf_ptr_->reserve(buf_capacity);
+    connection_del_list_ptr_->reserve(buf_capacity);
+    connection_buf_mutex_ptr_->reserve(buf_capacity);
+    connection_bucket_mutex_ptr_->reserve(buckets_size * 1.5);
+    connection_dellist_mutex_ptr_->reserve(buf_capacity);
     rpc_heartbeat_server_ptr_ = new RpcHeartbeatServer(server_addr, hb_server_port, config_file);
 }
 
@@ -163,9 +174,10 @@ void ConnectionTimerManager::Run() {
         /*
          * lookup every connection and process it
          */
-        for (CT_MAP::iterator iter = ctm_ptr->begin(); iter != ctm_ptr->end(); ++iter) {
+        for (CT_MAP::iterator iter = ctm_ptr->begin(); iter != ctm_ptr->end();) {
             CT_PTR& ct_ptr = iter->second;
             if (NULL == ct_ptr) {
+                ++iter;
                 continue;
             }
             /*
@@ -176,17 +188,17 @@ void ConnectionTimerManager::Run() {
                 int32_t spliter_location = (iter->first).find_first_of("_");
                 if (spliter_location < 0) {
                     iter = ctm_ptr->erase(iter);
-                    continue;
-                }
-                if (refresh_set_ptr->find((iter->first).substr(0, spliter_location)) != refresh_set_ptr->end()) {
+                } else if (refresh_set_ptr->find((iter->first).substr(0, spliter_location)) != refresh_set_ptr->end()) {
                     ct_ptr->expire_time = time(NULL) + refresh_interval_;
-                    continue;
                 }
             }
             if (ct_ptr->expire_time > time(NULL)) {
+                iter = ctm_ptr->erase(iter);
+                RpcServer::GetInstance().RestartWorkerThread(ct_ptr->thread_id, ct_ptr->running_version);
                 // TODO  if client is gone, disconnect it! and remove it
-                //       if client is fine, expire_time += refresh_interval_
+                continue;
             }
+            ++iter;
         }
         bucket_index_ = (bucket_index_ + 1) % buckets_size;
         sleep(1);

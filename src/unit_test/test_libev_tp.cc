@@ -30,14 +30,24 @@ void* RpcCallTest(void *arg) {
     if (NULL != ts) {
         printf("Test ts %s\n", ts->cc.c_str());
     }
+    for (int i = 0; i < 100; ++i) {
+        printf("Test ts %s\n", ts->cc.c_str());
+        sleep(1);
+    }
 }
 
 int main() {
     LibevThreadPool ltp;
-    ltp.Start();
+    ltp.Start(1);
     TS ts;
     ts.cc = "call 1";
     ltp.DispatchRpcCall(RpcCallTest, &ts);
+    sleep(3);
+
+    LIBEV_THREAD* lt_ptr = ltp.GetTestThreadInfo();
+    printf("Test tid is %ld", lt_ptr->thread_id);
+    ltp.RestartThread(lt_ptr->thread_id, lt_ptr->running_version);
+
 
     TS ts2;
     ts2.cc = "call ****2";

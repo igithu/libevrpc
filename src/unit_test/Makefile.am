@@ -37,7 +37,9 @@ RPC_SRC = ${config_parser}/config_parser.h \
 
 # LTP = ${ut_dir}/test_libev_tp.cpp ${util_dir}/pthread_mutex.h ${server_rootdir}/libev_thread_pool.h ${server_rootdir}/libev_thread_pool.cpp
 
-bin_PROGRAMS = ltp_client ltp_server
+#bin_PROGRAMS = ltp_client ltp_server
+
+bin_PROGRAMS = ltp_test
 
 LTP_CLIENT = ${ut_dir}/test_hb_client.cc ${RPC_SRC} \
 			 ${client_rootdir}/rpc_heartbeat_client.h \
@@ -56,5 +58,20 @@ LTP_SERVER = ${ut_dir}/test_hb_server.cc ${RPC_SRC} \
 			 ${server_rootdir}/rpc_heartbeat_server.h \
 			 ${server_rootdir}/rpc_heartbeat_server.cpp
 ltp_server_SOURCES = ${LTP_SERVER}
+
+LTP_TEST = ${ut_dir}/test_libev_tp.cc ${RPC_SRC} \
+			 ${server_rootdir}/rpc_server.h \
+			 ${server_rootdir}/rpc_server.cpp \
+			 ${server_rootdir}/dispatch_thread.h \
+			 ${server_rootdir}/dispatch_thread.cpp \
+			 ${server_rootdir}/libev_thread_pool.h \
+			 ${server_rootdir}/libev_thread_pool.cpp \
+			 ${server_rootdir}/connection_timer_manager.h \
+			 ${server_rootdir}/connection_timer_manager.cpp \
+			 ${server_rootdir}/rpc_heartbeat_server.h \
+			 ${server_rootdir}/rpc_heartbeat_server.cpp
+ltp_test_SOURCES = ${LTP_TEST}
+
+
 
 #SUBDIRS = test

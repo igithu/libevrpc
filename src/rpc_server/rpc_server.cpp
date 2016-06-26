@@ -32,7 +32,7 @@ namespace libevrpc {
 
 using std::string;
 
-RpcServer::RpcServer(const std::string& config_file) :
+RpcServer::RpcServer(const string& config_file) :
     dispatcher_thread_ptr_(NULL),
     worker_threads_ptr_(NULL),
     reader_threads_ptr_(NULL),
@@ -40,7 +40,7 @@ RpcServer::RpcServer(const std::string& config_file) :
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
     connection_timer_manager_(ConnectionTimerManager::GetInstance(config_file.c_str())),
     connection_timer_open_(false) {
-    Initialize();
+    Initialize(config_file);
 }
 
 RpcServer::~RpcServer() {
@@ -72,10 +72,14 @@ RpcServer::~RpcServer() {
 
 }
 
-bool RpcServer::Initialize() {
+bool RpcServer::Initialize(const string& config_file) {
     // should read from config file
     // strcpy(host_, "127.0.0.1");
     // strcpy(port_, "9998");
+    connection_timer_open_ = config_parser_instance_.IniGetBool("rpc_server:timer_open", false);
+    if (connection_timer_open_) {
+        connection_timer_manager_.Start();
+    }
 
     return true;
 }
@@ -186,11 +190,11 @@ bool RpcServer::Wait() {
     return true;
 }
 
-bool RpcServer::RestartWorkerThread(pthread_t thread_id) {
+bool RpcServer::RestartWorkerThread(pthread_t thread_id, long running_version) {
     if (NULL == worker_threads_ptr_) {
         return false;
     }
-    worker_threads_ptr_->RestartThread(thread_id);
+    worker_threads_ptr_->RestartThread(thread_id, running_version);
     return true;
 }
 
@@ -347,12 +351,6 @@ void* RpcServer::RpcWriter(void *arg) {
      * The current cb_params_ptr never be used!
      */
     delete cb_params_ptr;
-}
-
-bool RpcServer::OpenConnectionTimer() {
-//    ctm_instance.Start();
-    connection_timer_open_ = true;
-    return true;
 }
 
 }  // end of namespace libevrpc

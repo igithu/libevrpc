@@ -1,7 +1,7 @@
 /***************************************************************************A
- * 
+ *
  * Copyright (c) 2014 aishuyu.com, Inc. All Rights Reserved
- * 
+ *
  **************************************************************************/
 
 
@@ -70,6 +70,8 @@ typedef struct {
     long running_version;
     RQ* new_request_queue;
     LibevThreadPool* lt_pool;
+
+    Mutex version_mutex;
 } LIBEV_THREAD;
 
 /*
@@ -93,7 +95,7 @@ class LibevThreadPool {
          * kill the current thread and restart a new thread to
          * replace it
          */
-        bool RestartThread(pthread_t thread_id);
+        bool RestartThread(pthread_t thread_id, long running_version);
 
         /*
          * nonblock call the processor and return shortly
@@ -137,6 +139,14 @@ class LibevThreadPool {
 
         static int32_t item_per_alloc_;
         //static atomic_bool running_;
+
+    // public:
+    private:
+        /*
+         * for unit test
+         */
+        LIBEV_THREAD*  GetTestThreadInfo() const;
+
 };
 
 
