@@ -8,56 +8,85 @@ client_dir = ${src_dir}/rpc_client
 server_dir = ${src_dir}/rpc_server
 
 
-CLIENT_INCLUDES =  \
-		rpc_client/rpc_client.h \
-		rpc_client/rpc_channel.h \
-		rpc_client/client_rpc_controller.h \
-		rpc_client/rpc_heartbeat_client.h \
-		rpc_client/config_parser.h \
-		rpc_client/dictionary.h \
-		rpc_client/iniparser.h \
-		rpc_client/rpc_util.h \
-		rpc_client/disallow_copy_and_assign.h \
-		rpc_client/rpc_communication.h \
-		rpc_client/pthread_rwlock.h
-CLIENT_SORCS = \
-SERVER_INCLUDES =  \
-SERVER_SRCS =  \
+CLIENT_INCLUDES =                               \
+		rpc_client/rpc_client.h                 \
+		rpc_client/rpc_channel.h                \
+		rpc_client/client_rpc_controller.h      \
+		rpc_client/rpc_heartbeat_client.h
+
+CLIENT_SORCS =                                  \
+		rpc_client/rpc_client.cpp               \
+		rpc_client/rpc_channel.cpp              \
+		rpc_client/client_rpc_controller.cpp    \
+		rpc_client/rpc_heartbeat_client.cpp     \
+
+SERVER_INCLUDES =                               \
+		rpc_server/rpc_server.h                 \
+		rpc_server/dispatch_thread.h            \
+		rpc_server/libev_thread_pool.h          \
+		rpc_server/server_rpc_controller.h      \
+		rpc_server/connection_timer_manager.h   \
+		rpc_server/rpc_heartbeat_server.h
+
+SERVER_SRCS =                                   \
+		rpc_server/rpc_server.cpp               \
+		rpc_server/dispatch_thread.cpp          \
+		rpc_server/libev_thread_pool.cpp        \
+		rpc_server/server_rpc_controller.cpp    \
+		rpc_server/connection_timer_manager.cpp \
+		rpc_server/rpc_heartbeat_server.cpp
 
 
-nobase_include_HEADERS =  \
-		${CLIENT_INCLUDES} \
-		${SERVER_INCLUDES}
+COMMON_INCLUDES =                        \
+		config_parser/config_parser.h    \
+		config_parser/dictionary.h       \
+		config_parser/iniparser.h        \
+		util/rpc_util.h                  \
+		util/disallow_copy_and_assign.h  \
+		util/rpc_communication.h         \
+		util/pthread_rwlock.h
+
+COMMON_SRCS =                            \
+		config_parser/config_parser.cpp  \
+		config_parser/dictionary.cpp     \
+		config_parser/iniparser.cpp      \
+		util/rpc_util.cpp                \
+		util/rpc_communication.cpp
 
 
+nobase_include_HEADERS =                 \
+		${CLIENT_INCLUDES}               \
+		${SERVER_INCLUDES}               \
+		${COMMON_INCLUDES}
 
 
-lib_LTLIBRARIES = librpc_client.a
+lib_LTLIBRARIES = librpc_client.a librpc_server.a
 
-rpc_client_CPPFLAGS = \
-		-I${top_srcdir}/src \
-		-I${third_dir}/gperftools/include/ \
+rpc_client_CPPFLAGS =                                     \
+		-I${top_srcdir}/src                               \
+		-I${third_dir}/gperftools/include/                \
 		-I${third_dir}/protobuf/include/
-rpc_client_LIBADD = \
+rpc_client_LIBADD =                                       \
 		${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
 		${third_dir}/protobuf/lib/*.a
-rpc_client_a_LDFLAGS =
-rpc_client_la_SOURCES = \
-		${CLIENT_SORCS}
+rpc_client_a_LDFLAGS = -lz -lstdc++
+rpc_client_la_SOURCES =       \
+		${CLIENT_SORCS}       \
+		${COMMON_SRCS}
 
 
-
-
-rpc_server_CPPFLAGS = \
-		-I${top_srcdir}/src \
+rpc_server_CPPFLAGS =                      \
+		-I${top_srcdir}/src                \
 		-I${third_dir}/gperftools/include/ \
-		-I${third_dir}/protobuf/include/ \
+		-I${third_dir}/protobuf/include/   \
 		-I${third_dir}/libev/include/
-rpc_server_LIBADD = \
+rpc_server_LIBADD =                                       \
 		${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
-		${third_dir}/protobuf/lib/*.a \
+		${third_dir}/protobuf/lib/*.a                     \
 		${third_dir}/libev/lib/*.a
-rpc_server_a_LDFLAGS =
-rpc_server_la_SOURCES =
+rpc_server_a_LDFLAGS = -lz -lstdc++
+rpc_server_la_SOURCES =      \
+		${SERVER_SRCS}       \
+		${COMMON_SRCS}
 
 
