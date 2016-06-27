@@ -14,7 +14,7 @@
  *
  **/
 
-#include <rpc_client.h>
+#include "rpc_client.h"
 
 #include "client_rpc_controller.h"
 #include "util/rpc_util.h"

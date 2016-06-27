@@ -6,6 +6,7 @@ src_dir = ${top_srcdir}/src
 config_dir = ${src_dir}/config_parser
 client_dir = ${src_dir}/rpc_client
 server_dir = ${src_dir}/rpc_server
+third_dir = ${top_dir}/third-64
 
 
 CLIENT_INCLUDES =                               \
@@ -18,7 +19,7 @@ CLIENT_SORCS =                                  \
 		rpc_client/rpc_client.cpp               \
 		rpc_client/rpc_channel.cpp              \
 		rpc_client/client_rpc_controller.cpp    \
-		rpc_client/rpc_heartbeat_client.cpp     \
+		rpc_client/rpc_heartbeat_client.cpp
 
 SERVER_INCLUDES =                               \
 		rpc_server/rpc_server.h                 \
@@ -60,32 +61,32 @@ nobase_include_HEADERS =                 \
 		${COMMON_INCLUDES}
 
 
-lib_LTLIBRARIES = librpc_client.a librpc_server.a
+lib_LTLIBRARIES = librpc_client.la librpc_server.la
 
-rpc_client_CPPFLAGS =                                     \
+librpc_client_la_CPPFLAGS =                                     \
 		-I${top_srcdir}/src                               \
 		-I${third_dir}/gperftools/include/                \
 		-I${third_dir}/protobuf/include/
-rpc_client_LIBADD =                                       \
-		${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
+librpc_client_la_LIBADD =                                       \
+		#${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
 		${third_dir}/protobuf/lib/*.a
-rpc_client_a_LDFLAGS = -lz -lstdc++
-rpc_client_la_SOURCES =       \
+librpc_client_la_LDFLAGS = -lz -std=c++11
+librpc_client_la_SOURCES =       \
 		${CLIENT_SORCS}       \
 		${COMMON_SRCS}
 
 
-rpc_server_CPPFLAGS =                      \
+librpc_server_la_CPPFLAGS =                      \
 		-I${top_srcdir}/src                \
 		-I${third_dir}/gperftools/include/ \
 		-I${third_dir}/protobuf/include/   \
 		-I${third_dir}/libev/include/
-rpc_server_LIBADD =                                       \
-		${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
+librpc_server_la_LIBADD =                                       \
+		#${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
 		${third_dir}/protobuf/lib/*.a                     \
 		${third_dir}/libev/lib/*.a
-rpc_server_a_LDFLAGS = -lz -lstdc++
-rpc_server_la_SOURCES =      \
+librpc_server_la_LDFLAGS = -lz -std=c++11
+librpc_server_la_SOURCES =      \
 		${SERVER_SRCS}       \
 		${COMMON_SRCS}
 
