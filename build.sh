@@ -22,7 +22,29 @@ SERVER_PATH=$BUILD_ROOT/libevrpc
 SERVER_BIN_PATH=$SERVER_PATH/bin
 CONF_PATH=$BUILD_ROOT/../../conf
 CONF_FILE=$CONF_PATH/ds.ini
-INSTALL_PATH=""
+INSTALL_PATH="/usr/local/"
+
+
+PREFIX='--prefix'
+for arg in "$@"
+do
+    #arr=$(echo $arg | tr "=" '=')
+    arr=(${arg//=/ })
+    ps=(${arr[0]})
+    content=(${arr[1]})
+    if [ "$ps" = "$PREFIX" ];
+    then
+        INSTALL_PATH=$content/libevrpc
+        echo $INSTALL_PATH
+    fi
+done
+
+# create new path to install
+if [ -d $INSTALL_PATH ]
+then
+    rm -rf $INSTALL_PATH
+fi
+mkdir -p $INSTALL_PATH
 
 echo $BUILD_ROOT
 

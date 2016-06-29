@@ -27,7 +27,8 @@ AC_CHECK_LIB([rt], [main])
 AC_CHECK_LIB([z], [main])
 
 # Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdint.h stdlib.h sys/socket.h unistd.h])
+#AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdint.h stdlib.h sys/socket.h unistd.h])
+AC_CONFIG_HEADERS
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE

@@ -1,4 +1,4 @@
-#AUTOMAKE_OPTIONS=foreign subdir-objects
+AUTOMAKE_OPTIONS=foreign subdir-objects
 #SUBDIRS=rpc_client rpc_server cs_sample
 
 top_dir = ${top_srcdir}/..
