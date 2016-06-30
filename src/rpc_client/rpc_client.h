@@ -31,7 +31,7 @@ namespace libevrpc {
 
 class RpcClient {
     public:
-        RpcClient(const std::string& config_file = "../rpc_conf/rpc_client.ini");
+        RpcClient(const std::string& config_file = "./rpc_client.ini");
         virtual ~RpcClient();
 
         /*

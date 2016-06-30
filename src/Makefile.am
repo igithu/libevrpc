@@ -43,8 +43,10 @@ COMMON_INCLUDES =                        \
 		config_parser/dictionary.h       \
 		config_parser/iniparser.h        \
 		util/rpc_util.h                  \
+		util/thread.h                  \
 		util/disallow_copy_and_assign.h  \
 		util/rpc_communication.h         \
+		util/pthread_mutex.h         \
 		util/pthread_rwlock.h
 
 COMMON_SRCS =                            \
