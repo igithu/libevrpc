@@ -60,6 +60,9 @@ RpcHeartbeatServer::~RpcHeartbeatServer() {
 
 bool RpcHeartbeatServer::InitHeartbeatServer() {
     int32_t server_fd = UdpServerInit(hb_host_, hb_port_);
+    if (server_fd < 0) {
+        return false;
+    }
 
     epoller_ = ev_loop_new(0);
     socket_watcher_.data = this;
@@ -72,7 +75,10 @@ void RpcHeartbeatServer::Run() {
     /*
      * UDP libev version
      */
-    InitHeartbeatServer();
+    if (InitHeartbeatServer()) {
+        PrintErrorInfo("Rpc heartbeat Thread init failed!\n");
+        return;
+    };
     if (NULL == epoller_) {
         PrintErrorInfo("The epoller ptr is null!\n");
         return;

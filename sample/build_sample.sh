@@ -5,10 +5,9 @@ CLIENT_SRC_PATH=$BUILD_ROOT
 SERVER_SRC_PATH=$BUILD_ROOT
 
 START_FILE=$BUILD_ROOT/libevrpc.sh
-SERVER_PATH=$BUILD_ROOT/libevrpc
-SERVER_BIN_PATH=$SERVER_PATH/bin
+SAMPLE_PATH=$BUILD_ROOT/rpc_sample
 CONF_PATH=$BUILD_ROOT
-CONF_FILE=$CONF_PATH/ds.ini
+CONF_FILE=$CONF_PATH/*.ini
 
 # check the bootstrap exist.
 if [ ! -f $BUILD_ROOT/bootstrap.sh ]
@@ -17,16 +16,11 @@ then
     exit -1
 fi
 
-# clean the .o file in order to make the proj
-if [ -d $SERVER_PATH ] 
-then
-    rm -rf $SERVER_PATH
-fi
 make distclean
 ./bootstrap.sh clean
 ./bootstrap.sh
 
-# check the configure file 
+# check the configure file
 if [ ! -f $BUILD_ROOT/configure ]
 then
     echo "the configure does not exist!"
@@ -55,17 +49,16 @@ then
 fi
 
 
-# make sure the path SERVER_BIN_PATH exist
-
-if [ ! -d $SERVER_BIN_PATH ]
+if [ -d $SAMPLE_PATH ]
 then
-    mkdir -p $SERVER_BIN_PATH
-fi 
+    rm -rf $SAMPLE_PATH
+fi
+mkdir -p $SAMPLE_PATH
 
 
-mv $CLIENT_SRC_PATH/rpc_client $SERVER_SRC_PATH/rpc_server $SERVER_BIN_PATH && \
-#cp -r $CONF_PATH $SERVER_PATH && \
-#cp $START_FILE $SERVER_BIN_PATH
+mv $CLIENT_SRC_PATH/rpc_client $SERVER_SRC_PATH/rpc_server $SAMPLE_PATH && \
+cp $START_FILE $SAMPLE_PATH
+cp -r $CONF_FILE $SAMPLE_PATH && \
 
 if [ $? -ne 0 ]
 then
