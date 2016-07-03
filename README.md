@@ -11,7 +11,9 @@
 
     1.预备安装需要automake, gcc(4.8版本以上).
     2.拉去安装相关依赖，确保当前目录有root权限后，执行deps_build.sh，安装需要的依赖编译文件，如果出错，按照出错信息进行修复依赖错误
-    2.安装好后，直接执行build.sh脚本
+    3.安装好后，执行build.sh脚本 需要参数，命令示例： sh build.sh --prefix=/home/xxx/lib/libevrpc
+    4.执行 make install 安装链接文件到指定目录
+    5.执行sh build.sh clean 清理编译文件
 
 
 代码说明：
