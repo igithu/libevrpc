@@ -11,7 +11,7 @@ if [ "$1" == "clean" ]; then
 fi
 
 BUILD_ROOT=$PWD
-INSTALL_PATH="/usr/local/"
+INSTALL_PATH="~/.lib/"
 
 PREFIX='--prefix'
 for arg in "$@"
