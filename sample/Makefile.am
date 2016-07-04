@@ -24,15 +24,14 @@ LDADD = ${third_dir}/libevrpc/lib/*.a \
 
 bin_PROGRAMS = rpc_server rpc_client
 
-SERVER_SRC = ${cs_rootdir}/libev_server.cc        \
+SERVER_SRC = ${cs_rootdir}/src/libev_server.cc    \
 			 ${cs_rootdir}/proto/rpc_sample.pb.h  \
 			 ${cs_rootdir}/proto/rpc_sample.pb.cc
 rpc_server_SOURCES = ${SERVER_SRC}
 
-CLIENT_SRC = ${cs_rootdir}/libev_client.cc        \
+CLIENT_SRC = ${cs_rootdir}/src/libev_client.cc    \
 			 ${cs_rootdir}/proto/rpc_sample.pb.h  \
 			 ${cs_rootdir}/proto/rpc_sample.pb.cc
-
 rpc_client_SOURCES = ${CLIENT_SRC}
 
 # rpc_client_LDADD = $(top_builddir)/src/rpc_client/librpc_client.a \
