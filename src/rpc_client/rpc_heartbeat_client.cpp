@@ -32,7 +32,7 @@ RpcHeartbeatClient::RpcHeartbeatClient(
     hb_server_port_(NULL),
     running_(true) {
 
-    if (NULL != hb_server_addr_ && NULL != hb_server_port_) {
+    if (NULL != hb_server_addr && NULL != hb_server_port) {
         hb_server_addr_ = (char*)malloc(strlen(hb_server_addr));
         hb_server_port_ = (char*)malloc(strlen(hb_server_port));
         strcpy(hb_server_addr_, hb_server_addr);
@@ -72,10 +72,12 @@ bool RpcHeartbeatClient::CreateRpcConnection() {
      * UDP connection
      */
     if (NULL == hb_server_addr_ || NULL == hb_server_port_) {
+        PrintErrorInfo("hb server port or addr is NULL!");
         return false;
     }
     connect_fd_ = UdpClientInit(hb_server_addr_, hb_server_port_, to_);
     if (connect_fd_ < 0) {
+        PrintErrorInfo("Init udp server failed!");
         return false;
     }
 

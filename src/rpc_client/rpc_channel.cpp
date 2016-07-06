@@ -60,8 +60,10 @@ void Channel::CallMethod(const MethodDescriptor* method,
         PrintErrorInfo("TcpConnect timeout! try again!");
     } while (try_times <= 0);
 
-    if (connect_fd_ < 0 && NULL != controller) {
-        controller->SetFailed("Rpc connect server failed!");
+    if (connect_fd_ < 0) {
+        if (NULL != controller) {
+            controller->SetFailed("Rpc connect server failed!");
+        }
         return;
     }
 
@@ -70,7 +72,9 @@ void Channel::CallMethod(const MethodDescriptor* method,
         AsyncRpcCall(rpc_params_ptr);
     } else {
         if (!RpcCommunication(rpc_params_ptr)) {
-            controller->SetFailed(error_info_);
+            if (NULL != controller) {
+                controller->SetFailed(error_info_);
+            }
             delete rpc_params_ptr;
             return;
         }
