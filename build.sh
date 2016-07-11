@@ -44,7 +44,7 @@ then
 fi
 
 # clean the .o file in order to make the proj
-if [ -d $SERVER_PATH ] 
+if [ -d $SERVER_PATH ]
 then
     rm -rf $SERVER_PATH
 fi
@@ -52,7 +52,7 @@ make distclean
 ./bootstrap.sh clean
 ./bootstrap.sh
 
-# check the configure file 
+# check the configure file
 if [ ! -f $BUILD_ROOT/configure ]
 then
     echo "the configure does not exist!"
