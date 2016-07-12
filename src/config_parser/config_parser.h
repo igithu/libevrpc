@@ -36,7 +36,7 @@ class ConfigParser {
     public:
         ~ConfigParser();
 
-        static ConfigParser& GetInstance();
+        // static ConfigParser& GetInstance();
         static ConfigParser& GetInstance(const std::string& ini_file);
 
         int32_t GetSecKeysNum(const char* sec_key, int32_t defalut_val);
@@ -50,7 +50,7 @@ class ConfigParser {
         void PrintErrorInfo();
 
     private:
-        ConfigParser();
+        // ConfigParser();
         ConfigParser(const std::string& ini_file);
 
         bool InitConfigParser();

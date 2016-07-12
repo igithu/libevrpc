@@ -14,7 +14,7 @@
  *
  **/
 
-#include <rpc_client.h>
+#include "rpc_client.h"
 
 #include "client_rpc_controller.h"
 #include "util/rpc_util.h"
@@ -48,16 +48,16 @@ RpcClient::~RpcClient() {
 }
 
 bool RpcClient::InitClient() {
-    const char* rpc_server_addr = config_parser_instance_.IniGetString("rpc_server:addr", NULL);
-    const char* rpc_server_port = config_parser_instance_.IniGetString("rpc_server:port", NULL);
-    const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", NULL);
+    const char* rpc_server_addr = config_parser_instance_.IniGetString("rpc_server:addr", "127.0.0.1");
+    const char* rpc_server_port = config_parser_instance_.IniGetString("rpc_server:port", "9998");
+    const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", "9999");
     bool hb_open = config_parser_instance_.IniGetBool("heartbeat:open", true);
     int32_t rpc_connection_timeout = config_parser_instance_.IniGetInt("connection:timeout", 10);
 
     if (NULL != rpc_server_addr && NULL != rpc_server_port) {
         rpc_channel_ptr_ = new Channel(rpc_server_addr, rpc_server_port);
     } else {
-        rpc_channel_ptr_ = new Channel("127.0.0.1", "8899");
+        rpc_channel_ptr_ = new Channel("127.0.0.1", "999b");
         PrintErrorInfo("Attention! rpc client cann't read config file!");
         PrintErrorInfo("Init with local server address and default port:8899!");
     }

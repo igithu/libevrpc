@@ -42,6 +42,5 @@ AC_CHECK_FUNCS([bzero memset socket strerror])
 
 CXXFLAGS=-std=c++11
 
-AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

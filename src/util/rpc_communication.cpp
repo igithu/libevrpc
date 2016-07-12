@@ -161,7 +161,6 @@ int32_t TcpConnect(const char *host, const char *port, const int32_t conn_overti
         conn_ret = connect(sockfd, res->ai_addr, res->ai_addrlen);
         /*
          * 0: connect successfully, conn_ret < 0 and EINPROGRESS: connecting
-         *
          */
         if (conn_overtime > 0 && conn_ret < 0 && errno == EINPROGRESS) {
             fd_set fs;
