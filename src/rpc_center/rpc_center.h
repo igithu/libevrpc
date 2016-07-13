@@ -20,6 +20,8 @@
 #ifndef __RPC_CENTER_H
 #define __RPC_CENTER_H
 
+#include "util/disallow_copy_and_assign.h"
+
 namespace libevrpc {
 
 class RpcCenter {
@@ -27,8 +29,11 @@ class RpcCenter {
         ~RpcCenter();
 
         static RpcCenter& GetInstance();
+
     private:
         RpcCenter();
+
+        DISALLOW_COPY_AND_ASSIGN(RpcCenter);
 };
 
 

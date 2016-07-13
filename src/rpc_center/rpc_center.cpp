@@ -26,6 +26,11 @@ RpcCenter::RpcCenter() {
 RpcCenter::~RpcCenter() {
 }
 
+RpcCenter& RpcCenter::GetInstance() {
+    static RpcCenter rc_instance;
+    return rc_instance;
+}
+
 
 }  // end of namespace
 
