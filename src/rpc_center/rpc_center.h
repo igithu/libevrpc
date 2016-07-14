@@ -24,6 +24,24 @@
 
 namespace libevrpc {
 
+/*
+ * 选举算法使用，决定哪一台机器为Leader，便于同步全局RpcServer列表
+ */
+enum CenterStatus {
+    LOOKING,
+    FOLLOWING,
+    OBSERVING,
+    LEADING,
+    UNKONW,
+    DEAD;
+};
+
+class RpcCenter;
+struct OtherCenter {
+    std::string ip_addr_;
+    CenterStatus center_status;
+};
+
 class RpcCenter {
     public:
         ~RpcCenter();
@@ -32,6 +50,8 @@ class RpcCenter {
 
     private:
         RpcCenter();
+
+        CenterStatus center_status_;
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);
 };
