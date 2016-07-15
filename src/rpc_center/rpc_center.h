@@ -20,6 +20,9 @@
 #ifndef __RPC_CENTER_H
 #define __RPC_CENTER_H
 
+#include <string>
+#include <unordered_map>
+
 #include "util/disallow_copy_and_assign.h"
 
 namespace libevrpc {
@@ -42,16 +45,31 @@ struct OtherCenter {
     CenterStatus center_status;
 };
 
+typedef std::unordered_map<std::string, CenterStatus> HashMap;
+
 class RpcCenter {
     public:
         ~RpcCenter();
 
         static RpcCenter& GetInstance();
 
+        bool InitRpcCenter();
+
     private:
         RpcCenter();
 
+    private:
         CenterStatus center_status_;
+        /*
+         * 记录其他Center服务器状态
+         */
+        HashMap* other_centers_ptr_;
+
+        /*
+         * 记录当前Leader机器
+         */
+        std::string leader_center_;
+
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);
 };
