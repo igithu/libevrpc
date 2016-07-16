@@ -30,6 +30,7 @@
 #include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_mutex.h"
+#include "util/pthread_rwlock.h"
 
 
 namespace libevrpc {
@@ -90,8 +91,14 @@ class RpcServer {
 
 
     private:
-        Mutex hashmap_mutex_;
+        /*
+         * RPC函数注册列表读写锁
+         */
+        RWLock hashmap_rwlock_;
 
+        /*
+         * RPC函数注册列表
+         */
         HashMap method_hashmap_;
 
         DispatchThread*  dispatcher_thread_ptr_;

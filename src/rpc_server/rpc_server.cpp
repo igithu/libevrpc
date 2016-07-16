@@ -122,14 +122,17 @@ bool RpcServer::RegisteService(Service* reg_service) {
         uint32_t hash_code = BKDRHash(method_desc->full_name().c_str());
 
         HashMap::iterator ret_iter = method_hashmap_.find(hash_code);
-        if (ret_iter == method_hashmap_.end()) {
-            method_hashmap_.insert(std::make_pair(hash_code, rpc_method));
-        } else {
-            /*
-             * if conflict, replace old one
-             */
-            delete ret_iter->second;
-            method_hashmap_[hash_code] = rpc_method;
+        {
+            WriteLockGuard wguard(hashmap_rwlock_);
+            if (ret_iter == method_hashmap_.end()) {
+                method_hashmap_.insert(std::make_pair(hash_code, rpc_method));
+            } else {
+                /*
+                 * if conflict, replace old one
+                 */
+                delete ret_iter->second;
+                method_hashmap_[hash_code] = rpc_method;
+            }
         }
     }
    return true;
@@ -249,24 +252,29 @@ void* RpcServer::RpcProcessor(void *arg) {
      * find the function will be called
      */
     HashMap& method_hashmap = rpc_serv_ptr->method_hashmap_;
-    HashMap::iterator method_iter = method_hashmap.find(call_id);
-    if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
-        PrintErrorInfo("Find the method failed!");
-        delete cb_params_ptr;
-        cb_params_ptr = NULL;
-        close(event_fd);
-        return NULL;
-    }
+    Message* request = NULL;
+    RpcMethod* rpc_method = NULL;
+    {
+        ReadLockGuard rguard(rpc_serv_ptr->hashmap_rwlock_);
+        HashMap::iterator method_iter = method_hashmap.find(call_id);
+        if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
+            PrintErrorInfo("Find the method failed!");
+            delete cb_params_ptr;
+            cb_params_ptr = NULL;
+            close(event_fd);
+            return NULL;
+        }
 
-    RpcMethod* rpc_method = method_iter->second;
-    Message* request = rpc_method->request->New();
-    if (!request->ParseFromString(recv_info)) {
-        PrintErrorInfo("Parse body msg error!");
-        delete cb_params_ptr;
-        delete request;
-        cb_params_ptr = NULL;
-        close(event_fd);
-        return NULL;
+        RpcMethod* rpc_method = method_iter->second;
+        Message* request = rpc_method->request->New();
+        if (!request->ParseFromString(recv_info)) {
+            PrintErrorInfo("Parse body msg error!");
+            delete cb_params_ptr;
+            delete request;
+            cb_params_ptr = NULL;
+            close(event_fd);
+            return NULL;
+        }
     }
 
     const MethodDescriptor* method_desc = rpc_method->method;
