@@ -40,13 +40,33 @@ enum CenterStatus {
     DEAD;
 };
 
-class RpcCenter;
-struct OtherCenter {
-    std::string ip_addr_;
-    CenterStatus center_status;
+enum CenterAction {
+    PROPOSAL,
+    ACCEPT,
+    REFUSED
 };
 
-typedef std::unordered_map<std::string, CenterStatus> HashMap;
+class RpcCenter;
+struct OtherCenter {
+    time_t start_time;
+    CenterStatus center_status;
+    char leader_center[128];
+};
+
+typedef std::shared_ptr<OtherCenter> OCPTR;
+typedef std::unordered_map<std::string, OCPTR> HashMap;
+typedef std::unordered_map<std::string, int32_t> CountMap;
+
+
+struct CenterData {
+    CenterStatus center_status;
+    CenterAction center_action;
+    time_t start_time;
+    time_t lc_start_time;
+    unsigned long logical_clock;
+    char leader_center[128];
+};
+
 
 class RpcCenter {
     public:
@@ -58,13 +78,29 @@ class RpcCenter {
         bool StartCenter();
 
         void UpdateCenterStatus(CenterStatus cs);
-        void UpdateOCStatus(const std::string& addr, CenterStatus cs);
+        void UpdateOCStatus(const std::string& addr, OCPTR& oc_ptr);
         void UpdateLeadingCenter(const std::string& addr);
+        void IncreaseLogicalClock();
+
+        CenterStatus GetLocalCenterStatus();
+        time_t GetOCStartTime(const std::string& leader_center);
+        std::string GetLeadingCenter();
+        unsigned long GetLogicalClock();
 
         /*
          * FastLeaderElection算法 选举出 RPC Center集群的Leader
          */
-        bool FastLeaderElection();
+        bool FastLeaderElection(const char* recommend_center);
+        /*
+         * 判断新的Proposal数据进行预判，是否需要更新本地Leader信息
+         */
+        CenterAction LeaderPredicate(struct CenterData& center_data);
+
+        /*
+         * 收发Center数据
+         */
+        bool Receiver(int32_t fd, struct CenterData& cd);
+        bool Sender(int32_t fd, const struct CenterData& cd);
 
     private:
         RpcCenter();
@@ -82,7 +118,7 @@ class RpcCenter {
         std::string leader_center_;
 
         /*
-         * 服务器启动时间，选举期间作为是否作为leader 标准之一
+         * 服务器启动时间，选举期间作为是否作为leader的标准之一
          */
         time_t start_time_;
 
@@ -92,6 +128,11 @@ class RpcCenter {
          */
         unsigned long logical_clock_;
 
+        /*
+         * Center服务器端口
+         */
+        char* center_port_;
+
 
         /*
          * 各种RWLock
@@ -99,6 +140,7 @@ class RpcCenter {
         RWLock status_rwlock_;
         RWLock oc_rwlock_;
         RWLock lc_rwlock_;
+        RWLock logical_clock_rwlock_;
 
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);

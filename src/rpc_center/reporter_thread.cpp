@@ -7,41 +7,32 @@
 
 
 /**
- * @file reporter_thread.h
+ * @file reporter_thread.cpp
  * @author aishuyu(asy5178@163.com)
- * @date 2016/07/16 22:42:27
+ * @date 2016/07/17 00:43:25
  * @brief
  *
  **/
 
-
-
-
-#ifndef __REPORTER_THREAD_H
-#define __REPORTER_THREAD_H
-
-#include "util/thread.h"
+#include "reporter_thread.h"
 
 namespace libevrpc {
 
-/*
- * 与Leader机器通信, 交换信息
- */
-class ReporterThread : public Thread {
-    public:
-        ReporterThread();
-        ~ReporterThread();
+ReporterThread::ReporterThread() {
+}
 
-        virtual void Run();
+ReporterThread::~ReporterThread() {
+}
 
-};
+void ReporterThread::Run() {
+}
 
 }  // end of namespace libevrpc
 
 
 
 
-#endif // __REPORTER_THREAD_H
+
 
 
 

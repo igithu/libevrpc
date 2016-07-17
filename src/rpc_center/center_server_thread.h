@@ -7,9 +7,9 @@
 
 
 /**
- * @file reporter_thread.h
+ * @file center_server_thread.h
  * @author aishuyu(asy5178@163.com)
- * @date 2016/07/16 22:42:27
+ * @date 2016/07/17 02:29:13
  * @brief
  *
  **/
@@ -17,20 +17,17 @@
 
 
 
-#ifndef __REPORTER_THREAD_H
-#define __REPORTER_THREAD_H
+#ifndef __CENTER_SERVER_THREAD_H
+#define __CENTER_SERVER_THREAD_H
 
 #include "util/thread.h"
 
 namespace libevrpc {
 
-/*
- * 与Leader机器通信, 交换信息
- */
-class ReporterThread : public Thread {
+class CenterServerThread : public Thread {
     public:
-        ReporterThread();
-        ~ReporterThread();
+        CenterServerThread();
+        ~CenterServerThread();
 
         virtual void Run();
 
@@ -41,7 +38,7 @@ class ReporterThread : public Thread {
 
 
 
-#endif // __REPORTER_THREAD_H
+#endif // __CENTER_SERVER_THREAD_H
 
 
 
