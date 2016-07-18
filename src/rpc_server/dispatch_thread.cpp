@@ -31,7 +31,7 @@ DispatchThread::~DispatchThread() {
     Stop();
     Wait();
     if (NULL != epoller_) {
-        delete epoller_;
+        ev_loop_destroy(epoller_);
     }
     if (NULL != eio_freelist_) {
         for (EIO_ITEM* eif = eio_freelist_->next; eio_freelist_ != NULL; ) {

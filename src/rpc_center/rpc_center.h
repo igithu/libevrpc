@@ -23,6 +23,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_rwlock.h"
 
@@ -58,7 +59,7 @@ typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
 
 
-struct CenterData {
+struct CenterProto {
     CenterStatus center_status;
     CenterAction center_action;
     time_t start_time;
@@ -72,7 +73,7 @@ class RpcCenter {
     public:
         ~RpcCenter();
 
-        static RpcCenter& GetInstance();
+        static RpcCenter& GetInstance(const std::string& config_file);
 
         bool InitRpcCenter();
         bool StartCenter();
@@ -94,18 +95,25 @@ class RpcCenter {
         /*
          * 判断新的Proposal数据进行预判，是否需要更新本地Leader信息
          */
-        CenterAction LeaderPredicate(struct CenterData& center_data);
+        CenterAction LeaderPredicate(struct CenterProto& center_prto);
 
         /*
          * 收发Center数据
          */
-        bool Receiver(int32_t fd, struct CenterData& cd);
-        bool Sender(int32_t fd, const struct CenterData& cd);
+        bool Receiver(int32_t fd, struct CenterProto& cp);
+        bool Sender(int32_t fd, const struct CenterProto& cp);
 
     private:
-        RpcCenter();
+        RpcCenter(const std::string& config_file);
 
     private:
+        /*
+         * 读取配置文件使用
+         */
+        ConfigParser& config_parser_instance_;
+        /*
+         * 当前Center机器的状态
+         */
         CenterStatus center_status_;
         /*
          * 记录其他Center服务器状态
@@ -127,11 +135,6 @@ class RpcCenter {
          * 投票轮次为准
          */
         unsigned long logical_clock_;
-
-        /*
-         * Center服务器端口
-         */
-        char* center_port_;
 
 
         /*

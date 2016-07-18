@@ -30,7 +30,8 @@ namespace libevrpc {
 
 using std::string;
 
-RpcCenter::RpcCenter() :
+RpcCenter::RpcCenter(const string& config_file) :
+    config_parser_instance_(ConfigParser::GetInstance(config_file)),
     center_status_(LOOKING),
     other_centers_ptr_(new HashMap()),
     start_time_(time(0)),
@@ -63,7 +64,7 @@ bool RpcCenter::InitRpcCenter() {
     string line;
     while (getline (in, line)) {
         /*
-         * 初始启动，视其他Center状态为LOOKING
+         * 初始启动
          */
         OCPTR oc_ptr = new OtherCenter();
         memet(oc_ptr, 0, sizeof(OtherCenter));
@@ -159,12 +160,12 @@ bool RpcCenter::FastLeaderElection(const char* recommend_center) {
             /*
              * 群发每个Center发送Proposal
              */
-            struct CenterData cd = {LOOKING, PROPOSAL, start_time_, start_time_, logical_clock_, ""};
+            struct CenterProto cd = {LOOKING, PROPOSAL, start_time_, start_time_, logical_clock_, ""};
             strcpy(cd.lead_center, recommend_center);
             if (!Sender(conn_fd, cd)) {
                 close(conn_fd);
             }
-            memset(cd, 0, sizeof(CenterData));
+            memset(cd, 0, sizeof(CenterProto));
             if (!Receiver(conn_fd, cd)) {
                 close(conn_fd);
             }
@@ -191,21 +192,21 @@ bool RpcCenter::FastLeaderElection(const char* recommend_center) {
     /*
      * 本轮投票结束, 更新logical_clock
      */
-    ++logical_clock_;
+    IncreaseLogicalClock();
     return true;
 }
 
-CenterAction RpcCenter::LeaderPredicate(struct CenterData& center_data) {
+CenterAction RpcCenter::LeaderPredicate(struct CenterProto& center_proto) {
     unsigned long logical_clock = GetLogicalClock();
-    if (center_data.logical_clock < logical_clock) {
+    if (center_proto.logical_clock < logical_clock) {
         return REFUSED;
-    } else if (center_data.logical_clock == logical_clock) {
+    } else if (center_proto.logical_clock == logical_clock) {
         string lc = GetLeadingCenter();
         time_t lc_start_time = GetOCStartTime(lc);
-        if (center_data.lc_start_time > lc_start_time) {
+        if (center_proto.lc_start_time > lc_start_time) {
             return REFUSED;
-        } else if (center_data.lc_start_time == lc_start_time &&
-                   strcmp(center_data.leader_center, lc.c_str()) >= 0) {
+        } else if (center_proto.lc_start_time == lc_start_time &&
+                   strcmp(center_proto.leader_center, lc.c_str()) >= 0) {
             /*
              * 启动时间相等时, 如果新Leader大于目前的Leader, 不更新目前leader
              */
@@ -213,15 +214,15 @@ CenterAction RpcCenter::LeaderPredicate(struct CenterData& center_data) {
         }
     }
 
-    UpdateLeadingCenter(center_data.lead_center);
+    UpdateLeadingCenter(center_proto.lead_center);
     return ACCEPT;
 }
 
-bool RpcCenter::Receiver(int32_t fd, struct CenterData& cd) {
+bool RpcCenter::Receiver(int32_t fd, struct CenterProto& cp) {
     return true;
 }
 
-bool RpcCenter::Sender(int32_t fd, const struct CenterData& cd) {
+bool RpcCenter::Sender(int32_t fd, const struct CenterProto& cp) {
     return true;
 }
 

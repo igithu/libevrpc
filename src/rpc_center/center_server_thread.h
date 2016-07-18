@@ -20,16 +20,52 @@
 #ifndef __CENTER_SERVER_THREAD_H
 #define __CENTER_SERVER_THREAD_H
 
+#include <ev.h>
+
 #include "util/thread.h"
 
 namespace libevrpc {
 
+typedef struct CenterEIOItem CEIO_ITEM;
+struct CenterEIOItem {
+    ev_io eio;
+    CEIO_ITEM* prev;
+    CEIO_ITEM* next;
+};
+
+struct CenterEioQueue {
+    CEIO_ITEM* head;
+    CEIO_ITEM* tail;
+};
+
 class CenterServerThread : public Thread {
     public:
-        CenterServerThread();
+        CenterServerThread(const char* server_port);
         ~CenterServerThread();
 
+        bool InitCenterServer();
+
         virtual void Run();
+
+    private:
+        static void AcceptCb(struct ev_loop *loop, struct ev_io *watcher, int revents);
+        static void Processor(struct ev_loop *loop, struct ev_io *watcher, int revents);
+
+        CEIO_ITEM* NewCEIO();
+        void FreeCEIO(CEIO_ITEM* eio_item);
+        static void PushCEIO(CenterEioQueue& eq, CEIO_ITEM* eio_item);
+        static CEIO_ITEM* PopCEIO(CenterEioQueue& eq);
+
+    private:
+        char* local_center_;
+        char* server_port_;
+
+        struct ev_loop *epoller_;
+        struct ev_io socket_watcher_;
+
+        CEIO_ITEM* eio_freelist_;
+        static int32_t ei_per_alloc_;
+        static CenterEioQueue eio_uselist_;
 
 };
 
