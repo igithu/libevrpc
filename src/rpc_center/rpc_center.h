@@ -29,24 +29,6 @@
 
 namespace libevrpc {
 
-/*
- * 选举算法使用，决定哪一台机器为Leader，便于同步全局RpcServer列表
- */
-enum CenterStatus {
-    LOOKING,
-    FOLLOWING,
-    OBSERVING,
-    LEADING,
-    UNKONW,
-    DEAD;
-};
-
-enum CenterAction {
-    PROPOSAL,
-    ACCEPT,
-    REFUSED
-};
-
 class RpcCenter;
 struct OtherCenter {
     time_t start_time;
@@ -57,17 +39,6 @@ struct OtherCenter {
 typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
-
-
-struct CenterProto {
-    CenterStatus center_status;
-    CenterAction center_action;
-    time_t start_time;
-    time_t lc_start_time;
-    unsigned long logical_clock;
-    char leader_center[128];
-};
-
 
 class RpcCenter {
     public:
@@ -95,13 +66,7 @@ class RpcCenter {
         /*
          * 判断新的Proposal数据进行预判，是否需要更新本地Leader信息
          */
-        CenterAction LeaderPredicate(struct CenterProto& center_prto);
-
-        /*
-         * 收发Center数据
-         */
-        bool Receiver(int32_t fd, struct CenterProto& cp);
-        bool Sender(int32_t fd, const struct CenterProto& cp);
+        CenterAction LeaderPredicate(const CentersProto& centers_prto);
 
     private:
         RpcCenter(const std::string& config_file);

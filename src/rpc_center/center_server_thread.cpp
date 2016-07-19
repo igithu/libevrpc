@@ -123,15 +123,52 @@ void CenterServerThread::Processor(struct ev_loop *loop, struct ev_io *watcher, 
 }
 
 CEIO_ITEM* CenterServerThread::NewCEIO() {
+    CEIO_ITEM* ei = NULL;
+    if (NULL != eio_freelist_) {
+        ei = eio_freelist_;
+        eio_freelist_ = eio_freelist_->next;
+    }
+    if (NULL == ei) {
+         ei = (CEIO_ITEM*)malloc(sizeof(CEIO_ITEM) * ei_per_alloc_);
+         if (NULL == ei) {
+             fprintf(stderr, "Center error, Alloc the ei item mem failed!\n");
+             return NULL;
+         }
+         for (int i = 0; i < ei_per_alloc_; ++i) {
+             ei[i - 1].next = &ei[i];
+         }
+         ei[ei_per_alloc_ - 1].next = NULL;
+         ei[ei_per_alloc_ - 1].next = eio_freelist_;
+         eio_freelist_ = &ei[1];
+    }
+    return ei;
 }
 
 void CenterServerThread::FreeCEIO(CEIO_ITEM* eio_item) {
+    eio_item->next = eio_freelist_;
+    eio_freelist_ = eio_item;
 }
 
 void CenterServerThread::PushCEIO(CenterEioQueue& eq, CEIO_ITEM* eio_item) {
+    eio_item->next = NULL;
+    if (NULL == eq.tail) {
+        eq.head = eio_item;
+    } else {
+        eq.tail->next = eio_item;
+    }
+    eq.tail = eio_item;
 }
 
 CEIO_ITEM* CenterServerThread::PopCEIO(CenterEioQueue& eq) {
+    CEIO_ITEM* ei = NULL;
+    ei = eq.head;
+    if (NULL != ei) {
+        eq.head = ei->next;
+        if (NULL == eq.head) {
+            eq.tail = NULL;
+        }
+    }
+    return ei;
 }
 
 

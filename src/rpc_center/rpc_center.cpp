@@ -147,6 +147,18 @@ bool RpcCenter::FastLeaderElection(const char* recommend_center) {
      * 同时尝试进行election选举
      */
     CountMap count_map;
+    CentersProto proposal;
+    proposal.set_center_status(LOOKING);
+    proposal.set_center_action(PROPOSAL);
+    proposal.set_start_time(start_time_);
+    proposal.set_lc_start_time(start_time_);
+    proposal.set_logical_clock(logical_clock_);
+    proposal.set_leader_center(recommend_center);
+
+    string proposal_str;
+    if (proposal.SerializeToString(&proposal)) {
+        return false;
+    }
     {
         WriteLockGuard wguard(oc_rwlock_);
         for (HashMap::iterator iter = other_centers_ptr_->begin();
@@ -160,30 +172,33 @@ bool RpcCenter::FastLeaderElection(const char* recommend_center) {
             /*
              * 群发每个Center发送Proposal
              */
-            struct CenterProto cd = {LOOKING, PROPOSAL, start_time_, start_time_, logical_clock_, ""};
-            strcpy(cd.lead_center, recommend_center);
-            if (!Sender(conn_fd, cd)) {
+            if (RpcSend(conn_fd, 0, proposal_str, false)) {
                 close(conn_fd);
             }
-            memset(cd, 0, sizeof(CenterProto));
-            if (!Receiver(conn_fd, cd)) {
+
+            strong response_str;
+            if (!RpcRecv(conn_fd, response_str, false)) {
                 close(conn_fd);
+            }
+            CentersProto respone_proto;
+            if (!respone_proto.ParseFromString(response_str)) {
+                continue;
             }
             string candidate;
-            switch (cd.center_action) {
+            switch (respone_proto.center_action()) {
                 case ACCEPT:
                     candidate = recommend_center;
                     break;
                 case REFUSED:
-                    candidate = cd.lead_center;
+                    candidate = respone_proto.lead_center();
                     break;
             }
             ++count_map[candidate];
 
             OCPTR oc_ptr = new OtherCenter();
-            oc_ptr->start_time = cd.start_time;
-            oc_ptr->center_status = cd.center_status;
-            strcpy(oc_ptr->lead_center, cd.lead_center);
+            oc_ptr->start_time = respone_proto.start_time();
+            oc_ptr->center_status = respone_proto.center_status();
+            strcpy(oc_ptr->lead_center, candidate.c_str());
             UpdateOCStatus(center_addr, oc_ptr);
             close(conn_fd);
         }
@@ -196,35 +211,27 @@ bool RpcCenter::FastLeaderElection(const char* recommend_center) {
     return true;
 }
 
-CenterAction RpcCenter::LeaderPredicate(struct CenterProto& center_proto) {
+CenterAction RpcCenter::LeaderPredicate(const CentersProto& center_proto) {
     unsigned long logical_clock = GetLogicalClock();
-    if (center_proto.logical_clock < logical_clock) {
+    if (center_proto.logical_clock() < logical_clock) {
         return REFUSED;
-    } else if (center_proto.logical_clock == logical_clock) {
+    } else if (center_proto.logical_clock() == logical_clock) {
         string lc = GetLeadingCenter();
         time_t lc_start_time = GetOCStartTime(lc);
-        if (center_proto.lc_start_time > lc_start_time) {
+        if (center_proto.lc_start_time() > lc_start_time) {
             return REFUSED;
-        } else if (center_proto.lc_start_time == lc_start_time &&
-                   strcmp(center_proto.leader_center, lc.c_str()) >= 0) {
+        } else if (center_proto.lc_start_time() == lc_start_time &&
+                   lc.compare(center_proto.leader_center()) >= 0) {
             /*
              * 启动时间相等时, 如果新Leader大于目前的Leader, 不更新目前leader
              */
             return REFUSED;
         }
-    }
 
-    UpdateLeadingCenter(center_proto.lead_center);
+    UpdateLeadingCenter(center_proto.lead_center());
     return ACCEPT;
 }
 
-bool RpcCenter::Receiver(int32_t fd, struct CenterProto& cp) {
-    return true;
-}
-
-bool RpcCenter::Sender(int32_t fd, const struct CenterProto& cp) {
-    return true;
-}
 
 }  // end of namespace libevrpc
 

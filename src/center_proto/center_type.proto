@@ -1,0 +1,8 @@
+package libevrpc;
+
+// 中心，RPC客户端，RPC集群通信标示
+enum CenterType {
+    CENTER2CENTER = 100;
+    CENTER2CLIENT = 101;
+    CENTER2CLUSTER = 102;
+}
