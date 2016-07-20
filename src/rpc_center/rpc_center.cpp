@@ -232,6 +232,9 @@ CenterAction RpcCenter::LeaderPredicate(const CentersProto& center_proto) {
     return ACCEPT;
 }
 
+bool RpcCenter::CenterProcessor(CenterType center_type, const std::string recv_message) {
+    return true;
+}
 
 }  // end of namespace libevrpc
 

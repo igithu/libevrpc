@@ -23,6 +23,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "center_proto/centers.pb.h"
 #include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_rwlock.h"
@@ -67,6 +68,10 @@ class RpcCenter {
          * 判断新的Proposal数据进行预判，是否需要更新本地Leader信息
          */
         CenterAction LeaderPredicate(const CentersProto& centers_prto);
+        /*
+         * 中心服务机器处理，服务于其他中心机器，RPC客户端，RPC集群
+         */
+        bool CenterProcessor(CenterType center_type, const std::string recv_message);
 
     private:
         RpcCenter(const std::string& config_file);
