@@ -232,7 +232,40 @@ CenterAction RpcCenter::LeaderPredicate(const CentersProto& center_proto) {
     return ACCEPT;
 }
 
-bool RpcCenter::CenterProcessor(CenterType center_type, const std::string recv_message) {
+bool RpcCenter::CenterProcessor(int32_t conn_fd) {
+    string recv_message;
+    int32_t center_type = RpcRecv(conn_fd, recv_message, true);
+    if (center_type < 0) {
+        return;
+    }
+    switch (center_type) {
+       case CENTER2CENTER : {
+            /*
+             * 处理来自其他Center服务器的请求
+             */
+            CentersProto centers_proto;
+            centers_proto.ParseFromString(recv_message);
+            break;
+       }
+       case CENTER2CLIENT : {
+            /*
+             * 处理来自RPC客户端的请求
+             */
+            CenterClient center_client;
+            center_client.ParseFromString(recv_message);
+            break;
+       }
+       case CENTER2CLUSTER : {
+            /*
+             * 处理来自RPC服务集群的请求
+             */
+            CenterCluster center_cluster;
+            center_cluster.ParseFromString(recv_message);
+            break;
+       }
+       default:
+            return false;
+    }
     return true;
 }
 

@@ -120,6 +120,11 @@ void CenterServerThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, i
 }
 
 void CenterServerThread::Processor(struct ev_loop *loop, struct ev_io *watcher, int revents) {
+    if (EV_ERROR & revents) {
+        fprintf(stderr, "EV_ERROR in AcceptCb callback!\n");
+        return;
+    }
+    g_rpc_server.CenterProcessor(watcher->fd);
 }
 
 CEIO_ITEM* CenterServerThread::NewCEIO() {

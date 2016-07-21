@@ -67,11 +67,11 @@ class RpcCenter {
         /*
          * 判断新的Proposal数据进行预判，是否需要更新本地Leader信息
          */
-        CenterAction LeaderPredicate(const CentersProto& centers_prto);
+        CenterAction LeaderPredicate(const CentersProto& centers_proto);
         /*
          * 中心服务机器处理，服务于其他中心机器，RPC客户端，RPC集群
          */
-        bool CenterProcessor(CenterType center_type, const std::string recv_message);
+        bool CenterProcessor(int32_t conn_fd);
 
     private:
         RpcCenter(const std::string& config_file);
