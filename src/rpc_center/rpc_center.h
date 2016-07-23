@@ -23,6 +23,9 @@
 #include <string>
 #include <unordered_map>
 
+#include "center_server_thread.h"
+#include "election_thread.h"
+#include "reporter_thread.h"
 #include "center_proto/centers.pb.h"
 #include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
@@ -114,6 +117,14 @@ class RpcCenter {
         RWLock oc_rwlock_;
         RWLock lc_rwlock_;
         RWLock logical_clock_rwlock_;
+
+        /*
+         * 各种线程
+         */
+
+        CenterServerThread* center_server_thread_;
+        ElectionThread* election_thread_;
+        ReporterThread* reporter_thread_;
 
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);

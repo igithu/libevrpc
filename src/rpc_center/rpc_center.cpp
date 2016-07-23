@@ -35,12 +35,24 @@ RpcCenter::RpcCenter(const string& config_file) :
     center_status_(LOOKING),
     other_centers_ptr_(new HashMap()),
     start_time_(time(0)),
-    logical_clock_(0) {
+    logical_clock_(0),
+    center_server_thread_(NULL),
+    election_thread_(NULL),
+    reporter_thread_(NULL) {
 }
 
 RpcCenter::~RpcCenter() {
     if (NULL != other_centers_ptr_) {
         delete other_centers_ptr_;
+    }
+    if (center_server_thread_ != NULL) {
+        delete center_server_thread_;
+    }
+    if (election_thread_ != NULL) {
+        delete election_thread_;
+    }
+    if (reporter_thread_ != NULL) {
+        delete reporter_thread_;
     }
 }
 
@@ -70,6 +82,14 @@ bool RpcCenter::InitRpcCenter() {
         memet(oc_ptr, 0, sizeof(OtherCenter));
         other_centers_ptr_->put(line, oc_ptr);
     }
+
+    /*
+     * 初始化线程指针
+     */
+    center_server_thread_ = new CenterServerThread();
+    election_thread_ = new ElectionThread();
+    reporter_thread_ = new ReporterThread();
+
 
     return true;
 }
@@ -243,8 +263,10 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             /*
              * 处理来自其他Center服务器的请求
              */
-            CentersProto centers_proto;
-            centers_proto.ParseFromString(recv_message);
+            if (NULL == election_thread_) {
+                return false;
+            }
+            election_thread_->PushElectionMessage(recv_message);
             break;
        }
        case CENTER2CLIENT : {
