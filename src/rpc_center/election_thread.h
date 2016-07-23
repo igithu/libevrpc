@@ -20,6 +20,7 @@
 #ifndef __ELECTION_THREAD_H
 #define __ELECTION_THREAD_H
 
+#include <atomic>
 
 #include "center_proto/centers.pb.h"
 #include "util/thread.h"
@@ -48,13 +49,16 @@ class ElectionThread : public Thread {
         ~ElectionThread();
 
         virtual void Run();
+        void StopThread();
 
         bool PushElectionMessage(const std::string& election_msg);
+        ElectionItem* PopElectionMessage();
 
     private:
-        EQ* election_q_*;
+        volatile std::atomic<bool> running_;
+        EQ* election_q_;
 
-
+        Mutex eq_mutex_;
 };
 
 
