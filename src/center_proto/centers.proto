@@ -21,12 +21,13 @@ enum CenterAction {
 };
 
 message CentersProto {
-    optional CenterStatus center_status = 1;
-    optional CenterAction center_action = 2;
-    optional uint64 start_time = 3;
-    optional uint64 lc_start_time = 4;
-    optional uint64 logical_clock = 5;
-    optional string leader_center = 6;
+    optional string from_center_addr = 1;
+    optional CenterStatus center_status = 2;
+    optional CenterAction center_action = 3;
+    optional uint64 start_time = 4;
+    optional uint64 lc_start_time = 5;
+    optional uint64 logical_clock = 6;
+    optional string leader_center = 7;
 };
 
 

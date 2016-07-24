@@ -34,6 +34,7 @@ RpcCenter::RpcCenter(const string& config_file) :
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
     center_status_(LOOKING),
     other_centers_ptr_(new HashMap()),
+    election_done_num_(0),
     start_time_(time(0)),
     logical_clock_(0),
     center_server_thread_(NULL),
@@ -72,16 +73,26 @@ bool RpcCenter::InitRpcCenter() {
         return false;
     }
 
+    const char* local_addr = GetLocalAddress();
     std::ifstream in(cfile);
     string line;
     while (getline (in, line)) {
+        if (strcmp(line.c_str(), local_addr) == 0) {
+            /*
+             * 本地服务器信息忽略
+             */
+            continue;
+        }
         /*
-         * 初始启动
+         * 初始中心服务信息
          */
         OCPTR oc_ptr = new OtherCenter();
+        oc_ptr->vote_count = 0;
         memet(oc_ptr, 0, sizeof(OtherCenter));
         other_centers_ptr_->put(line, oc_ptr);
     }
+
+    election_done_num_ = (other_centers_ptr_->size() + 1) / 2 + 1;
 
     /*
      * 初始化线程指针
@@ -99,7 +110,7 @@ bool RpcCenter::StartCenter() {
         return false;
     }
 
-    if (!FastLeaderElection()) {
+    if (!ProposalLeaderElection()) {
         fprintf(stderr, "Run the Ecletion failed!\n");
     }
 
@@ -111,22 +122,67 @@ void RpcCenter::UpdateCenterStatus(CenterStatus cs) {
     center_status_ = cs;
 }
 
-void RpcCenter::UpdateOCStatus(const string& addr, OCPTR& oc_ptr) {
+bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
     if (NULL == other_centers_ptr_) {
-        return;
+        fprintf(stderr, "Center error！ Other center info hasn't inited!\n");
+        return false;
     }
-    WriteLockGuard wguard(oc_rwlock_);
-    HashMap::iterator iter = other_centers_ptr_->find(addr);
-    if (iter == other_centers_ptr_->end()) {
-        other_centers_ptr_->insert(std::make_pair(addr, oc_ptr));
-    } else {
-        iter->second = oc_ptr;
-        // strcpy(oc_ptr->lead_center, rec_addr.c_str());
-        // oc_ptr->center_status = cs;
+
+    if (centers_proto.logical_clock() < GetLogicalClock()) {
+        return false;
     }
+
+    const string& addr = centers_proto.from_center_addr();
+    {
+        WriteLockGuard wguard(oc_rwlock_);
+        /*
+         * 更新当前中心服务器状态信息
+         */
+        HashMap::iterator iter = other_centers_ptr_->find(addr);
+        if (iter == other_centers_ptr_->end()) {
+            OCPTR oc_ptr = new OtherCenter();
+            oc_ptr->start_time = centers_proto.start_time();
+            oc_ptr->center_status = centers_proto.center_status();
+            oc_ptr->vote_count = 0;
+            strcpy(oc_ptr->current_follow_leader_center, centers_proto.leader_center().c_str())
+            other_centers_ptr_->insert(std::make_pair(addr, oc_ptr));
+        } else {
+            OCPTR& oc_ptr = iter->second;
+            oc_ptr->start_time = centers_proto.start_time();
+            oc_ptr->center_status = centers_proto.center_status();
+            strcpy(oc_ptr->current_follow_leader_center, centers_proto.leader_center().c_str())
+        }
+    }
+
+    uint32_t vote_count = 0
+    {
+        WriteLockGuard wguard(oc_rwlock_);
+        /*
+         * 更新当前中心服务器投票的中心服务器信息
+         */
+        HashMap::iterator leader_iter = other_centers_ptr_->find(centers_proto.leader_center());
+        if (leader_iter == other_centers_ptr_->end()) {
+            OCPTR oc_ptr = new OtherCenter();
+            oc_ptr->start_time = 0;
+            oc_ptr->center_status = LOOKING;
+            oc_ptr->vote_count = 1;
+        } else {
+            OCPTR& oc_ptr = iter->second;
+            vote_count = ++oc_ptr->vote_count;
+        }
+    }
+
+    if (0 != election_done_num_ && vote_count >= election_done_num_) {
+        /*
+         * 当前投票结果已经有票数超过 n / 2 + 1, 结果产出
+         */
+        UpdateLeadingCenter(centers_proto.leader_center());
+    }
+
+    return true;
 }
 
-void RpcCenter::UpdateLeadingCenter(const string& lead_center) {
+void RpcCenter::UpdateLeadingCenter(const string& leader_center) {
     WriteLockGuard wguard(lc_rwlock_);
     leader_center_ = leader_center;
 }
@@ -152,7 +208,7 @@ time_t RpcCenter::GetOCStartTime(const string& center) {
 
 string RpcCenter::GetLeadingCenter() {
     WriteLockGuard wguard(lc_rwlock_);
-    return lead_center;
+    return leader_center_;
 }
 
 unsigned long RpcCenter::GetLogicalClock() {
@@ -160,8 +216,22 @@ unsigned long RpcCenter::GetLogicalClock() {
     return logical_clock_;
 }
 
+CenterStatus RpcCenter::GetCenterStatus() {
+    ReadLockGuard wguard(status_rwlock_);
+    return center_status;
+}
 
-bool RpcCenter::FastLeaderElection(const char* recommend_center) {
+
+CenterAction RpcCenter::FastLeaderElection(const CentersProto& centers_proto) {
+    CenterAction ca = LeaderPredicate(centers_proto);
+
+    if (ACCEPT == ca) {
+        UpdateOCStatus(centers_proto);
+    }
+    return ca;
+}
+
+bool RpcCenter::ProposalLeaderElection(const char* recommend_center) {
     /*
      * 遍历所有已知Center服务器, 获取每个Center服务状态，以及其Follow的Leader机器
      * 同时尝试进行election选举
@@ -195,60 +265,35 @@ bool RpcCenter::FastLeaderElection(const char* recommend_center) {
             if (RpcSend(conn_fd, 0, proposal_str, false)) {
                 close(conn_fd);
             }
-
-            strong response_str;
-            if (!RpcRecv(conn_fd, response_str, false)) {
-                close(conn_fd);
-            }
-            CentersProto respone_proto;
-            if (!respone_proto.ParseFromString(response_str)) {
-                continue;
-            }
-            string candidate;
-            switch (respone_proto.center_action()) {
-                case ACCEPT:
-                    candidate = recommend_center;
-                    break;
-                case REFUSED:
-                    candidate = respone_proto.lead_center();
-                    break;
-            }
-            ++count_map[candidate];
-
-            OCPTR oc_ptr = new OtherCenter();
-            oc_ptr->start_time = respone_proto.start_time();
-            oc_ptr->center_status = respone_proto.center_status();
-            strcpy(oc_ptr->lead_center, candidate.c_str());
-            UpdateOCStatus(center_addr, oc_ptr);
             close(conn_fd);
         }
     }
 
     /*
-     * 本轮投票结束, 更新logical_clock
+     * Proposal结束, 更新logical_clock
      */
     IncreaseLogicalClock();
     return true;
 }
 
-CenterAction RpcCenter::LeaderPredicate(const CentersProto& center_proto) {
+CenterAction RpcCenter::LeaderPredicate(const CentersProto& centers_proto) {
     unsigned long logical_clock = GetLogicalClock();
-    if (center_proto.logical_clock() < logical_clock) {
+    if (centers_proto.logical_clock() < logical_clock) {
         return REFUSED;
-    } else if (center_proto.logical_clock() == logical_clock) {
+    } else if (centers_proto.logical_clock() == logical_clock) {
         string lc = GetLeadingCenter();
         time_t lc_start_time = GetOCStartTime(lc);
-        if (center_proto.lc_start_time() > lc_start_time) {
+        if (centers_proto.lc_start_time() > lc_start_time) {
             return REFUSED;
-        } else if (center_proto.lc_start_time() == lc_start_time &&
-                   lc.compare(center_proto.leader_center()) >= 0) {
+        } else if (centers_proto.lc_start_time() == lc_start_time &&
+                   lc.compare(centers_proto.leader_center()) >= 0) {
             /*
              * 启动时间相等时, 如果新Leader大于目前的Leader, 不更新目前leader
              */
             return REFUSED;
         }
+    }
 
-    UpdateLeadingCenter(center_proto.lead_center());
     return ACCEPT;
 }
 

@@ -37,7 +37,8 @@ class RpcCenter;
 struct OtherCenter {
     time_t start_time;
     CenterStatus center_status;
-    char leader_center[128];
+    uint32_t vote_count;
+    char current_follow_leader_center[128];
 };
 
 typedef std::shared_ptr<OtherCenter> OCPTR;
@@ -54,7 +55,7 @@ class RpcCenter {
         bool StartCenter();
 
         void UpdateCenterStatus(CenterStatus cs);
-        void UpdateOCStatus(const std::string& addr, OCPTR& oc_ptr);
+        bool UpdateOCStatus(const CentersProto& centers_proto);
         void UpdateLeadingCenter(const std::string& addr);
         void IncreaseLogicalClock();
 
@@ -62,11 +63,16 @@ class RpcCenter {
         time_t GetOCStartTime(const std::string& leader_center);
         std::string GetLeadingCenter();
         unsigned long GetLogicalClock();
+        CenterStatus GetCenterStatus();
 
         /*
          * FastLeaderElection算法 选举出 RPC Center集群的Leader
          */
-        bool FastLeaderElection(const char* recommend_center);
+        CenterAction FastLeaderElection(const CentersProto& centers_proto);
+        /*
+         * 发起Proposal
+         */
+        bool ProposalLeaderElection(const char* recommend_center);
         /*
          * 判断新的Proposal数据进行预判，是否需要更新本地Leader信息
          */
@@ -97,6 +103,10 @@ class RpcCenter {
          * 记录当前Leader机器
          */
         std::string leader_center_;
+        /*
+         * 选举生效票数
+         */
+        uint32_t election_done_num_;
 
         /*
          * 服务器启动时间，选举期间作为是否作为leader的标准之一
