@@ -111,7 +111,13 @@ bool RpcCenter::StartCenter() {
     }
 
     if (!ProposalLeaderElection()) {
-        fprintf(stderr, "Run the Ecletion failed!\n");
+        fprintf(stderr, "Run the Election failed!\n");
+        return false;
+    }
+
+    if (!center_server_thread_->Start()) {
+        fprintf(stderr, "Start the center thread failed!\n");
+        return false;
     }
 
     return true;
@@ -228,6 +234,31 @@ CenterAction RpcCenter::FastLeaderElection(const CentersProto& centers_proto) {
     if (ACCEPT == ca) {
         UpdateOCStatus(centers_proto);
     }
+
+    int32_t conn_fd = TcpConnect(centers_proto.from_center_addr().c_str(), center_port_, 15);
+    if (conn_fd <= 0) {
+        return ca;
+    }
+
+    string lc_center = GetLeadingCenter();
+
+    CentersProto response_proto;
+    response_proto.set_from_center_addr(GetLocalAddress());
+    response_proto.set_center_status(GetCenterStatus());
+    response_proto.set_center_action(ca);
+    response_proto.set_start_time(start_time_);
+    response_proto.set_lc_start_time(GetOCStartTime(lc_center));
+    response_proto.set_logical_clock(GetLogicalClock());
+    response_proto.set_leader_center(lc_center);
+
+    string response_str;
+    response_proto.SerializeToString(response_str);
+
+    if (!RpcSend(conn_fd, 0, proposal_str, false)) {
+        fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
+    }
+    close(conn_fd);
+
     return ca;
 }
 
@@ -238,6 +269,7 @@ bool RpcCenter::ProposalLeaderElection(const char* recommend_center) {
      */
     CountMap count_map;
     CentersProto proposal;
+    proposal.set_from_center_addr(GetLocalAddress());
     proposal.set_center_status(LOOKING);
     proposal.set_center_action(PROPOSAL);
     proposal.set_start_time(start_time_);
@@ -262,8 +294,8 @@ bool RpcCenter::ProposalLeaderElection(const char* recommend_center) {
             /*
              * 群发每个Center发送Proposal
              */
-            if (RpcSend(conn_fd, 0, proposal_str, false)) {
-                close(conn_fd);
+            if (!RpcSend(conn_fd, 0, proposal_str, false)) {
+                fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
             }
             close(conn_fd);
         }

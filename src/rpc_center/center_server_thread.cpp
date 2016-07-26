@@ -21,8 +21,6 @@
 
 namespace libevrpc {
 
-static RpcServer& g_rpc_server = RpcServer::GetInstance();
-
 int32_t CenterServerThread::ei_per_alloc_ = 4;
 CenterEioQueue CenterServerThread::eio_uselist_ = {NULL, NULL};
 

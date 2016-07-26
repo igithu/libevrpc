@@ -45,6 +45,11 @@ typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
 
+/**
+ * 供其他引用代码使用
+ */
+#define g_rpc_center RpcCenter::GetInstance()
+
 class RpcCenter {
     public:
         ~RpcCenter();
@@ -139,6 +144,7 @@ class RpcCenter {
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);
 };
+
 
 
 }  // end of namespace

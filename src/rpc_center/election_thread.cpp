@@ -17,6 +17,8 @@
 
 #include "election_thread.h"
 
+#include "rpc_center.h"
+
 
 namespace libevrpc {
 
@@ -45,6 +47,9 @@ void ElectionThread::Run() {
             sleep(5);
             continue;
         }
+
+
+        delete el_item;
     }
 }
 
