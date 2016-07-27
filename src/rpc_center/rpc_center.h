@@ -73,7 +73,7 @@ class RpcCenter {
         /*
          * FastLeaderElection算法 选举出 RPC Center集群的Leader
          */
-        CenterAction FastLeaderElection(const CentersProto& centers_proto);
+        bool FastLeaderElection(const CentersProto& centers_proto);
         /*
          * 发起Proposal
          */
@@ -89,6 +89,8 @@ class RpcCenter {
 
     private:
         RpcCenter(const std::string& config_file);
+
+        bool BroadcastInfo(const std::string& bc_info);
 
     private:
         /*
@@ -136,7 +138,6 @@ class RpcCenter {
         /*
          * 各种线程
          */
-
         CenterServerThread* center_server_thread_;
         ElectionThread* election_thread_;
         ReporterThread* reporter_thread_;

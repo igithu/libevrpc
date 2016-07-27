@@ -30,6 +30,10 @@ ElectionThread::ElectionThread() :
 }
 
 ElectionThread::~ElectionThread() {
+    Destory();
+}
+
+void ElectionThread::Destory() {
     if (NULL != election_q_) {
         for (EL_ITEM* el_item = election_q_->head;
              el_item != election_q_->tail && el_item != NULL;
@@ -37,20 +41,32 @@ ElectionThread::~ElectionThread() {
             delete el_item;
         }
         delete election_q_;
+        election_q_ = NULL;
     }
 }
 
 void ElectionThread::Run() {
+    if (NULL == election_q_) {
+        election_q_ = new ElectionQueue();
+    }
+    string current_leader_center = g_rpc_center.GetLeadingCenter();
+    if (!g_rpc_center.ProposalLeaderElection(current_leader_center)) {
+        fprintf(stderr, "Run the Election failed!\n");
+        return;
+    }
+
     while (running_) {
         ElectionItem* el_item = PopElectionMessage();;
         if (NULL == el_item) {
-            sleep(5);
+            sleep(30);
             continue;
         }
-
+        g_rpc_center.FastLeaderElection(el_item->centers_proto);
 
         delete el_item;
+        sleep(30);
     }
+    Destory();
 }
 
 void ElectionThread::StopThread() {

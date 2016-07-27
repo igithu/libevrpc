@@ -34,6 +34,7 @@ RpcCenter::RpcCenter(const string& config_file) :
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
     center_status_(LOOKING),
     other_centers_ptr_(new HashMap()),
+    leader_center_(GetLocalAddress()),
     election_done_num_(0),
     start_time_(time(0)),
     logical_clock_(0),
@@ -110,13 +111,13 @@ bool RpcCenter::StartCenter() {
         return false;
     }
 
-    if (!ProposalLeaderElection()) {
-        fprintf(stderr, "Run the Election failed!\n");
+    if (!center_server_thread_->Start()) {
+        fprintf(stderr, "Start the center thread failed!\n");
         return false;
     }
 
-    if (!center_server_thread_->Start()) {
-        fprintf(stderr, "Start the center thread failed!\n");
+    if (!election_thread_->Start()) {
+        fprintf(stderr, "Start the election thread failed!\n");
         return false;
     }
 
@@ -182,7 +183,23 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
         /*
          * 当前投票结果已经有票数超过 n / 2 + 1, 结果产出
          */
-        UpdateLeadingCenter(centers_proto.leader_center());
+        string& leader_center = centers_proto.leader_center();
+        UpdateLeadingCenter(leader_center);
+        /*
+         * 投票结果产出 终止选票线程
+         */
+        election_thread_->Stop();
+        if (strcmp(leader_center.c_str(), GetLocalAddress()) == 0) {
+            /**
+             * 确认当前Center服务器为 Leader服务器
+             */
+            UpdateCenterStatus(LEADING);
+            /*
+             * TODO 开始向所有机器广播 确认Leader身份
+             */
+        } else {
+            UpdateCenterStatus(OBSERVING);
+        }
     }
 
     return true;
@@ -228,7 +245,7 @@ CenterStatus RpcCenter::GetCenterStatus() {
 }
 
 
-CenterAction RpcCenter::FastLeaderElection(const CentersProto& centers_proto) {
+bool RpcCenter::FastLeaderElection(const CentersProto& centers_proto) {
     CenterAction ca = LeaderPredicate(centers_proto);
 
     if (ACCEPT == ca) {
@@ -237,7 +254,7 @@ CenterAction RpcCenter::FastLeaderElection(const CentersProto& centers_proto) {
 
     int32_t conn_fd = TcpConnect(centers_proto.from_center_addr().c_str(), center_port_, 15);
     if (conn_fd <= 0) {
-        return ca;
+        return false;
     }
 
     string lc_center = GetLeadingCenter();
@@ -259,7 +276,7 @@ CenterAction RpcCenter::FastLeaderElection(const CentersProto& centers_proto) {
     }
     close(conn_fd);
 
-    return ca;
+    return true;
 }
 
 bool RpcCenter::ProposalLeaderElection(const char* recommend_center) {
@@ -281,25 +298,7 @@ bool RpcCenter::ProposalLeaderElection(const char* recommend_center) {
     if (proposal.SerializeToString(&proposal)) {
         return false;
     }
-    {
-        WriteLockGuard wguard(oc_rwlock_);
-        for (HashMap::iterator iter = other_centers_ptr_->begin();
-             iter != other_centers_ptr_->end();
-             ++iter) {
-            string& center_addr = iter->first;
-            int32_t conn_fd = TcpConnect(center_addr.c_str(), center_port_, 15);
-            if (conn_fd <= 0) {
-                continue;
-            }
-            /*
-             * 群发每个Center发送Proposal
-             */
-            if (!RpcSend(conn_fd, 0, proposal_str, false)) {
-                fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
-            }
-            close(conn_fd);
-        }
-    }
+    BroadcastInfo(proposal_str);
 
     /*
      * Proposal结束, 更新logical_clock
@@ -365,6 +364,28 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
        default:
             return false;
     }
+    return true;
+}
+
+bool RpcCenter::BroadcastInfo(const std::string& bc_info) {
+    WriteLockGuard wguard(oc_rwlock_);
+    for (HashMap::iterator iter = other_centers_ptr_->begin();
+         iter != other_centers_ptr_->end();
+         ++iter) {
+        string& center_addr = iter->first;
+        int32_t conn_fd = TcpConnect(center_addr.c_str(), center_port_, 15);
+        if (conn_fd <= 0) {
+            continue;
+        }
+        /*
+         * 群发每个Center发送Proposal
+         */
+        if (!RpcSend(conn_fd, 0, bc_info, false)) {
+            fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
+        }
+        close(conn_fd);
+    }
+
     return true;
 }
 
