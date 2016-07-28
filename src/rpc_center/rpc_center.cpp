@@ -38,6 +38,7 @@ RpcCenter::RpcCenter(const string& config_file) :
     election_done_num_(0),
     start_time_(time(0)),
     logical_clock_(0),
+    fastleader_election_running_(false),
     center_server_thread_(NULL),
     election_thread_(NULL),
     reporter_thread_(NULL) {
@@ -240,7 +241,7 @@ unsigned long RpcCenter::GetLogicalClock() {
 }
 
 CenterStatus RpcCenter::GetCenterStatus() {
-    ReadLockGuard wguard(status_rwlock_);
+    ReadLockGuard rguard(status_rwlock_);
     return center_status;
 }
 
@@ -387,6 +388,17 @@ bool RpcCenter::BroadcastInfo(const std::string& bc_info) {
     }
 
     return true;
+}
+
+
+void RpcCenter::SetFastLeaderRunning(bool is_running) {
+    WriteLockGuard wguard(fle_running_rwlock_);
+    fastleader_election_running_ = is_running;
+}
+
+bool RpcCenter::IsFastLeaderRunning() {
+    ReadLockGuard rguard(fle_running_rwlock_);
+    return fastleader_election_running_;
 }
 
 }  // end of namespace libevrpc

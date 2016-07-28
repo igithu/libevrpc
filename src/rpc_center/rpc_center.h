@@ -92,6 +92,12 @@ class RpcCenter {
 
         bool BroadcastInfo(const std::string& bc_info);
 
+        /**
+         * 标示判决FastLeaderElection是否在运行
+         */
+        void SetFastLeaderRunning(bool is_running);
+        bool IsFastLeaderRunning();
+
     private:
         /*
          * 读取配置文件使用
@@ -125,6 +131,10 @@ class RpcCenter {
          * 投票轮次为准
          */
         unsigned long logical_clock_;
+        /*
+         * FastLeaderElection算法是否在运行，主要防止多线程同时运行，运行两次FastLeaderElection
+         */
+        bool fastleader_election_running_;
 
 
         /*
@@ -134,6 +144,7 @@ class RpcCenter {
         RWLock oc_rwlock_;
         RWLock lc_rwlock_;
         RWLock logical_clock_rwlock_;
+        RWLock fle_running_rwlock_;
 
         /*
          * 各种线程
