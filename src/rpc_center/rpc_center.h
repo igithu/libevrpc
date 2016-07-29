@@ -87,15 +87,21 @@ class RpcCenter {
          */
         bool CenterProcessor(int32_t conn_fd);
 
-    private:
-        RpcCenter(const std::string& config_file);
-
-        bool BroadcastInfo(const std::string& bc_info);
+        /*
+         * 开始FastLeaderElection,同时启动Election线程
+         */
+        bool StartFastLeaderElection();
 
         /**
          * 标示判决FastLeaderElection是否在运行
          */
         void SetFastLeaderRunning(bool is_running);
+
+    private:
+        RpcCenter(const std::string& config_file);
+
+        bool BroadcastInfo(const std::string& bc_info);
+
         bool IsFastLeaderRunning();
 
     private:

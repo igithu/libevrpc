@@ -117,7 +117,7 @@ bool RpcCenter::StartCenter() {
         return false;
     }
 
-    if (!election_thread_->Start()) {
+    if (!StartFastLeaderElection()) {
         fprintf(stderr, "Start the election thread failed!\n");
         return false;
     }
@@ -364,6 +364,16 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
        }
        default:
             return false;
+    }
+    return true;
+}
+
+bool RpcCenter::StartFastLeaderElection() {
+    if (!IsFastLeaderRunning()) {
+        if (!election_thread_->Start()) {
+            return false;
+        }
+        SetFastLeaderRunning(true);
     }
     return true;
 }

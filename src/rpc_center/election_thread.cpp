@@ -67,6 +67,7 @@ void ElectionThread::Run() {
         sleep(30);
     }
     Destory();
+    g_rpc_center.SetFastLeaderRunning(false);
 }
 
 void ElectionThread::StopThread() {
