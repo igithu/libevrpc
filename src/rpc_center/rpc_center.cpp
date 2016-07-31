@@ -33,18 +33,26 @@ using std::string;
 RpcCenter::RpcCenter(const string& config_file) :
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
     center_status_(LOOKING),
-    other_centers_ptr_(new HashMap()),
-    leader_center_(GetLocalAddress()),
-    election_done_num_(0),
     start_time_(time(0)),
+    leader_infos_ptr_(new LeaderInfos());
+    other_centers_ptr_(new HashMap()),
+    // leader_center_(GetLocalAddress()),
+    election_done_num_(0),
     logical_clock_(0),
     fastleader_election_running_(false),
     center_server_thread_(NULL),
     election_thread_(NULL),
     reporter_thread_(NULL) {
+
+    leader_infos_ptr_->lc_start_time = start_time_;
+    leader_infos_ptr_->leader_center = GetLocalAddress();
 }
 
 RpcCenter::~RpcCenter() {
+    if (NULL != leader_infos_ptr_) {
+        delete leader_infos_ptr_;
+    }
+
     if (NULL != other_centers_ptr_) {
         delete other_centers_ptr_;
     }
@@ -184,31 +192,34 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
         /*
          * 当前投票结果已经有票数超过 n / 2 + 1, 结果产出
          */
-        string& leader_center = centers_proto.leader_center();
-        UpdateLeadingCenter(leader_center);
+        LeaderInfos li = {centers_proto.lc_start_time, centers_proto.leader_center()}
+        UpdateLeadingCenterInfos(li);
         /*
          * 投票结果产出 终止选票线程
          */
-        election_thread_->Stop();
         if (strcmp(leader_center.c_str(), GetLocalAddress()) == 0) {
             /**
              * 确认当前Center服务器为 Leader服务器
              */
             UpdateCenterStatus(LEADING);
+            CentersProto confirm_leader;
             /*
              * TODO 开始向所有机器广播 确认Leader身份
              */
+
         } else {
             UpdateCenterStatus(OBSERVING);
         }
+        election_thread_->Stop();
     }
 
     return true;
 }
 
-void RpcCenter::UpdateLeadingCenter(const string& leader_center) {
+void RpcCenter::UpdateLeadingCenterInfos(const LeaderInfos& leader_infos) {
     WriteLockGuard wguard(lc_rwlock_);
-    leader_center_ = leader_center;
+    leader_infos_ptr_->leader_center = leader_infos.leader_center;
+    leader_infos_ptr_->lc_start_time = leader_infos.lc_start_time;
 }
 
 void RpcCenter::IncreaseLogicalClock() {
@@ -232,7 +243,7 @@ time_t RpcCenter::GetOCStartTime(const string& center) {
 
 string RpcCenter::GetLeadingCenter() {
     WriteLockGuard wguard(lc_rwlock_);
-    return leader_center_;
+    return leader_infos_ptr_->leader_center;
 }
 
 unsigned long RpcCenter::GetLogicalClock() {

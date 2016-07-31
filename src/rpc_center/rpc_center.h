@@ -41,6 +41,14 @@ struct OtherCenter {
     char current_follow_leader_center[128];
 };
 
+struct LeaderInfos {
+    /*
+     * lc: leader center
+     */
+    time_t lc_start_time;
+    std::string leader_center;
+}
+
 typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
@@ -61,7 +69,7 @@ class RpcCenter {
 
         void UpdateCenterStatus(CenterStatus cs);
         bool UpdateOCStatus(const CentersProto& centers_proto);
-        void UpdateLeadingCenter(const std::string& addr);
+        void UpdateLeadingCenterInfos(const LeaderInfo& leader_infos);
         void IncreaseLogicalClock();
 
         CenterStatus GetLocalCenterStatus();
@@ -114,24 +122,24 @@ class RpcCenter {
          */
         CenterStatus center_status_;
         /*
+         * 服务器启动时间，选举期间作为是否作为leader的标准之一
+         */
+        time_t start_time_;
+
+        /**
+         * 记录当前LeaderCenter信息
+         */
+        LeaderInfos* leader_infos_ptr_;
+
+        /*
          * 记录其他Center服务器状态
          */
         HashMap* other_centers_ptr_;
 
         /*
-         * 记录当前Leader机器
-         */
-        std::string leader_center_;
-        /*
          * 选举生效票数
          */
         uint32_t election_done_num_;
-
-        /*
-         * 服务器启动时间，选举期间作为是否作为leader的标准之一
-         */
-        time_t start_time_;
-
         /*
          * 投票轮次，启动时候为最小，与其他Center服务器通信时候 以最大
          * 投票轮次为准
