@@ -75,6 +75,7 @@ class RpcCenter {
         CenterStatus GetLocalCenterStatus();
         time_t GetOCStartTime(const std::string& leader_center);
         std::string GetLeadingCenter();
+        time_t GetLeadingCenterStartTime();
         unsigned long GetLogicalClock();
         CenterStatus GetCenterStatus();
 

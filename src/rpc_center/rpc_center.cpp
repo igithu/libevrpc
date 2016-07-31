@@ -228,12 +228,12 @@ void RpcCenter::IncreaseLogicalClock() {
 }
 
 CenterStatus RpcCenter::GetLocalCenterStatus() {
-    WriteLockGuard wguard(status_rwlock_);
+    ReadLockGuard rguard(status_rwlock_);
     return center_status_;
 }
 
 time_t RpcCenter::GetOCStartTime(const string& center) {
-    WriteLockGuard wguard(oc_rwlock_);
+    ReadLockGuard rguard(oc_rwlock_);
     HashMap::iterator iter = other_centers_ptr_->find(center);
     if (other_centers_ptr_->end() == iter) {
         return 0;
@@ -242,12 +242,17 @@ time_t RpcCenter::GetOCStartTime(const string& center) {
 }
 
 string RpcCenter::GetLeadingCenter() {
-    WriteLockGuard wguard(lc_rwlock_);
+    ReadLockGuard rguard(lc_rwlock_);
     return leader_infos_ptr_->leader_center;
 }
 
+time_t RpcCenter::GetLeadingCenterStartTime() {
+    ReadLockGuard rguard(lc_rwlock_);
+    return leader_infos_ptr_->lc_start_time;
+}
+
 unsigned long RpcCenter::GetLogicalClock() {
-    WriteLockGuard wguard(logical_clock_rwlock_);
+    ReadLockGuard rguard(logical_clock_rwlock_);
     return logical_clock_;
 }
 
@@ -276,7 +281,7 @@ bool RpcCenter::FastLeaderElection(const CentersProto& centers_proto) {
     response_proto.set_center_status(GetCenterStatus());
     response_proto.set_center_action(ca);
     response_proto.set_start_time(start_time_);
-    response_proto.set_lc_start_time(GetOCStartTime(lc_center));
+    response_proto.set_lc_start_time(GetLeadingCenterStartTime());
     response_proto.set_logical_clock(GetLogicalClock());
     response_proto.set_leader_center(lc_center);
 
@@ -307,7 +312,7 @@ bool RpcCenter::ProposalLeaderElection(const char* recommend_center) {
     proposal.set_leader_center(recommend_center);
 
     string proposal_str;
-    if (proposal.SerializeToString(&proposal)) {
+    if (proposal.SerializeToString(&proposal_str)) {
         return false;
     }
     BroadcastInfo(proposal_str);
