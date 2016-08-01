@@ -197,19 +197,29 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
         /*
          * 投票结果产出 终止选票线程
          */
+        CentersProto confirm_proto;
+        confirm_proto.set_from_center_addr(GetLocalAddress());
+        confirm_proto.set_center_action(CONFIRM);
+        confirm_proto.set_start_time(start_time_);
+        confirm_proto.set_logical_clock(GetLogicalClock());
         if (strcmp(leader_center.c_str(), GetLocalAddress()) == 0) {
             /**
              * 确认当前Center服务器为 Leader服务器
              */
             UpdateCenterStatus(LEADING);
-            CentersProto confirm_leader;
-            /*
-             * TODO 开始向所有机器广播 确认Leader身份
-             */
-
+            confirm_proto.set_center_status(LEADING);
+            confirm_proto.set_lc_start_time(start_time_);
+            confirm_proto.set_leader_center(GetLocalAddress());
         } else {
-            UpdateCenterStatus(OBSERVING);
+            /**
+             * 确认当前Center服务器为 follow服务器
+             */
+            UpdateCenterStatus(FOLLOWING);
+            confirm_proto.set_center_status(FOLLOWING);
+            confirm_proto.set_lc_start_time(GetLeadingCenterStartTime());
+            confirm_proto.set_leader_center(GetLeadingCenter());
         }
+        BroadcastInfo(confirm_proto);
         election_thread_->Stop();
     }
 
