@@ -69,7 +69,7 @@ class RpcCenter {
 
         void UpdateCenterStatus(CenterStatus cs);
         bool UpdateOCStatus(const CentersProto& centers_proto);
-        void UpdateLeadingCenterInfos(const LeaderInfo& leader_infos);
+        void UpdateLeadingCenterInfos(const CentersProto& centers_proto);
         void IncreaseLogicalClock();
 
         CenterStatus GetLocalCenterStatus();
@@ -84,9 +84,13 @@ class RpcCenter {
          */
         bool FastLeaderElection(const CentersProto& centers_proto);
         /*
+         * 群发信息，询问各个机器，获取各个Center机器的信息
+         */
+        bool InquiryCenters();
+        /*
          * 发起Proposal
          */
-        bool ProposalLeaderElection(const char* recommend_center);
+        bool ProposalLeaderElection();
         /*
          * 判断新的Proposal数据进行预判，是否需要更新本地Leader信息
          */

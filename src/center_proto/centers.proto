@@ -15,9 +15,10 @@ enum CenterStatus {
 };
 
 enum CenterAction {
-    PROPOSAL = 0;
-    ACCEPT = 1;
-    REFUSED = 2;
+    INQUIRY = 0;
+    PROPOSAL = 1;
+    ACCEPT = 2;
+    REFUSED = 3;
 };
 
 message CentersProto {

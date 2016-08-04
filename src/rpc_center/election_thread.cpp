@@ -49,11 +49,12 @@ void ElectionThread::Run() {
     if (NULL == election_q_) {
         election_q_ = new ElectionQueue();
     }
-    string current_leader_center = g_rpc_center.GetLeadingCenter();
-    if (!g_rpc_center.ProposalLeaderElection(current_leader_center)) {
+    /*
+    if (!g_rpc_center.ProposalLeaderElection()) {
         fprintf(stderr, "Run the Election failed!\n");
         return;
     }
+    */
 
     while (running_) {
         ElectionItem* el_item = PopElectionMessage();;
