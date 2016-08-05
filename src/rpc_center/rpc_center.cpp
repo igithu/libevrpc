@@ -193,7 +193,6 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
         /*
          * 当前投票结果已经有票数超过 n / 2 + 1, 结果产出
          */
-        LeaderInfos li = {centers_proto.lc_start_time(), centers_proto.leader_center()}
         UpdateLeadingCenterInfos(centers_proto);
         /*
          * 投票结果产出 终止选票线程
@@ -347,6 +346,11 @@ bool RpcCenter::InquiryCenters() {
         if (response_proto.ParseFromString(recv_message)) {
             oc_ptr->start_time = response_proto.start_time();
             oc_ptr->center_status = response_proto.center_status();
+            /*
+             * 询问阶段主要以被询问的机器为目标，判断其是否具有Leader资格
+             */
+            response_proto.set_lc_start_time(response_proto.start_time())
+            response_proto.set_leader_center(response_proto.from_center_addr());
             if (ACCEPT == LeaderPredicate(response_proto)) {
                 UpdateLeadingCenterInfos(response_proto)
             }
@@ -358,6 +362,11 @@ bool RpcCenter::InquiryCenters() {
 }
 
 bool RpcCenter::ProposalLeaderElection() {
+    /*
+     * Proposal开始前, 更新logical_clock
+     */
+    IncreaseLogicalClock();
+
     /*
      * 遍历所有已知Center服务器, 获取每个Center服务状态，以及其Follow的Leader机器
      * 同时尝试进行election选举
@@ -378,10 +387,6 @@ bool RpcCenter::ProposalLeaderElection() {
     }
     BroadcastInfo(proposal_str);
 
-    /*
-     * Proposal结束, 更新logical_clock
-     */
-    IncreaseLogicalClock();
     return true;
 }
 
