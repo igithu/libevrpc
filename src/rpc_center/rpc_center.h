@@ -82,7 +82,7 @@ class RpcCenter {
         /*
          * FastLeaderElection算法 选举出 RPC Center集群的Leader
          */
-        bool FastLeaderElection(const CentersProto& centers_proto);
+        bool FastLeaderElection();
         /*
          * 群发信息，询问各个机器，获取各个Center机器的信息
          */
@@ -116,6 +116,8 @@ class RpcCenter {
         bool BroadcastInfo(const std::string& bc_info);
 
         bool IsFastLeaderRunning();
+
+        bool ProcessCenterData(int32_t fd, const CentersProto& center_proto);
 
     private:
         /*

@@ -272,37 +272,9 @@ CenterStatus RpcCenter::GetCenterStatus() {
 }
 
 
-bool RpcCenter::FastLeaderElection(const CentersProto& centers_proto) {
-    CenterAction ca = LeaderPredicate(centers_proto);
-
-    if (ACCEPT == ca) {
-        UpdateOCStatus(centers_proto);
-    }
-
-    int32_t conn_fd = TcpConnect(centers_proto.from_center_addr().c_str(), center_port_, 15);
-    if (conn_fd <= 0) {
-        return false;
-    }
-
-    string lc_center = GetLeadingCenter();
-
-    CentersProto response_proto;
-    response_proto.set_from_center_addr(GetLocalAddress());
-    response_proto.set_center_status(GetCenterStatus());
-    response_proto.set_center_action(ca);
-    response_proto.set_start_time(start_time_);
-    response_proto.set_lc_start_time(GetLeadingCenterStartTime());
-    response_proto.set_logical_clock(GetLogicalClock());
-    response_proto.set_leader_center(lc_center);
-
-    string response_str;
-    response_proto.SerializeToString(response_str);
-
-    if (!RpcSend(conn_fd, 0, proposal_str, false)) {
-        fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
-    }
-    close(conn_fd);
-
+bool RpcCenter::FastLeaderElection() {
+    InquiryCenters();
+    ProposalLeaderElection();
     return true;
 }
 
@@ -457,6 +429,7 @@ bool RpcCenter::StartFastLeaderElection() {
         }
         SetFastLeaderRunning(true);
     }
+    FastLeaderElection();
     return true;
 }
 
@@ -491,6 +464,46 @@ void RpcCenter::SetFastLeaderRunning(bool is_running) {
 bool RpcCenter::IsFastLeaderRunning() {
     ReadLockGuard rguard(fle_running_rwlock_);
     return fastleader_election_running_;
+}
+
+
+bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& center_proto) {
+    CenterAction ca = centers_proto.center_action();
+
+    switch (ca) {
+        case INQUIRY:
+            /**
+             * TODO
+             */
+            break;
+        case PROPOSAL:
+            CenterAction ca_result = LeaderPredicate(centers_proto);
+            if (ACCEPT == ca_result) {
+                UpdateOCStatus(centers_proto);
+            }
+            string lc_center = GetLeadingCenter();
+
+            CentersProto response_proto;
+            response_proto.set_from_center_addr(GetLocalAddress());
+            response_proto.set_center_status(GetCenterStatus());
+            response_proto.set_center_action(ca_result);
+            response_proto.set_start_time(start_time_);
+            response_proto.set_lc_start_time(GetLeadingCenterStartTime());
+            response_proto.set_logical_clock(GetLogicalClock());
+            response_proto.set_leader_center(lc_center);
+
+            string response_str;
+            response_proto.SerializeToString(response_str);
+
+            if (!RpcSend(fd, 0, proposal_str, false)) {
+                fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
+            }
+            close(fd);
+
+            break;
+        default:
+    }
+    return true;
 }
 
 }  // end of namespace libevrpc
