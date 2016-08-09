@@ -293,7 +293,7 @@ bool RpcCenter::InquiryCenters() {
         OCPTR oc_ptr = iter->second;
         if (UNKONW != oc_ptr->center_status) {
             /*
-             * 询问阶段 如果UNKONW说明该服务机器没有同步最新机器到本地
+             * 询问阶段 如果不是UNKONW，说明该服务机器已经同步最新机器到本地，忽略
              */
             continue;
         }
@@ -305,7 +305,7 @@ bool RpcCenter::InquiryCenters() {
         /*
          * 群发每个Center发送Proposal
          */
-        if (!RpcSend(conn_fd, 0, bc_info, false)) {
+        if (!RpcSend(conn_fd, CENTER2CENTER, bc_info, false)) {
             fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
         }
 
@@ -446,7 +446,7 @@ bool RpcCenter::BroadcastInfo(const std::string& bc_info) {
         /*
          * 群发每个Center发送Proposal
          */
-        if (!RpcSend(conn_fd, 0, bc_info, false)) {
+        if (!RpcSend(conn_fd, CENTER2CENTER, bc_info, false)) {
             fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
         }
         close(conn_fd);
@@ -473,16 +473,8 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& center_proto) 
     switch (ca) {
         case INQUIRY:
             /**
-             * TODO
+             * 仅仅返回本地相应的Center信息
              */
-            break;
-        case PROPOSAL:
-            CenterAction ca_result = LeaderPredicate(centers_proto);
-            if (ACCEPT == ca_result) {
-                UpdateOCStatus(centers_proto);
-            }
-            string lc_center = GetLeadingCenter();
-
             CentersProto response_proto;
             response_proto.set_from_center_addr(GetLocalAddress());
             response_proto.set_center_status(GetCenterStatus());
@@ -495,8 +487,16 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& center_proto) 
             string response_str;
             response_proto.SerializeToString(response_str);
 
-            if (!RpcSend(fd, 0, proposal_str, false)) {
+            if (!RpcSend(fd, CENTER2CENTER, proposal_str, false)) {
                 fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
+            }
+            close(fd);
+
+            break;
+        case PROPOSAL:
+            CenterAction ca_result = LeaderPredicate(centers_proto);
+            if (ACCEPT == ca_result) {
+                UpdateOCStatus(centers_proto);
             }
             close(fd);
 
