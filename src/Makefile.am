@@ -38,6 +38,22 @@ SERVER_SRCS =                                   \
 		rpc_server/rpc_heartbeat_server.cpp
 
 
+CENTER_INCLUDES =                           \
+		rpc_center/rpc_center.h             \
+		rpc_center/center_server_thread.h   \
+		rpc_center/election_thread.h        \
+		rpc_center/load_balancer.h          \
+		rpc_center/reporter_thread.h
+
+
+CENTER_SRCS =                               \
+		rpc_center/rpc_center.cpp           \
+		rpc_center/center_server_thread.cpp \
+		rpc_center/election_thread.cpp      \
+		rpc_center/load_balancer.cpp        \
+		rpc_center/reporter_thread.cpp
+
+
 COMMON_INCLUDES =                        \
 		config_parser/config_parser.h    \
 		config_parser/dictionary.h       \
