@@ -6,7 +6,8 @@
 
 
 if [ "$1" == "clean" ]; then
-    make distclean && ./bootstrap.sh clean
+    make distclean
+    ./bootstrap.sh clean
     exit
 fi
 

@@ -76,7 +76,8 @@ COMMON_SRCS =                            \
 nobase_include_HEADERS =                 \
 		${CLIENT_INCLUDES}               \
 		${SERVER_INCLUDES}               \
-		${COMMON_INCLUDES}
+		${COMMON_INCLUDES}               \
+		${CENTER_INCLUDES}
 
 
 lib_LTLIBRARIES = librpc_client.la librpc_server.la
@@ -108,4 +109,12 @@ librpc_server_la_SOURCES =      \
 		${SERVER_SRCS}       \
 		${COMMON_SRCS}
 
+
+bin_PROGRAMS = rpc_center
+rpc_center_SOURCES = ${CENTER_INCLUDES} ${CENTER_SRCS}
+rpc_center_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a
+INCLUDES = -I${top_srcdir}/src                \
+		   -I${third_dir}/gperftools/include/ \
+		   -I${third_dir}/protobuf/include/   \
+		   -I${third_dir}/libev/include/
 
