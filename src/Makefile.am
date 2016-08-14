@@ -110,11 +110,11 @@ librpc_server_la_SOURCES =      \
 		${COMMON_SRCS}
 
 
-bin_PROGRAMS = rpc_center
-rpc_center_SOURCES = ${CENTER_INCLUDES} ${CENTER_SRCS}
-rpc_center_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a
-INCLUDES = -I${top_srcdir}/src                \
-		   -I${third_dir}/gperftools/include/ \
-		   -I${third_dir}/protobuf/include/   \
-		   -I${third_dir}/libev/include/
-
+#bin_PROGRAMS = rpc_center
+#rpc_center_SOURCES = ${CENTER_INCLUDES} ${CENTER_SRCS}
+#rpc_center_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a
+#INCLUDES = -I${top_srcdir}/src                \
+#		   -I${third_dir}/gperftools/include/ \
+#		   -I${third_dir}/protobuf/include/   \
+#		   -I${third_dir}/libev/include/
+#
