@@ -22,6 +22,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 #include "center_server_thread.h"
 #include "election_thread.h"
@@ -47,7 +48,7 @@ struct LeaderInfos {
      */
     time_t lc_start_time;
     std::string leader_center;
-}
+};
 
 typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;

@@ -25,6 +25,7 @@
 
 #include "center_proto/centers.pb.h"
 #include "util/thread.h"
+#include "util/pthread_mutex.h"
 
 namespace libevrpc {
 

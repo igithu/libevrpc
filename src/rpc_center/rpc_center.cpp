@@ -18,6 +18,7 @@
 #include "rpc_center.h"
 
 // #include <io.h>
+#include <unistd.h>
 #include <time.h>
 #include <fstream>
 #include <iostream>
@@ -34,7 +35,7 @@ RpcCenter::RpcCenter(const string& config_file) :
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
     center_status_(LOOKING),
     start_time_(time(0)),
-    leader_infos_ptr_(new LeaderInfos());
+    leader_infos_ptr_(new LeaderInfos()),
     other_centers_ptr_(new HashMap()),
     // leader_center_(GetLocalAddress()),
     election_done_num_(0),
@@ -67,14 +68,14 @@ RpcCenter::~RpcCenter() {
     }
 }
 
-RpcCenter& RpcCenter::GetInstance() {
-    static RpcCenter rc_instance;
+RpcCenter& RpcCenter::GetInstance(const std::string& config_file) {
+    static RpcCenter rc_instance(config_file);
     return rc_instance;
 }
 
 bool RpcCenter::InitRpcCenter() {
     const string cfile = "/tmp/centers.data";
-    int ftyp = _access(cfile.c_str(), 0);
+    int ftyp = access(cfile.c_str(), 0);
     if (0 != ftyp) {
         /*
          * 需要的服务器列表文件不存在，无法初始化后与其他机器进行通信
@@ -96,11 +97,11 @@ bool RpcCenter::InitRpcCenter() {
         /*
          * 初始中心服务信息
          */
-        OCPTR oc_ptr = new OtherCenter();
+        OCPTR oc_ptr(new OtherCenter());
         oc_ptr->vote_count = 0;
         oc_ptr->center_status = UNKONW;
-        memet(oc_ptr, 0, sizeof(OtherCenter));
-        other_centers_ptr_->put(line, oc_ptr);
+        memset(oc_ptr.get(), 0, sizeof(OtherCenter));
+        other_centers_ptr_->insert(std::make_pair(line, oc_ptr));
     }
 
     election_done_num_ = (other_centers_ptr_->size() + 1) / 2 + 1;
@@ -157,21 +158,21 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
          */
         HashMap::iterator iter = other_centers_ptr_->find(addr);
         if (iter == other_centers_ptr_->end()) {
-            OCPTR oc_ptr = new OtherCenter();
+            OCPTR oc_ptr(new OtherCenter());
             oc_ptr->start_time = centers_proto.start_time();
             oc_ptr->center_status = centers_proto.center_status();
             oc_ptr->vote_count = 0;
-            strcpy(oc_ptr->current_follow_leader_center, centers_proto.leader_center().c_str())
+            strcpy(oc_ptr->current_follow_leader_center, centers_proto.leader_center().c_str());
             other_centers_ptr_->insert(std::make_pair(addr, oc_ptr));
         } else {
             OCPTR& oc_ptr = iter->second;
             oc_ptr->start_time = centers_proto.start_time();
             oc_ptr->center_status = centers_proto.center_status();
-            strcpy(oc_ptr->current_follow_leader_center, centers_proto.leader_center().c_str())
+            strcpy(oc_ptr->current_follow_leader_center, centers_proto.leader_center().c_str());
         }
     }
 
-    uint32_t vote_count = 0
+    uint32_t vote_count = 0;
     {
         WriteLockGuard wguard(oc_rwlock_);
         /*

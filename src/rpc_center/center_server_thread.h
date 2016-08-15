@@ -40,7 +40,7 @@ struct CenterEioQueue {
 
 class CenterServerThread : public Thread {
     public:
-        CenterServerThread(const char* server_port);
+        CenterServerThread(const char* local_center, const char* server_port);
         ~CenterServerThread();
 
         bool InitCenterServer();
