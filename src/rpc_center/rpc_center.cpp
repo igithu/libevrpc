@@ -57,12 +57,15 @@ RpcCenter::~RpcCenter() {
     if (NULL != other_centers_ptr_) {
         delete other_centers_ptr_;
     }
+
     if (center_server_thread_ != NULL) {
         delete center_server_thread_;
     }
+
     if (election_thread_ != NULL) {
         delete election_thread_;
     }
+
     if (reporter_thread_ != NULL) {
         delete reporter_thread_;
     }
@@ -85,6 +88,7 @@ bool RpcCenter::InitRpcCenter() {
     }
 
     const char* local_addr = GetLocalAddress();
+    const char* local_port = config_parser_instance_.IniGetString("rpc_server:port", "8899");
     std::ifstream in(cfile);
     string line;
     while (getline (in, line)) {
@@ -109,7 +113,7 @@ bool RpcCenter::InitRpcCenter() {
     /*
      * 初始化线程指针
      */
-    center_server_thread_ = new CenterServerThread();
+    center_server_thread_ = new CenterServerThread(GetLocalAddress(), local_port);
     election_thread_ = new ElectionThread();
     reporter_thread_ = new ReporterThread();
 
@@ -180,12 +184,12 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
          */
         HashMap::iterator leader_iter = other_centers_ptr_->find(centers_proto.leader_center());
         if (leader_iter == other_centers_ptr_->end()) {
-            OCPTR oc_ptr = new OtherCenter();
+            OCPTR oc_ptr(new OtherCenter());
             oc_ptr->start_time = 0;
             oc_ptr->center_status = LOOKING;
             oc_ptr->vote_count = 1;
         } else {
-            OCPTR& oc_ptr = iter->second;
+            OCPTR& oc_ptr = leader_iter->second;
             vote_count = ++oc_ptr->vote_count;
         }
     }
@@ -198,20 +202,25 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
         /*
          * 投票结果产出 终止选票线程
          */
-       if (strcmp(leader_center.c_str(), GetLocalAddress()) == 0) {
+        string leader_center = GetLeadingCenter();
+        if (strcmp(leader_center.c_str(), GetLocalAddress()) == 0) {
             /**
              * 确认当前Center服务器为 Leader服务器
              */
             UpdateCenterStatus(LEADING);
             CentersProto confirm_proto;
             confirm_proto.set_from_center_addr(GetLocalAddress());
-            confirm_proto.set_center_action(CONFIRM);
+            confirm_proto.set_center_action(LEADER_CONFIRM);
             confirm_proto.set_start_time(start_time_);
             confirm_proto.set_logical_clock(GetLogicalClock());
             confirm_proto.set_center_status(LEADING);
             confirm_proto.set_lc_start_time(start_time_);
             confirm_proto.set_leader_center(GetLocalAddress());
-            BroadcastInfo(confirm_proto);
+
+            string confitm_str;
+            if (confirm_proto.SerializeToString(confitm_str)) {
+                BroadcastInfo(confirm_proto);
+            }
             election_thread_->Stop();
         } else {
             /**
