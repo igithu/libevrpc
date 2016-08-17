@@ -58,7 +58,7 @@ class CenterServerThread : public Thread {
 
     private:
         char* local_center_;
-        char* server_port_;
+        char* center_port_;
 
         struct ev_loop *epoller_;
         struct ev_io socket_watcher_;

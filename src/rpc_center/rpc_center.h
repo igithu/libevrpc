@@ -32,6 +32,11 @@
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_rwlock.h"
 
+// /**
+//  * 供其他CPP代码使用
+//  */
+// #define g_rpc_center RpcCenter::GetInstance()
+
 namespace libevrpc {
 
 class RpcCenter;
@@ -53,11 +58,6 @@ struct LeaderInfos {
 typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
-
-/**
- * 供其他CPP代码使用
- */
-#define g_rpc_center RpcCenter::GetInstance()
 
 class RpcCenter {
     public:
@@ -114,13 +114,17 @@ class RpcCenter {
     private:
         RpcCenter(const std::string& config_file);
 
-        bool BroadcastInfo(const std::string& bc_info);
+        bool BroadcastInfo(std::string& bc_info);
 
         bool IsFastLeaderRunning();
 
-        bool ProcessCenterData(int32_t fd, const CentersProto& center_proto);
+        bool ProcessCenterData(int32_t fd, const CentersProto& centers_proto);
 
     private:
+        /*
+         * Center服务器统一端口
+         */
+        char* center_port_;
         /*
          * 读取配置文件使用
          */

@@ -32,6 +32,7 @@ namespace libevrpc {
 using std::string;
 
 RpcCenter::RpcCenter(const string& config_file) :
+    center_port_(NULL),
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
     center_status_(LOOKING),
     start_time_(time(0)),
@@ -58,16 +59,20 @@ RpcCenter::~RpcCenter() {
         delete other_centers_ptr_;
     }
 
-    if (center_server_thread_ != NULL) {
+    if (NULL != center_server_thread_) {
         delete center_server_thread_;
     }
 
-    if (election_thread_ != NULL) {
+    if (NULL != election_thread_) {
         delete election_thread_;
     }
 
-    if (reporter_thread_ != NULL) {
+    if (NULL != reporter_thread_) {
         delete reporter_thread_;
+    }
+
+    if (NULL != center_port_) {
+        free(center_port_);
     }
 }
 
@@ -89,6 +94,11 @@ bool RpcCenter::InitRpcCenter() {
 
     const char* local_addr = GetLocalAddress();
     const char* local_port = config_parser_instance_.IniGetString("rpc_server:port", "8899");
+
+    center_port_ = (char*)malloc(strlen(local_port));
+    strcpy(center_port_, local_port);
+
+
     std::ifstream in(cfile);
     string line;
     while (getline (in, line)) {
@@ -217,9 +227,9 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
             confirm_proto.set_lc_start_time(start_time_);
             confirm_proto.set_leader_center(GetLocalAddress());
 
-            string confitm_str;
-            if (confirm_proto.SerializeToString(confitm_str)) {
-                BroadcastInfo(confirm_proto);
+            string confirm_str;
+            if (confirm_proto.SerializeToString(&confirm_str)) {
+                BroadcastInfo(confirm_str);
             }
             election_thread_->Stop();
         } else {
@@ -237,8 +247,8 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
 
 void RpcCenter::UpdateLeadingCenterInfos(const CentersProto& centers_proto) {
     WriteLockGuard wguard(lc_rwlock_);
-    leader_infos_ptr_->lc_start_time = center_proto.lc_start_time();
-    leader_infos_ptr_->leader_center = center_proto.leader_center();
+    leader_infos_ptr_->lc_start_time = centers_proto.lc_start_time();
+    leader_infos_ptr_->leader_center = centers_proto.leader_center();
 }
 
 void RpcCenter::IncreaseLogicalClock() {
@@ -277,7 +287,7 @@ unsigned long RpcCenter::GetLogicalClock() {
 
 CenterStatus RpcCenter::GetCenterStatus() {
     ReadLockGuard rguard(status_rwlock_);
-    return center_status;
+    return center_status_;
 }
 
 
@@ -295,6 +305,11 @@ bool RpcCenter::InquiryCenters() {
     inquiry_proto.set_start_time(start_time_);
     inquiry_proto.set_logical_clock(GetLogicalClock());
 
+    string inquiry_str;
+    if (!inquiry_proto.SerializeToString(&inquiry_str)) {
+        return false;
+    }
+
     WriteLockGuard wguard(oc_rwlock_);
     for (HashMap::iterator iter = other_centers_ptr_->begin();
          iter != other_centers_ptr_->end();
@@ -306,7 +321,7 @@ bool RpcCenter::InquiryCenters() {
              */
             continue;
         }
-        string& center_addr = iter->first;
+        const string& center_addr = iter->first;
         int32_t conn_fd = TcpConnect(center_addr.c_str(), center_port_, 15);
         if (conn_fd <= 0) {
             continue;
@@ -314,7 +329,7 @@ bool RpcCenter::InquiryCenters() {
         /*
          * 群发每个Center发送Proposal
          */
-        if (!RpcSend(conn_fd, CENTER2CENTER, bc_info, false)) {
+        if (!RpcSend(conn_fd, CENTER2CENTER, inquiry_str, false)) {
             fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
         }
 
@@ -330,10 +345,10 @@ bool RpcCenter::InquiryCenters() {
             /*
              * 询问阶段主要以被询问的机器为目标，判断其是否具有Leader资格
              */
-            response_proto.set_lc_start_time(response_proto.start_time())
+            response_proto.set_lc_start_time(response_proto.start_time());
             response_proto.set_leader_center(response_proto.from_center_addr());
             if (ACCEPT == LeaderPredicate(response_proto)) {
-                UpdateLeadingCenterInfos(response_proto)
+                UpdateLeadingCenterInfos(response_proto);
             }
         }
         close(conn_fd);
@@ -396,7 +411,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
     string recv_message;
     int32_t center_type = RpcRecv(conn_fd, recv_message, true);
     if (center_type < 0) {
-        return;
+        return false;
     }
     switch (center_type) {
        case CENTER2CENTER : {
@@ -442,12 +457,12 @@ bool RpcCenter::StartFastLeaderElection() {
     return true;
 }
 
-bool RpcCenter::BroadcastInfo(const std::string& bc_info) {
+bool RpcCenter::BroadcastInfo(std::string& bc_info) {
     ReadLockGuard rguard(oc_rwlock_);
     for (HashMap::iterator iter = other_centers_ptr_->begin();
          iter != other_centers_ptr_->end();
          ++iter) {
-        string& center_addr = iter->first;
+        const string& center_addr = iter->first;
         int32_t conn_fd = TcpConnect(center_addr.c_str(), center_port_, 15);
         if (conn_fd <= 0) {
             continue;
@@ -476,47 +491,54 @@ bool RpcCenter::IsFastLeaderRunning() {
 }
 
 
-bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& center_proto) {
+bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto) {
     CenterAction ca = centers_proto.center_action();
 
     switch (ca) {
-        case INQUIRY:
+        case INQUIRY: {
             /**
              * 仅仅返回本地相应的Center信息
              */
+            string lc_center = GetLeadingCenter();
             CentersProto response_proto;
             response_proto.set_from_center_addr(GetLocalAddress());
             response_proto.set_center_status(GetCenterStatus());
-            response_proto.set_center_action(ca_result);
+            response_proto.set_center_action(ca);
             response_proto.set_start_time(start_time_);
             response_proto.set_lc_start_time(GetLeadingCenterStartTime());
             response_proto.set_logical_clock(GetLogicalClock());
             response_proto.set_leader_center(lc_center);
 
             string response_str;
-            response_proto.SerializeToString(response_str);
+            if (!response_proto.SerializeToString(&response_str)) {
+                close(fd);
+            }
 
-            if (!RpcSend(fd, CENTER2CENTER, proposal_str, false)) {
+            if (!RpcSend(fd, CENTER2CENTER, response_str, false)) {
                 fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
             }
             close(fd);
 
             break;
-        case PROPOSAL:
+        }
+        case PROPOSAL: {
             CenterAction ca_result = LeaderPredicate(centers_proto);
             if (ACCEPT == ca_result) {
                 UpdateOCStatus(centers_proto);
             }
             close(fd);
             break;
-        case LEADER_CONFIRM:
+        }
+        case LEADER_CONFIRM: {
             CenterAction ca_result = LeaderPredicate(centers_proto);
             if (ACCEPT == ca_result) {
                 UpdateCenterStatus(FOLLOWING);
             }
             close(fd);
             break;
+        }
         default:
+            break;
     }
     return true;
 }

@@ -17,6 +17,7 @@
 #include "center_server_thread.h"
 
 #include "rpc_center.h"
+#include "util/rpc_communication.h"
 
 
 namespace libevrpc {
@@ -28,22 +29,22 @@ CenterServerThread::CenterServerThread(
         const char* local_center,
         const char* server_port) :
     local_center_(NULL),
-    server_port_(NULL),
+    center_port_(NULL),
     epoller_(NULL) {
 
     local_center_ =  (char*)malloc(strlen(local_center));
-    server_port_ = (char*)malloc(strlen(server_port));
+    center_port_ = (char*)malloc(strlen(server_port));
 
     strcpy(local_center_, local_center);
-    strcpy(server_port_, server_port);
+    strcpy(center_port_, server_port);
 }
 
 CenterServerThread::~CenterServerThread() {
     if (NULL != local_center_) {
         free(local_center_);
     }
-    if (NULL != server_port_) {
-        free(server_port_);
+    if (NULL != center_port_) {
+        free(center_port_);
     }
     if (NULL != epoller_) {
         ev_loop_destroy(epoller_);
@@ -51,7 +52,7 @@ CenterServerThread::~CenterServerThread() {
 }
 
 bool CenterServerThread::InitCenterServer() {
-    int32_t listenfd = TcpListen(local_center_, server_port_);
+    int32_t listenfd = TcpListen(local_center_, center_port_);
     if (listenfd < 0) {
         fprintf(stderr, "Center Listen Server Init failed!\n");
         return false;
@@ -66,7 +67,7 @@ bool CenterServerThread::InitCenterServer() {
     /*
      * 初始启动 Accept epoller事件 负责接收请求
      */
-    ev_io_init(&socket_watcher_, DispatchThread::AcceptCb, listenfd, EV_READ);
+    ev_io_init(&socket_watcher_, CenterServerThread::AcceptCb, listenfd, EV_READ);
     ev_io_start(epoller_, &socket_watcher_);
 
     return true;
@@ -109,7 +110,7 @@ void CenterServerThread::AcceptCb(struct ev_loop *loop, struct ev_io *watcher, i
      * 初始化启动处理epoller事件
      */
     CenterServerThread* cst = (CenterServerThread*)(watcher->data);
-    CEIO_ITEM *eio_item = dt->NewCEIO();
+    CEIO_ITEM *eio_item = cst->NewCEIO();
     struct ev_io& client_eio = eio_item->eio;
     client_eio.data = watcher->data;
     ev_io_init(&client_eio, CenterServerThread::Processor, cfd, EV_READ);
@@ -122,7 +123,7 @@ void CenterServerThread::Processor(struct ev_loop *loop, struct ev_io *watcher, 
         fprintf(stderr, "EV_ERROR in AcceptCb callback!\n");
         return;
     }
-    g_rpc_server.CenterProcessor(watcher->fd);
+    RpcCenter.GetInstance().CenterProcessor(watcher->fd);
 }
 
 CEIO_ITEM* CenterServerThread::NewCEIO() {
