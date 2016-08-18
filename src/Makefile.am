@@ -65,10 +65,10 @@ COMMON_INCLUDES =                        \
 		config_parser/dictionary.h       \
 		config_parser/iniparser.h        \
 		util/rpc_util.h                  \
-		util/thread.h                  \
+		util/thread.h                    \
 		util/disallow_copy_and_assign.h  \
 		util/rpc_communication.h         \
-		util/pthread_mutex.h         \
+		util/pthread_mutex.h             \
 		util/pthread_rwlock.h
 
 COMMON_SRCS =                            \
@@ -88,30 +88,30 @@ nobase_include_HEADERS =                 \
 
 lib_LTLIBRARIES = librpc_client.la librpc_server.la
 
-librpc_client_la_CPPFLAGS =                                     \
-		-I${top_srcdir}/src                               \
-		-I${third_dir}/gperftools/include/                \
+librpc_client_la_CPPFLAGS =                                 \
+		-I${top_srcdir}/src                                 \
+		-I${third_dir}/gperftools/include/                  \
 		-I${third_dir}/protobuf/include/
-librpc_client_la_LIBADD =                                       \
+librpc_client_la_LIBADD =                                   \
 		#${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
 		${third_dir}/protobuf/lib/*.a
 librpc_client_la_LDFLAGS = -lz -std=c++11
 librpc_client_la_SOURCES =       \
-		${CLIENT_SORCS}       \
+		${CLIENT_SORCS}          \
 		${COMMON_SRCS}
 
 
-librpc_server_la_CPPFLAGS =                      \
+librpc_server_la_CPPFLAGS =                \
 		-I${top_srcdir}/src                \
 		-I${third_dir}/gperftools/include/ \
 		-I${third_dir}/protobuf/include/   \
 		-I${third_dir}/libev/include/
-librpc_server_la_LIBADD =                                       \
+librpc_server_la_LIBADD =                                    \
 		#${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
-		${third_dir}/protobuf/lib/*.a                     \
+		${third_dir}/protobuf/lib/*.a                        \
 		${third_dir}/libev/lib/*.a
 librpc_server_la_LDFLAGS = -lz -std=c++11
-librpc_server_la_SOURCES =      \
+librpc_server_la_SOURCES =   \
 		${SERVER_SRCS}       \
 		${COMMON_SRCS}
 

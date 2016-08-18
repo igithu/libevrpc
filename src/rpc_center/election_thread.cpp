@@ -22,6 +22,8 @@
 
 namespace libevrpc {
 
+using std::string;
+
 ElectionThread::ElectionThread() :
     election_q_(new ElectionQueue()),
     running_(true) {
@@ -62,22 +64,23 @@ void ElectionThread::Run() {
             sleep(30);
             continue;
         }
-        g_rpc_center.FastLeaderElection(el_item->centers_proto);
+        RpcCenter::GetInstance(g_config_file).ProcessCenterData(el_item->conn_fd, el_item->centers_proto);
 
         delete el_item;
         sleep(30);
     }
     Destory();
-    g_rpc_center.SetFastLeaderRunning(false);
+    RpcCenter::GetInstance(g_config_file).SetFastLeaderRunning(false);
 }
 
 void ElectionThread::StopThread() {
     running_ = false;
 }
 
-bool ElectionThread::PushElectionMessage(const string& election_msg) {
+bool ElectionThread::PushElectionMessage(int32_t fd, const string& election_msg) {
     ElectionItem* ei = new ElectionItem();
     ei->centers_proto.ParseFromString(election_msg);
+    ei->conn_fd = fd;
     ei->next = NULL;
     {
         MutexLockGuard lock(eq_mutex_);

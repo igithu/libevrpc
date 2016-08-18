@@ -123,7 +123,7 @@ void CenterServerThread::Processor(struct ev_loop *loop, struct ev_io *watcher, 
         fprintf(stderr, "EV_ERROR in AcceptCb callback!\n");
         return;
     }
-    RpcCenter.GetInstance().CenterProcessor(watcher->fd);
+    RpcCenter::GetInstance(g_config_file).CenterProcessor(watcher->fd);
 }
 
 CEIO_ITEM* CenterServerThread::NewCEIO() {

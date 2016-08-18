@@ -38,7 +38,6 @@ RpcCenter::RpcCenter(const string& config_file) :
     start_time_(time(0)),
     leader_infos_ptr_(new LeaderInfos()),
     other_centers_ptr_(new HashMap()),
-    // leader_center_(GetLocalAddress()),
     election_done_num_(0),
     logical_clock_(0),
     fastleader_election_running_(false),
@@ -48,6 +47,8 @@ RpcCenter::RpcCenter(const string& config_file) :
 
     leader_infos_ptr_->lc_start_time = start_time_;
     leader_infos_ptr_->leader_center = GetLocalAddress();
+    g_config_file = config_file;
+
 }
 
 RpcCenter::~RpcCenter() {
@@ -126,7 +127,6 @@ bool RpcCenter::InitRpcCenter() {
     center_server_thread_ = new CenterServerThread(GetLocalAddress(), local_port);
     election_thread_ = new ElectionThread();
     reporter_thread_ = new ReporterThread();
-
 
     return true;
 }
@@ -421,7 +421,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             if (NULL == election_thread_) {
                 return false;
             }
-            election_thread_->PushElectionMessage(recv_message);
+            election_thread_->PushElectionMessage(conn_fd, recv_message);
             break;
        }
        case CENTER2CLIENT : {
@@ -445,51 +445,6 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
     }
     return true;
 }
-
-bool RpcCenter::StartFastLeaderElection() {
-    if (!IsFastLeaderRunning()) {
-        if (!election_thread_->Start()) {
-            return false;
-        }
-        SetFastLeaderRunning(true);
-    }
-    FastLeaderElection();
-    return true;
-}
-
-bool RpcCenter::BroadcastInfo(std::string& bc_info) {
-    ReadLockGuard rguard(oc_rwlock_);
-    for (HashMap::iterator iter = other_centers_ptr_->begin();
-         iter != other_centers_ptr_->end();
-         ++iter) {
-        const string& center_addr = iter->first;
-        int32_t conn_fd = TcpConnect(center_addr.c_str(), center_port_, 15);
-        if (conn_fd <= 0) {
-            continue;
-        }
-        /*
-         * 群发每个Center发送Proposal
-         */
-        if (!RpcSend(conn_fd, CENTER2CENTER, bc_info, false)) {
-            fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
-        }
-        close(conn_fd);
-    }
-
-    return true;
-}
-
-
-void RpcCenter::SetFastLeaderRunning(bool is_running) {
-    WriteLockGuard wguard(fle_running_rwlock_);
-    fastleader_election_running_ = is_running;
-}
-
-bool RpcCenter::IsFastLeaderRunning() {
-    ReadLockGuard rguard(fle_running_rwlock_);
-    return fastleader_election_running_;
-}
-
 
 bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto) {
     CenterAction ca = centers_proto.center_action();
@@ -542,6 +497,51 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
     }
     return true;
 }
+
+bool RpcCenter::StartFastLeaderElection() {
+    if (!IsFastLeaderRunning()) {
+        if (!election_thread_->Start()) {
+            return false;
+        }
+        SetFastLeaderRunning(true);
+    }
+    FastLeaderElection();
+    return true;
+}
+
+bool RpcCenter::BroadcastInfo(std::string& bc_info) {
+    ReadLockGuard rguard(oc_rwlock_);
+    for (HashMap::iterator iter = other_centers_ptr_->begin();
+         iter != other_centers_ptr_->end();
+         ++iter) {
+        const string& center_addr = iter->first;
+        int32_t conn_fd = TcpConnect(center_addr.c_str(), center_port_, 15);
+        if (conn_fd <= 0) {
+            continue;
+        }
+        /*
+         * 群发每个Center发送Proposal
+         */
+        if (!RpcSend(conn_fd, CENTER2CENTER, bc_info, false)) {
+            fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
+        }
+        close(conn_fd);
+    }
+
+    return true;
+}
+
+
+void RpcCenter::SetFastLeaderRunning(bool is_running) {
+    WriteLockGuard wguard(fle_running_rwlock_);
+    fastleader_election_running_ = is_running;
+}
+
+bool RpcCenter::IsFastLeaderRunning() {
+    ReadLockGuard rguard(fle_running_rwlock_);
+    return fastleader_election_running_;
+}
+
 
 }  // end of namespace libevrpc
 

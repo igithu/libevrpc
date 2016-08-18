@@ -59,6 +59,8 @@ typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
 
+extern std::string g_config_file = "";
+
 class RpcCenter {
     public:
         ~RpcCenter();
@@ -101,6 +103,7 @@ class RpcCenter {
          */
         bool CenterProcessor(int32_t conn_fd);
 
+        bool ProcessCenterData(int32_t fd, const CentersProto& centers_proto);
         /*
          * 开始FastLeaderElection,同时启动Election线程
          */
@@ -118,8 +121,6 @@ class RpcCenter {
 
         bool IsFastLeaderRunning();
 
-        bool ProcessCenterData(int32_t fd, const CentersProto& centers_proto);
-
     private:
         /*
          * Center服务器统一端口
@@ -130,17 +131,10 @@ class RpcCenter {
          */
         ConfigParser& config_parser_instance_;
         /*
-         * 当前Center机器的状态
+         * 当前Center机器的状态,服务启动时间,当前LeaderCenter信息,
          */
         CenterStatus center_status_;
-        /*
-         * 服务器启动时间，选举期间作为是否作为leader的标准之一
-         */
         time_t start_time_;
-
-        /**
-         * 记录当前LeaderCenter信息
-         */
         LeaderInfos* leader_infos_ptr_;
 
         /*

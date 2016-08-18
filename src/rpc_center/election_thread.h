@@ -31,6 +31,7 @@ namespace libevrpc {
 
 typedef struct ElectionItem EL_ITEM;
 struct ElectionItem {
+    int32_t conn_fd;
     CentersProto centers_proto;
     EL_ITEM* prev;
     EL_ITEM* next;
@@ -53,7 +54,7 @@ class ElectionThread : public Thread {
         virtual void Run();
         void StopThread();
 
-        bool PushElectionMessage(const std::string& election_msg);
+        bool PushElectionMessage(int32_t fd, const std::string& election_msg);
         ElectionItem* PopElectionMessage();
 
     private:
