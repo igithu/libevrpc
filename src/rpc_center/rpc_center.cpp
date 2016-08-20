@@ -149,6 +149,12 @@ bool RpcCenter::StartCenter() {
     return true;
 }
 
+void RpcCenter::WaitCenter() {
+    if (NULL != center_server_thread_) {
+        center_server_thread_->Wait();
+    }
+}
+
 void RpcCenter::UpdateCenterStatus(CenterStatus cs) {
     WriteLockGuard wguard(status_rwlock_);
     center_status_ = cs;
@@ -374,7 +380,7 @@ bool RpcCenter::ProposalLeaderElection() {
     proposal.set_center_action(PROPOSAL);
     proposal.set_start_time(start_time_);
     proposal.set_lc_start_time(GetLeadingCenterStartTime());
-    proposal.set_logical_clock(logical_clock_);
+    proposal.set_logical_clock(GetLogicalClock());
     proposal.set_leader_center(GetLeadingCenter());
 
     string proposal_str;
@@ -486,6 +492,11 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
         }
         case LEADER_CONFIRM: {
             CenterAction ca_result = LeaderPredicate(centers_proto);
+            if (NULL != reporter_thread_) {
+                reporter_thread_->Start();
+            } else {
+                fprintf(stderr, "Start reporter_thread error! reporter_thread ptr is NULL!\n");
+            }
             if (ACCEPT == ca_result) {
                 UpdateCenterStatus(FOLLOWING);
             }

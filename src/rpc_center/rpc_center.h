@@ -69,6 +69,7 @@ class RpcCenter {
 
         bool InitRpcCenter();
         bool StartCenter();
+        void WaitCenter();
 
         void UpdateCenterStatus(CenterStatus cs);
         bool UpdateOCStatus(const CentersProto& centers_proto);

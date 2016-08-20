@@ -32,7 +32,17 @@ class ReporterThread : public Thread {
         ReporterThread();
         ~ReporterThread();
 
+        bool StartReporter(
+                const char* leader_addr,
+                const char* leader_port);
+
         virtual void Run();
+
+    private:
+        char* leader_addr_;
+        char* leader_port_;
+
+        bool reporter_running_;
 
 };
 
