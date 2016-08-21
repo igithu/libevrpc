@@ -69,6 +69,7 @@ class RpcCenter {
 
         bool InitRpcCenter();
         bool StartCenter();
+        bool StopCenter();
         void WaitCenter();
 
         void UpdateCenterStatus(CenterStatus cs);

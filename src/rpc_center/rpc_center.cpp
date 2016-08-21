@@ -149,6 +149,22 @@ bool RpcCenter::StartCenter() {
     return true;
 }
 
+bool RpcCenter::StopCenter() {
+    if (NULL != election_thread_) {
+        election_thread_->Stop();
+    }
+
+    if (NULL != reporter_thread_) {
+        reporter_thread_->Stop();
+    }
+
+    if (NULL != center_server_thread_) {
+        center_server_thread_->Stop();
+    }
+
+    return true;
+}
+
 void RpcCenter::WaitCenter() {
     if (NULL != center_server_thread_) {
         center_server_thread_->Wait();
