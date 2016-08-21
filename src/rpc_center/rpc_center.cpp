@@ -519,6 +519,9 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             close(fd);
             break;
         }
+        case FOLLOWER_PING: {
+            break;
+        }
         default:
             break;
     }

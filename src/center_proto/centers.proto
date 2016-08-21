@@ -20,6 +20,7 @@ enum CenterAction {
     LEADER_CONFIRM = 2;
     ACCEPT = 3;
     REFUSED = 4;
+    FOLLOWER_PING = 5;
 };
 
 message CentersProto {

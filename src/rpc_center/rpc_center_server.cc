@@ -63,6 +63,7 @@ int main(int argc, char* argv[]) {
     RpcCenter& rc = RpcCenter::GetInstance("conf/rpc_center.ini");
     rc.StartCenter();
     rc.WaitCenter();
+    rc.StopCenter();
     return 0;
 }
 

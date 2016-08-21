@@ -43,6 +43,7 @@ class ReporterThread : public Thread {
         char* leader_port_;
 
         bool reporter_running_;
+        int32_t conn_fd_;
 
 };
 

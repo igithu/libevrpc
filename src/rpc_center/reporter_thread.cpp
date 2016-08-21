@@ -17,6 +17,7 @@
 #include "reporter_thread.h"
 
 #include "rpc_center.h"
+#include "util/rpc_communication.h"
 
 namespace libevrpc {
 
@@ -45,6 +46,7 @@ bool StartReporter(
         if (NULL != leader_port) {
             free(leader_port_);
         }
+        close(conn_fd_);
         Stop();
     }
 
@@ -58,11 +60,25 @@ bool StartReporter(
 
 void ReporterThread::Run() {
 
-    RpcCenter& rc = RpcCenter::GetInstance(g_config_file);
+    if (!reporter_running_) {
+        return;
+    }
 
+    RpcCenter& rc = RpcCenter::GetInstance(g_config_file);
+    const char* local_addr = GetLocalAddress();
+    CentersProto cp;
+    cp.set_from_center_addr(local_addr);
+    cp.set_center_action(FOLLOWER_PING);
+
+    conn_fd_ = TcpConnect(leader_addr_, leader_port_);
     while (reporter_running_) {
+        string ping_str;
+        if (cp.SerializeToString(ping_str)) {
+            RpcSend(fd, CENTER2CENTER, ping_str, false);
+        }
         sleep(5);
     }
+    close(conn_fd_);
 }
 
 }  // end of namespace libevrpc
