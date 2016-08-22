@@ -59,7 +59,7 @@ typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
 
-extern std::string g_config_file = "";
+extern std::string g_config_file;
 
 class RpcCenter {
     public:

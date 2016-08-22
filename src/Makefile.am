@@ -46,7 +46,8 @@ CENTER_INCLUDES =                           \
 		rpc_center/reporter_thread.h        \
 		center_proto/centers.pb.h           \
 		center_proto/center_client.pb.h     \
-		center_proto/center_cluster.pb.h
+		center_proto/center_cluster.pb.h    \
+		${COMMON_INCLUDES}
 
 
 CENTER_SRCS =                               \
@@ -57,7 +58,8 @@ CENTER_SRCS =                               \
 		rpc_center/reporter_thread.cpp      \
 		center_proto/centers.pb.cc          \
 		center_proto/center_client.pb.cc    \
-		center_proto/center_cluster.pb.cc
+		center_proto/center_cluster.pb.cc   \
+		${COMMON_SRCS}
 
 
 COMMON_INCLUDES =                        \
@@ -82,8 +84,7 @@ COMMON_SRCS =                            \
 nobase_include_HEADERS =                 \
 		${CLIENT_INCLUDES}               \
 		${SERVER_INCLUDES}               \
-		${COMMON_INCLUDES}               \
-		${CENTER_INCLUDES}
+		${COMMON_INCLUDES}
 
 
 lib_LTLIBRARIES = librpc_client.la librpc_server.la
@@ -116,9 +117,9 @@ librpc_server_la_SOURCES =   \
 		${COMMON_SRCS}
 
 
-#bin_PROGRAMS = rpc_center_server.cc
-#rpc_center_SOURCES = rpc_center/rpc_center_server.cc ${CENTER_INCLUDES} ${CENTER_SRCS}
-#rpc_center_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a
+#bin_PROGRAMS = rpc_center_server
+#rpc_center_server_SOURCES = rpc_center/rpc_center_server.cc ${CENTER_INCLUDES} ${CENTER_SRCS}
+#rpc_center_server_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a
 #INCLUDES = -I${top_srcdir}/src                \
 #		   -I${third_dir}/gperftools/include/ \
 #		   -I${third_dir}/protobuf/include/   \

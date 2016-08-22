@@ -31,6 +31,8 @@ namespace libevrpc {
 
 using std::string;
 
+extern string g_config_file = "";
+
 RpcCenter::RpcCenter(const string& config_file) :
     center_port_(NULL),
     config_parser_instance_(ConfigParser::GetInstance(config_file)),

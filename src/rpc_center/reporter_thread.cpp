@@ -16,10 +16,15 @@
 
 #include "reporter_thread.h"
 
+#include <string>
+
 #include "rpc_center.h"
 #include "util/rpc_communication.h"
+#include "util/rpc_util.h"
 
 namespace libevrpc {
+
+using std::string;
 
 ReporterThread::ReporterThread():
     leader_addr_(NULL),
@@ -28,22 +33,22 @@ ReporterThread::ReporterThread():
 }
 
 ReporterThread::~ReporterThread() {
-    if (NULL != leader_addr) {
+    if (NULL != leader_addr_) {
         free(leader_addr_);
     }
-    if (NULL != leader_port) {
+    if (NULL != leader_port_) {
         free(leader_port_);
     }
 }
 
-bool StartReporter(
+bool ReporterThread::StartReporter(
         const char* leader_addr,
         const char* leader_port) {
     if (reporter_running_) {
-        if (NULL != leader_addr) {
+        if (NULL != leader_addr_) {
             free(leader_addr_);
         }
-        if (NULL != leader_port) {
+        if (NULL != leader_port_) {
             free(leader_port_);
         }
         close(conn_fd_);
@@ -70,11 +75,13 @@ void ReporterThread::Run() {
     cp.set_from_center_addr(local_addr);
     cp.set_center_action(FOLLOWER_PING);
 
-    conn_fd_ = TcpConnect(leader_addr_, leader_port_);
+    conn_fd_ = TcpConnect(leader_addr_, leader_port_, 15);
+
+    int failed_cnt = 0;
     while (reporter_running_) {
         string ping_str;
-        if (cp.SerializeToString(ping_str)) {
-            RpcSend(fd, CENTER2CENTER, ping_str, false);
+        if (cp.SerializeToString(&ping_str)) {
+            RpcSend(conn_fd_, CENTER2CENTER, ping_str, false);
         }
         sleep(5);
     }

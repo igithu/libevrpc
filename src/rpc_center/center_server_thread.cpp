@@ -22,6 +22,8 @@
 
 namespace libevrpc {
 
+using std::string;
+
 int32_t CenterServerThread::ei_per_alloc_ = 4;
 CenterEioQueue CenterServerThread::eio_uselist_ = {NULL, NULL};
 

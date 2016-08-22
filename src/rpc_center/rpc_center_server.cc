@@ -15,11 +15,11 @@
  **/
 
 
-#include "rpc_center.h"
-
 #include <signal.h>
 #include <stdio.h>
 #include <fcntl.h>
+
+#include "rpc_center.h"
 
 
 using namespace libevrpc;
