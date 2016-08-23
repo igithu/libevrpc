@@ -442,10 +442,22 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             /*
              * 处理来自其他Center服务器的请求
              */
-            if (NULL == election_thread_) {
+            CentersProto response_proto;
+            if (response_proto.ParseFromString(recv_message)) {
                 return false;
             }
-            election_thread_->PushElectionMessage(conn_fd, recv_message);
+            switch response_proto.center_action() {
+                case INQUIRY:
+                case PROPOSAL:
+                case ACCEPT:
+                case REFUSED: {
+                    if (NULL == election_thread_) {
+                        return false;
+                    }
+                    election_thread_->PushElectionMessage(conn_fd, recv_message);
+                }
+                case FOLLOWER_PING:
+            }
             break;
        }
        case CENTER2CLIENT : {
@@ -563,6 +575,13 @@ bool RpcCenter::BroadcastInfo(std::string& bc_info) {
     return true;
 }
 
+bool RpcCenter::ReporterProcessor(int32_t conn_fdi, CentersProto& centers_proto) {
+    string ping_str;
+    if (centers_proto.SerializeToString(&ping_str)) {
+        RpcSend(conn_fd_, CENTER2CENTER, ping_str, false);
+    }
+    return true;
+}
 
 void RpcCenter::SetFastLeaderRunning(bool is_running) {
     WriteLockGuard wguard(fle_running_rwlock_);

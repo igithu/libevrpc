@@ -116,6 +116,8 @@ class RpcCenter {
          */
         void SetFastLeaderRunning(bool is_running);
 
+        bool ReporterProcessor(int32_t conn_fd, CentersProto& centers_proto);
+
     private:
         RpcCenter(const std::string& config_file);
 

@@ -79,10 +79,6 @@ void ReporterThread::Run() {
 
     int failed_cnt = 0;
     while (reporter_running_) {
-        string ping_str;
-        if (cp.SerializeToString(&ping_str)) {
-            RpcSend(conn_fd_, CENTER2CENTER, ping_str, false);
-        }
         sleep(5);
     }
     close(conn_fd_);

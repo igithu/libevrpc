@@ -54,7 +54,7 @@ class ElectionThread : public Thread {
         virtual void Run();
         void StopThread();
 
-        bool PushElectionMessage(int32_t fd, const std::string& election_msg);
+        bool PushElectionMessage(int32_t fd, const CentersProto& centers_proto);
         ElectionItem* PopElectionMessage();
 
     private:

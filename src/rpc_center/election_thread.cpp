@@ -59,7 +59,7 @@ void ElectionThread::Run() {
     */
 
     while (running_) {
-        ElectionItem* el_item = PopElectionMessage();;
+        ElectionItem* el_item = PopElectionMessage();
         if (NULL == el_item) {
             sleep(30);
             continue;
@@ -77,9 +77,9 @@ void ElectionThread::StopThread() {
     running_ = false;
 }
 
-bool ElectionThread::PushElectionMessage(int32_t fd, const string& election_msg) {
+bool ElectionThread::PushElectionMessage(int32_t fd, const CentersProto& centers_proto) {
     ElectionItem* ei = new ElectionItem();
-    ei->centers_proto.ParseFromString(election_msg);
+    ei->centers_proto.CopyFrom(centers_proto);
     ei->conn_fd = fd;
     ei->next = NULL;
     {
