@@ -65,6 +65,7 @@ void ElectionThread::Run() {
             continue;
         }
         RpcCenter::GetInstance(g_config_file).ProcessCenterData(el_item->conn_fd, el_item->centers_proto);
+        close(el_item->conn_fd);
 
         delete el_item;
         sleep(30);

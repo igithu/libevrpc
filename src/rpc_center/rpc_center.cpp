@@ -447,16 +447,15 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                 return false;
             }
             switch response_proto.center_action() {
-                case INQUIRY:
-                case PROPOSAL:
-                case ACCEPT:
-                case REFUSED: {
+                case INQUIRY: case PROPOSAL: case ACCEPT: case REFUSED: case LEADER_CONFIRM: {
                     if (NULL == election_thread_) {
                         return false;
                     }
                     election_thread_->PushElectionMessage(conn_fd, recv_message);
                 }
-                case FOLLOWER_PING:
+                case FOLLOWER_PING: {
+                    break;
+                }
             }
             break;
        }
@@ -502,13 +501,12 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
 
             string response_str;
             if (!response_proto.SerializeToString(&response_str)) {
-                close(fd);
+                return false;
             }
 
             if (!RpcSend(fd, CENTER2CENTER, response_str, false)) {
                 fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
             }
-            close(fd);
 
             break;
         }
@@ -517,7 +515,6 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             if (ACCEPT == ca_result) {
                 UpdateOCStatus(centers_proto);
             }
-            close(fd);
             break;
         }
         case LEADER_CONFIRM: {
@@ -530,7 +527,6 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             if (ACCEPT == ca_result) {
                 UpdateCenterStatus(FOLLOWING);
             }
-            close(fd);
             break;
         }
         case FOLLOWER_PING: {
@@ -575,12 +571,16 @@ bool RpcCenter::BroadcastInfo(std::string& bc_info) {
     return true;
 }
 
-bool RpcCenter::ReporterProcessor(int32_t conn_fdi, CentersProto& centers_proto) {
+bool RpcCenter::ReporterProcessor(int32_t conn_fd, CentersProto& centers_proto) {
+    sleep(1);
     string ping_str;
-    if (centers_proto.SerializeToString(&ping_str)) {
-        RpcSend(conn_fd_, CENTER2CENTER, ping_str, false);
+    if (!centers_proto.SerializeToString(&ping_str)) {
+        return false;
     }
-    return true;
+    if (!RpcSend(conn_fd_, CENTER2CENTER, ping_str, false)) {
+        return false;
+    }
+    return CenterProcessor(conn_fd);
 }
 
 void RpcCenter::SetFastLeaderRunning(bool is_running) {
