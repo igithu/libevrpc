@@ -454,6 +454,21 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     election_thread_->PushElectionMessage(conn_fd, recv_message);
                 }
                 case FOLLOWER_PING: {
+                    CentersProto response_proto;
+                    if (GetCenterStatus() != LEADING) {
+                        /*
+                         * 本地Center非Leader直接拒绝请求
+                         */
+                        response_proto.set_from_center_addr(GetLocalAddress());
+                        response_proto.set_center_action(REFUSED);
+                        string response_str;
+                        if (!response_proto.SerializeToString(&response_str)) {
+                            return false;
+                        }
+                        if (!RpcSend(conn_fd, CENTER2CENTER, response_str, false)) {
+                            return false;
+                        }
+                    }
                     break;
                 }
             }
@@ -571,8 +586,9 @@ bool RpcCenter::BroadcastInfo(std::string& bc_info) {
     return true;
 }
 
-bool RpcCenter::ReporterProcessor(int32_t conn_fd, CentersProto& centers_proto) {
+bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
     sleep(1);
+    CentersProto centers_proto;
     string ping_str;
     if (!centers_proto.SerializeToString(&ping_str)) {
         return false;
