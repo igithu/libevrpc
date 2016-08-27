@@ -45,7 +45,8 @@ RpcCenter::RpcCenter(const string& config_file) :
     fastleader_election_running_(false),
     center_server_thread_(NULL),
     election_thread_(NULL),
-    reporter_thread_(NULL) {
+    reporter_thread_(NULL),
+    leader_thread_(NULL) {
 
     leader_infos_ptr_->lc_start_time = start_time_;
     leader_infos_ptr_->leader_center = GetLocalAddress();
@@ -76,6 +77,10 @@ RpcCenter::~RpcCenter() {
 
     if (NULL != center_port_) {
         free(center_port_);
+    }
+
+    if (NULL != leader_thread_) {
+        delete leader_thread_;
     }
 }
 
@@ -129,6 +134,7 @@ bool RpcCenter::InitRpcCenter() {
     center_server_thread_ = new CenterServerThread(GetLocalAddress(), local_port);
     election_thread_ = new ElectionThread();
     reporter_thread_ = new ReporterThread();
+    leader_thread_ = new LeaderThread();
 
     return true;
 }

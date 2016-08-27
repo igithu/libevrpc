@@ -38,7 +38,7 @@ void LeaderThread::Destory() {
         for (FW_ITEM* fw_item = follower_q_->head;
              fw_item != fw_item->tail && fw_item != NULL;
              fw_item = fw_item->next) {
-            delete el_item;
+            delete fw_item;
         }
         delete fw_item;
         follower_q_ = NULL;
@@ -46,16 +46,53 @@ void LeaderThread::Destory() {
 }
 
 void LeaderThread::Run() {
+    if (NULL == follower_q_) {
+        follower_q_ = new FollowerQueue();
+    }
+    while (running_) {
+        FollowerItem fw_item = PopFollowerMessage();
+        if (NULL == fw_item) {
+            sleep(20);
+            continue;
+        }
+    }
+    Destory();
 }
 
 void LeaderThread::StopThread() {
+    running_ = false;
 }
 
 bool LeaderThread::PushFollowerMessage(int32_t fd, const CentersProto& centers_proto) {
+    FollowerItem* fi = new FollowerItem();
+    fi->centers_proto.CopyFrom(centers_proto);
+    fi->conn_fd = fd;
+    fi->next = NULL;
+    {
+        MutexLockGuard lock(fq_mutex_);
+        if (NULL == follower_q_->tail) {
+            follower_q_->head = fi;
+        } else {
+            follower_q_->tail->next = fi;
+        }
+        follower_q_->tail = fi;
+    }
     return true;
 }
 
 FollowerItem* LeaderThread::PopFollowerMessage() {
+    FollowerItem* fw_item = NULL;
+    {
+        MutexLockGuard lock(eq_mutex_);
+        fw_item = follower_q_->head;
+        if (NULL != fw_item) {
+            follower_q_->head = fw_item->next;
+            if (NULL == follower_q_->head) {
+                follower_q_->tail = NULL;
+            }
+        }
+    }
+    return fw_item;
 }
 
 

@@ -27,6 +27,7 @@
 #include "center_server_thread.h"
 #include "election_thread.h"
 #include "reporter_thread.h"
+#include "leader_thread.h"
 #include "center_proto/centers.pb.h"
 #include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
@@ -176,6 +177,7 @@ class RpcCenter {
         CenterServerThread* center_server_thread_;
         ElectionThread* election_thread_;
         ReporterThread* reporter_thread_;
+        LeaderThread* leader_thread_;
 
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);
