@@ -18,6 +18,8 @@
 
 #include "leader_thread.h"
 
+#include "rpc_center.h"
+
 
 namespace libevrpc {
 
@@ -55,6 +57,9 @@ void LeaderThread::Run() {
             sleep(20);
             continue;
         }
+        RpcCenter::GetInstance(g_config_file).ProcessCenterData(fw_item->conn_fd, fw_item->centers_proto);
+        close(fw_item->conn_fd);
+        delete fw_item;
     }
     Destory();
 }

@@ -248,6 +248,10 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
              * 确认当前Center服务器为 Leader服务器
              */
             UpdateCenterStatus(LEADING);
+            if (!leader_thread_->Start()) {
+                return false;
+            }
+
             CentersProto confirm_proto;
             confirm_proto.set_from_center_addr(GetLocalAddress());
             confirm_proto.set_center_action(LEADER_CONFIRM);
@@ -547,6 +551,9 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             }
             if (ACCEPT == ca_result) {
                 UpdateCenterStatus(FOLLOWING);
+                if (leader_thread_->IsAlive()) {
+                    leader_thread_->Stop();
+                }
             }
             break;
         }
