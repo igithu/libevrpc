@@ -31,8 +31,8 @@ typedef struct FollowerItem FW_ITEM;
 struct FollowerItem {
     int32_t conn_fd;
     CentersProto centers_proto;
-    EL_ITEM* prev;
-    EL_ITEM* next;
+    FW_ITEM* prev;
+    FW_ITEM* next;
 };
 
 typedef struct FollowerQueue FQ;

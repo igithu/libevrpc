@@ -456,12 +456,12 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             if (response_proto.ParseFromString(recv_message)) {
                 return false;
             }
-            switch response_proto.center_action() {
+            switch (response_proto.center_action()) {
                 case INQUIRY: case PROPOSAL: case ACCEPT: case REFUSED: case LEADER_CONFIRM: {
                     if (NULL == election_thread_) {
                         return false;
                     }
-                    election_thread_->PushElectionMessage(conn_fd, recv_message);
+                    election_thread_->PushElectionMessage(conn_fd,response_proto);
                 }
                 case FOLLOWER_PING: {
                     CentersProto response_proto;
@@ -478,6 +478,8 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                         if (!RpcSend(conn_fd, CENTER2CENTER, response_str, false)) {
                             return false;
                         }
+                    } else {
+                        leader_thread_->PushFollowerMessage(conn_fd, response_proto);
                     }
                     break;
                 }
@@ -606,7 +608,7 @@ bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
     if (!centers_proto.SerializeToString(&ping_str)) {
         return false;
     }
-    if (!RpcSend(conn_fd_, CENTER2CENTER, ping_str, false)) {
+    if (!RpcSend(conn_fd, CENTER2CENTER, ping_str, false)) {
         return false;
     }
     return CenterProcessor(conn_fd);

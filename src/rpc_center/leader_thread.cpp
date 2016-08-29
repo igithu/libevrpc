@@ -38,11 +38,10 @@ LeaderThread::~LeaderThread() {
 void LeaderThread::Destory() {
     if (NULL != follower_q_) {
         for (FW_ITEM* fw_item = follower_q_->head;
-             fw_item != fw_item->tail && fw_item != NULL;
+             fw_item != follower_q_->tail && fw_item != NULL;
              fw_item = fw_item->next) {
             delete fw_item;
         }
-        delete fw_item;
         follower_q_ = NULL;
     }
 }
@@ -52,7 +51,7 @@ void LeaderThread::Run() {
         follower_q_ = new FollowerQueue();
     }
     while (running_) {
-        FollowerItem fw_item = PopFollowerMessage();
+        FollowerItem* fw_item = PopFollowerMessage();
         if (NULL == fw_item) {
             sleep(20);
             continue;
@@ -88,7 +87,7 @@ bool LeaderThread::PushFollowerMessage(int32_t fd, const CentersProto& centers_p
 FollowerItem* LeaderThread::PopFollowerMessage() {
     FollowerItem* fw_item = NULL;
     {
-        MutexLockGuard lock(eq_mutex_);
+        MutexLockGuard lock(fq_mutex_);
         fw_item = follower_q_->head;
         if (NULL != fw_item) {
             follower_q_->head = fw_item->next;
