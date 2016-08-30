@@ -604,6 +604,8 @@ bool RpcCenter::BroadcastInfo(std::string& bc_info) {
 bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
     sleep(1);
     CentersProto centers_proto;
+    centers_proto.set_from_center_addr(GetLocalAddress());
+    centers_proto.set_center_action(FOLLOWER_PING);
     string ping_str;
     if (!centers_proto.SerializeToString(&ping_str)) {
         return false;
