@@ -1,8 +1,8 @@
 package libevrpc;
 
-import "center_type.proto";
-import "center_client.proto";
-import "center_cluster.proto";
+// import "center_type.proto";
+// import "center_client.proto";
+// import "center_cluster.proto";
 
 // 选举算法使用，决定哪一台机器为Leader，便于同步全局RpcServer列表
 enum CenterStatus {

@@ -42,10 +42,11 @@ CENTER_INCLUDES =                           \
 		rpc_center/rpc_center.h             \
 		rpc_center/center_server_thread.h   \
 		rpc_center/election_thread.h        \
-		rpc_center/leader_thread.h        \
+		rpc_center/leader_thread.h          \
 		rpc_center/load_balancer.h          \
 		rpc_center/reporter_thread.h        \
 		center_proto/centers.pb.h           \
+		center_proto/center_type.pb.h       \
 		center_proto/center_client.pb.h     \
 		center_proto/center_cluster.pb.h    \
 		${COMMON_INCLUDES}
@@ -59,6 +60,7 @@ CENTER_SRCS =                               \
 		rpc_center/load_balancer.cpp        \
 		rpc_center/reporter_thread.cpp      \
 		center_proto/centers.pb.cc          \
+		center_proto/center_type.pb.cc      \
 		center_proto/center_client.pb.cc    \
 		center_proto/center_cluster.pb.cc   \
 		${COMMON_SRCS}
@@ -119,11 +121,12 @@ librpc_server_la_SOURCES =   \
 		${COMMON_SRCS}
 
 
-#bin_PROGRAMS = rpc_center_server
-#rpc_center_server_SOURCES = rpc_center/rpc_center_server.cc ${CENTER_INCLUDES} ${CENTER_SRCS}
-#rpc_center_server_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a
-#INCLUDES = -I${top_srcdir}/src                \
-#		   -I${third_dir}/gperftools/include/ \
-#		   -I${third_dir}/protobuf/include/   \
-#		   -I${third_dir}/libev/include/
-#
+AM_LDFLAGS = -lz -lrt -lm -lpthread -std=c++11 -lprotobuf
+bin_PROGRAMS = rpc_center_server
+rpc_center_server_SOURCES = rpc_center/rpc_center_server.cc ${CENTER_INCLUDES} ${CENTER_SRCS}
+rpc_center_server_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a
+INCLUDES = -I${top_srcdir}/src                \
+		   -I${third_dir}/gperftools/include/ \
+		   -I${third_dir}/protobuf/include/   \
+		   -I${third_dir}/libev/include/
+

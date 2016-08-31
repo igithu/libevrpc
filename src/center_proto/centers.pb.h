@@ -25,9 +25,6 @@
 #include <google/protobuf/extension_set.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
-#include "center_type.pb.h"
-#include "center_client.pb.h"
-#include "center_cluster.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace libevrpc {
@@ -67,11 +64,12 @@ enum CenterAction {
   PROPOSAL = 1,
   LEADER_CONFIRM = 2,
   ACCEPT = 3,
-  REFUSED = 4
+  REFUSED = 4,
+  FOLLOWER_PING = 5
 };
 bool CenterAction_IsValid(int value);
 const CenterAction CenterAction_MIN = INQUIRY;
-const CenterAction CenterAction_MAX = REFUSED;
+const CenterAction CenterAction_MAX = FOLLOWER_PING;
 const int CenterAction_ARRAYSIZE = CenterAction_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* CenterAction_descriptor();

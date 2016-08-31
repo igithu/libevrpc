@@ -23,6 +23,9 @@
 #include <fstream>
 #include <iostream>
 
+#include "center_proto/center_type.pb.h"
+#include "center_proto/center_client.pb.h"
+#include "center_proto/center_cluster.pb.h"
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
 
