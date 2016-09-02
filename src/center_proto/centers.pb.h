@@ -25,6 +25,9 @@
 #include <google/protobuf/extension_set.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "center_type.pb.h"
+#include "center_client.pb.h"
+#include "center_cluster.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace libevrpc {

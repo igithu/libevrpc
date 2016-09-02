@@ -87,19 +87,23 @@ void protobuf_AddDesc_centers_2eproto() {
   already_here = true;
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+  ::libevrpc::protobuf_AddDesc_center_5ftype_2eproto();
+  ::libevrpc::protobuf_AddDesc_center_5fclient_2eproto();
+  ::libevrpc::protobuf_AddDesc_center_5fcluster_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rcenters.proto\022\010libevrpc\"\337\001\n\014CentersPro"
-    "to\022\030\n\020from_center_addr\030\001 \001(\t\022-\n\rcenter_s"
-    "tatus\030\002 \001(\0162\026.libevrpc.CenterStatus\022-\n\rc"
-    "enter_action\030\003 \001(\0162\026.libevrpc.CenterActi"
-    "on\022\022\n\nstart_time\030\004 \001(\004\022\025\n\rlc_start_time\030"
-    "\005 \001(\004\022\025\n\rlogical_clock\030\006 \001(\004\022\025\n\rleader_c"
-    "enter\030\007 \001(\t*\\\n\014CenterStatus\022\013\n\007LOOKING\020\000"
-    "\022\r\n\tFOLLOWING\020\001\022\r\n\tOBSERVING\020\002\022\013\n\007LEADIN"
-    "G\020\003\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*i\n\014CenterActio"
-    "n\022\013\n\007INQUIRY\020\000\022\014\n\010PROPOSAL\020\001\022\022\n\016LEADER_C"
-    "ONFIRM\020\002\022\n\n\006ACCEPT\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFOL"
-    "LOWER_PING\020\005", 452);
+    "\n\rcenters.proto\022\010libevrpc\032\021center_type.p"
+    "roto\032\023center_client.proto\032\024center_cluste"
+    "r.proto\"\337\001\n\014CentersProto\022\030\n\020from_center_"
+    "addr\030\001 \001(\t\022-\n\rcenter_status\030\002 \001(\0162\026.libe"
+    "vrpc.CenterStatus\022-\n\rcenter_action\030\003 \001(\016"
+    "2\026.libevrpc.CenterAction\022\022\n\nstart_time\030\004"
+    " \001(\004\022\025\n\rlc_start_time\030\005 \001(\004\022\025\n\rlogical_c"
+    "lock\030\006 \001(\004\022\025\n\rleader_center\030\007 \001(\t*\\\n\014Cen"
+    "terStatus\022\013\n\007LOOKING\020\000\022\r\n\tFOLLOWING\020\001\022\r\n"
+    "\tOBSERVING\020\002\022\013\n\007LEADING\020\003\022\n\n\006UNKONW\020\004\022\010\n"
+    "\004DEAD\020\005*i\n\014CenterAction\022\013\n\007INQUIRY\020\000\022\014\n\010"
+    "PROPOSAL\020\001\022\022\n\016LEADER_CONFIRM\020\002\022\n\n\006ACCEPT"
+    "\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFOLLOWER_PING\020\005", 514);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "centers.proto", &protobuf_RegisterTypes);
   CentersProto::default_instance_ = new CentersProto();

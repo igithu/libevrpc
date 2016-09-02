@@ -128,5 +128,6 @@ rpc_center_server_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/
 INCLUDES = -I${top_srcdir}/src                \
 		   -I${third_dir}/gperftools/include/ \
 		   -I${third_dir}/protobuf/include/   \
-		   -I${third_dir}/libev/include/
+		   -I${third_dir}/libev/include/      \
+		   -I${top_srcdir}/src/center_proto/
 
