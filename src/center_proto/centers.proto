@@ -12,7 +12,7 @@ enum CenterStatus {
     LEADING = 3;
     UNKONW = 4;
     DEAD = 5;
-};
+}
 
 enum CenterAction {
     INQUIRY = 0;
@@ -21,7 +21,7 @@ enum CenterAction {
     ACCEPT = 3;
     REFUSED = 4;
     FOLLOWER_PING = 5;
-};
+}
 
 message CentersProto {
     optional string from_center_addr = 1;
@@ -31,6 +31,7 @@ message CentersProto {
     optional uint64 lc_start_time = 5;
     optional uint64 logical_clock = 6;
     optional string leader_center = 7;
-};
+    repeated CenterCluster cluster_infos_list = 8;
+}
 
 
