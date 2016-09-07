@@ -46,7 +46,6 @@
 
 Rpc Center集群选举算法：为了协调Center集群信息数据一致性，实现负载均衡等功能，必须从集群中选举出Leader进行计算，最后同步计算结果到所有机器上，集群运行步骤如下（FastLeaderElection，网络失联情况待补充）
 
-
     1.RpcCenter集群中每台机器/tmp/centers_list下都会预先放置好 初始集群的机器列表
     2.集群启动，每个机器启动服务线程准备接受请求
     3.每台机器向其他机器询问信息（主要是启动时间等，同时同步本地Center 服务信息到其他Center服务上）
@@ -61,3 +60,17 @@ Rpc Center集群选举算法：为了协调Center集群信息数据一致性，�
        未通过，发起新一轮选举，整个集群进入新一轮选举状态 回到步骤4，直到通过
     8.每台机器收到其他机器宣布的结果 。更新本地内存中 所有Center服务器相应信息，标示起跟随的Leader
     9.选举结束
+
+Rpc Center集群LoadBalancer实现：
+
+     1.RpcCenter集群正常启动完成, ConfigServe启动（管理RpcCenter机器列表等信息, 统一向RpcClient或者RpcServer提供全局服务器读取器信息）
+     2.RpcServer Cluster机器启动与RpcCenter之间的心跳线程, 初始化过程中从ConfigServer读取RpcCenter机器列表, 然后随机从这些RpcCenter列表中, 选取一个Center地址与之通信
+     3.接收到Rpc服务器的Center的根据CenterCluster统一的Hash算法计算出该Rpc服务机器应该向哪个(或哪些)Center汇报, 将结果返回该RpcServer服务器
+     4.RpcServer得到对应汇报Center机器，记录到内存和磁盘上，然后周期向对应汇报Center服务器心跳，汇报本地发Load CPU等信息
+     5.RpcCenter Cluster会根据所有RpcServer汇总上来的信息进行LoadBalancer计算(例如哪些虚节点与RpcServer对应)
+     6.RpcClient启动， 从ConfigServer获取Center列表, 随机选取一个与之进行通信(或者与RpcServer类似，初始化获取Center机器最后确定与之服务的Center服务器)
+     6.RpcCenter返回给RpcClient 对应的虚节点以及和虚节点下面对应的RpcServer服务器(选取虚节点遵循改虚节点对应RpcCenter为当时资源消耗最小原则)
+     7.RpcClient获取RpcServer列表之后, 随机选取一个RPCServer, 开始运行P2P(点对点)模式 Rpc
+     8.RpcClient 30s ~ 1分钟左右 重新执行6, 更新RpcServer信息
+
+
