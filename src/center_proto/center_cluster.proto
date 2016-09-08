@@ -5,8 +5,9 @@ import "center_type.proto";
 // 中心与RPC集群之间的信息协议
 message CenterCluster {
     optional string cluster_server_addr = 1;
-    optional int32 load = 2;
+    optional float load = 2;
     optional float cpu_used = 3;
+    optional int32 connection_num = 4;
 }
 
 

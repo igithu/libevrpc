@@ -56,12 +56,6 @@ struct LeaderInfos {
     std::string leader_center;
 };
 
-/*
- * 虚拟节点, 对应多个实际RpcServer
- */
-struct VirtualNode {
-    int32_t vn_id;
-};
 
 typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
