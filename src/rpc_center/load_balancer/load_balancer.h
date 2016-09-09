@@ -21,6 +21,7 @@
 #define __LOAD_BALANCER_H
 
 #include <string>
+#include <vector>
 
 namespace libevrpc {
 
@@ -30,10 +31,9 @@ class LoadBalancer {
         virtual ~LoadBalancer();
 
         virtual bool InitBalancer() = 0;
+        virtual void SetConfigFile(const std::string& file_name) = 0;
         virtual bool AddRpcServer(const std::string& rpc_server) = 0;
-        virtual std::string GetRpcServer(const std::string& rpc_client) = 0;
-
-    private:
+        virtual void GetRpcServer(const std::string& rpc_client, std::vector<string>& rpc_server_list) = 0;
 
 };  // end of namespace libevrpc
 

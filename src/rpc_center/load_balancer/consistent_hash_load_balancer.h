@@ -20,8 +20,6 @@
 #ifndef __CONSISTENT_HASH_LOAD_BALANCER_H
 #define __CONSISTENT_HASH_LOAD_BALANCER_H
 
-#include <vector>
-
 #include "load_balancer.h"
 
 
@@ -41,10 +39,13 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
         ConsistentHashLoadBalancer();
         virtual ~ConsistentHashLoadBalancer();
 
-        bool InitBalancer() = 0;
-        bool AddRpcServer(const std::string& rpc_server) = 0;
-        std::string GetRpcServer(const std::string& rpc_client) = 0;
-
+        bool InitBalancer();
+        void SetConfigFile(const std::string& file_name)
+        bool AddRpcServer(const std::string& rpc_server);
+        void GetRpcServer(const std::string& rpc_client,
+                          std::vector<string>& rpc_server_list);
+    private:
+        std::string config_file_;
 
 };
 

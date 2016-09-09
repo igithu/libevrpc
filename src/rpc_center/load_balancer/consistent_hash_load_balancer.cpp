@@ -21,6 +21,7 @@
 namespace libevrpc {
 
 using std::string;
+using std::vector;
 
 ConsistentHashLoadBalancer::ConsistentHashLoadBalancer() {
 }
@@ -32,12 +33,16 @@ bool ConsistentHashLoadBalancer::InitBalancer() {
     return true;
 }
 
+void ConsistentHashLoadBalancer::SetConfigFile(const std::string& file_name) {
+    config_file_ = file_name;
+}
+
 bool ConsistentHashLoadBalancer::AddRpcServer(const string& rpc_server) {
     return true;
 }
 
-string ConsistentHashLoadBalancer::GetRpcServer(const string& rpc_client) {
-    return "";
+void ConsistentHashLoadBalancer::GetRpcServer(
+        const string& rpc_client, vector<string>& rpc_server_list) {
 }
 
 
