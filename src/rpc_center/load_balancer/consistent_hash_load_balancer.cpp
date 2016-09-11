@@ -23,13 +23,16 @@ namespace libevrpc {
 using std::string;
 using std::vector;
 
-ConsistentHashLoadBalancer::ConsistentHashLoadBalancer() {
+ConsistentHashLoadBalancer::ConsistentHashLoadBalancer() : config_file_("") {
 }
 
 ConsistentHashLoadBalancer::~ConsistentHashLoadBalancer() {
 }
 
 bool ConsistentHashLoadBalancer::InitBalancer() {
+    if ("" == config_file_) {
+        return false;
+    }
     return true;
 }
 
