@@ -17,13 +17,17 @@
 
 #include "consistent_hash_load_balancer.h"
 
+#include "config_parser/config_parser.h"
+
 
 namespace libevrpc {
 
 using std::string;
 using std::vector;
 
-ConsistentHashLoadBalancer::ConsistentHashLoadBalancer() : config_file_("") {
+ConsistentHashLoadBalancer::ConsistentHashLoadBalancer() :
+    config_file_(""),
+    virtual_node_num_(20) {
 }
 
 ConsistentHashLoadBalancer::~ConsistentHashLoadBalancer() {
@@ -33,6 +37,8 @@ bool ConsistentHashLoadBalancer::InitBalancer() {
     if ("" == config_file_) {
         return false;
     }
+    ConfigParser& config_parser_instance = ConfigParser::GetInstance(config_file_);
+    int32_t virtual_node_num_ = config_parser_instance.IniGetInt("rpc_center:virtual_node_num", 20);
     return true;
 }
 

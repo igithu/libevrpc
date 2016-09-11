@@ -28,8 +28,9 @@ namespace libevrpc {
 class CenterClusterHeartbeat : public Thread {
     public:
         CenterClusterHeartbeat();
-
         ~CenterClusterHeartbeat();
+
+        bool InitCenterClusterHB();
 
         virtual void Run();
 

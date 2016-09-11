@@ -46,6 +46,7 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
                           std::vector<string>& rpc_server_list);
     private:
         std::string config_file_;
+        int32_t virtual_node_num_;
 
 };
 

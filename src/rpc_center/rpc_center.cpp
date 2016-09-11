@@ -104,7 +104,7 @@ bool RpcCenter::InitRpcCenter() {
     }
 
     const char* local_addr = GetLocalAddress();
-    const char* local_port = config_parser_instance_.IniGetString("rpc_server:port", "8899");
+    const char* local_port = config_parser_instance_.IniGetString("rpc_center:port", "8899");
 
     center_port_ = (char*)malloc(strlen(local_port));
     strcpy(center_port_, local_port);
