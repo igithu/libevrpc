@@ -22,6 +22,8 @@
 
 #include "load_balancer.h"
 
+#include <memory>
+#include <unordered_map>
 
 namespace libevrpc {
 
@@ -29,10 +31,12 @@ namespace libevrpc {
  * 虚拟节点, 对应多个实际RpcServer
  */
 struct VirtualNode {
-    int32_t vn_id;
     float vn_load
     std::vector<std::string> py_node_list;
 };
+
+typedef std::shared_ptr<VirtualNode> VN_PTR;
+typedef std::unordered_map<uint32_t, VN_PTR> VN_HASH_MAP;
 
 class ConsistentHashLoadBalancer : public LoadBalancer {
     public:
@@ -47,7 +51,6 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
     private:
         std::string config_file_;
         int32_t virtual_node_num_;
-
 };
 
 }  // end of namespace
