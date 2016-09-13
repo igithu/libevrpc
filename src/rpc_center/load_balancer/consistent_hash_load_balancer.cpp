@@ -27,10 +27,14 @@ using std::vector;
 
 ConsistentHashLoadBalancer::ConsistentHashLoadBalancer() :
     config_file_(""),
-    virtual_node_num_(20) {
+    virtual_node_num_(20),
+    vn_map_ptr_(new VN_HASH_MAP()) {
 }
 
 ConsistentHashLoadBalancer::~ConsistentHashLoadBalancer() {
+    if (NULL != vn_map_ptr_) {
+        delete vn_map_ptr_;
+    }
 }
 
 bool ConsistentHashLoadBalancer::InitBalancer() {
@@ -54,6 +58,9 @@ void ConsistentHashLoadBalancer::GetRpcServer(
         const string& rpc_client, vector<string>& rpc_server_list) {
 }
 
+bool ConsistentHashLoadBalancer::BuildConsistentHashMap() {
+    return true;
+}
 
 
 }  // end of namespace libevrpc

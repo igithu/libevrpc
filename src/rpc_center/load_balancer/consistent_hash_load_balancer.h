@@ -24,6 +24,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <map>
 
 namespace libevrpc {
 
@@ -36,7 +37,7 @@ struct VirtualNode {
 };
 
 typedef std::shared_ptr<VirtualNode> VN_PTR;
-typedef std::unordered_map<uint32_t, VN_PTR> VN_HASH_MAP;
+typedef std::map<uint32_t, VN_PTR> VN_HASH_MAP;
 
 class ConsistentHashLoadBalancer : public LoadBalancer {
     public:
@@ -48,9 +49,15 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
         bool AddRpcServer(const std::string& rpc_server);
         void GetRpcServer(const std::string& rpc_client,
                           std::vector<string>& rpc_server_list);
+
+    private:
+        bool BuildConsistentHashMap();
+
     private:
         std::string config_file_;
         int32_t virtual_node_num_;
+
+        VN_HASH_MAP* vn_map_ptr_;
 };
 
 }  // end of namespace
