@@ -30,6 +30,8 @@ void PrintErrorInfo(const char* error_info);
 
 const char* GetLocalAddress();
 
+uint32_t MurMurHash2(const char* key_str, int32_t len);
+
 }  // end of namespace libevrpc
 
 
