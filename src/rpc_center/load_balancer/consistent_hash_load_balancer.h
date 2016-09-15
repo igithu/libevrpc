@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <map>
 
+#include "center_proto/rpc_cluster_server.pb.h"
+
 namespace libevrpc {
 
 /*
@@ -58,6 +60,7 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
         int32_t virtual_node_num_;
 
         VN_HASH_MAP* vn_map_ptr_;
+        std::vector<std::string> py_server_list_;
 };
 
 }  // end of namespace

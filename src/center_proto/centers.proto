@@ -2,7 +2,7 @@ package libevrpc;
 
 import "center_type.proto";
 import "center_client.proto";
-import "center_cluster.proto";
+import "rpc_cluster_server.proto";
 
 // 选举算法使用，决定哪一台机器为Leader，便于同步全局RpcServer列表
 enum CenterStatus {
@@ -31,7 +31,7 @@ message CentersProto {
     optional uint64 lc_start_time = 5;
     optional uint64 logical_clock = 6;
     optional string leader_center = 7;
-    repeated CenterCluster cluster_infos_list = 8;
+    repeated RpcClusterServer server_infos_list = 8;
 }
 
 

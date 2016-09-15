@@ -51,6 +51,7 @@ void ConsistentHashLoadBalancer::SetConfigFile(const std::string& file_name) {
 }
 
 bool ConsistentHashLoadBalancer::AddRpcServer(const string& rpc_server) {
+
     return true;
 }
 

@@ -91,6 +91,38 @@ class CenterClient : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
+  // repeated string center_list = 1;
+  inline int center_list_size() const;
+  inline void clear_center_list();
+  static const int kCenterListFieldNumber = 1;
+  inline const ::std::string& center_list(int index) const;
+  inline ::std::string* mutable_center_list(int index);
+  inline void set_center_list(int index, const ::std::string& value);
+  inline void set_center_list(int index, const char* value);
+  inline void set_center_list(int index, const char* value, size_t size);
+  inline ::std::string* add_center_list();
+  inline void add_center_list(const ::std::string& value);
+  inline void add_center_list(const char* value);
+  inline void add_center_list(const char* value, size_t size);
+  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& center_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_center_list();
+
+  // repeated string server_list = 2;
+  inline int server_list_size() const;
+  inline void clear_server_list();
+  static const int kServerListFieldNumber = 2;
+  inline const ::std::string& server_list(int index) const;
+  inline ::std::string* mutable_server_list(int index);
+  inline void set_server_list(int index, const ::std::string& value);
+  inline void set_server_list(int index, const char* value);
+  inline void set_server_list(int index, const char* value, size_t size);
+  inline ::std::string* add_server_list();
+  inline void add_server_list(const ::std::string& value);
+  inline void add_server_list(const char* value);
+  inline void add_server_list(const char* value, size_t size);
+  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& server_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_server_list();
+
   // @@protoc_insertion_point(class_scope:libevrpc.CenterClient)
  private:
 
@@ -98,6 +130,8 @@ class CenterClient : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> center_list_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> server_list_;
   friend void  protobuf_AddDesc_center_5fclient_2eproto();
   friend void protobuf_AssignDesc_center_5fclient_2eproto();
   friend void protobuf_ShutdownFile_center_5fclient_2eproto();
@@ -111,6 +145,114 @@ class CenterClient : public ::google::protobuf::Message {
 // ===================================================================
 
 // CenterClient
+
+// repeated string center_list = 1;
+inline int CenterClient::center_list_size() const {
+  return center_list_.size();
+}
+inline void CenterClient::clear_center_list() {
+  center_list_.Clear();
+}
+inline const ::std::string& CenterClient::center_list(int index) const {
+  // @@protoc_insertion_point(field_get:libevrpc.CenterClient.center_list)
+  return center_list_.Get(index);
+}
+inline ::std::string* CenterClient::mutable_center_list(int index) {
+  // @@protoc_insertion_point(field_mutable:libevrpc.CenterClient.center_list)
+  return center_list_.Mutable(index);
+}
+inline void CenterClient::set_center_list(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:libevrpc.CenterClient.center_list)
+  center_list_.Mutable(index)->assign(value);
+}
+inline void CenterClient::set_center_list(int index, const char* value) {
+  center_list_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:libevrpc.CenterClient.center_list)
+}
+inline void CenterClient::set_center_list(int index, const char* value, size_t size) {
+  center_list_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.CenterClient.center_list)
+}
+inline ::std::string* CenterClient::add_center_list() {
+  return center_list_.Add();
+}
+inline void CenterClient::add_center_list(const ::std::string& value) {
+  center_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:libevrpc.CenterClient.center_list)
+}
+inline void CenterClient::add_center_list(const char* value) {
+  center_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:libevrpc.CenterClient.center_list)
+}
+inline void CenterClient::add_center_list(const char* value, size_t size) {
+  center_list_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:libevrpc.CenterClient.center_list)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+CenterClient::center_list() const {
+  // @@protoc_insertion_point(field_list:libevrpc.CenterClient.center_list)
+  return center_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+CenterClient::mutable_center_list() {
+  // @@protoc_insertion_point(field_mutable_list:libevrpc.CenterClient.center_list)
+  return &center_list_;
+}
+
+// repeated string server_list = 2;
+inline int CenterClient::server_list_size() const {
+  return server_list_.size();
+}
+inline void CenterClient::clear_server_list() {
+  server_list_.Clear();
+}
+inline const ::std::string& CenterClient::server_list(int index) const {
+  // @@protoc_insertion_point(field_get:libevrpc.CenterClient.server_list)
+  return server_list_.Get(index);
+}
+inline ::std::string* CenterClient::mutable_server_list(int index) {
+  // @@protoc_insertion_point(field_mutable:libevrpc.CenterClient.server_list)
+  return server_list_.Mutable(index);
+}
+inline void CenterClient::set_server_list(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:libevrpc.CenterClient.server_list)
+  server_list_.Mutable(index)->assign(value);
+}
+inline void CenterClient::set_server_list(int index, const char* value) {
+  server_list_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:libevrpc.CenterClient.server_list)
+}
+inline void CenterClient::set_server_list(int index, const char* value, size_t size) {
+  server_list_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.CenterClient.server_list)
+}
+inline ::std::string* CenterClient::add_server_list() {
+  return server_list_.Add();
+}
+inline void CenterClient::add_server_list(const ::std::string& value) {
+  server_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:libevrpc.CenterClient.server_list)
+}
+inline void CenterClient::add_server_list(const char* value) {
+  server_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:libevrpc.CenterClient.server_list)
+}
+inline void CenterClient::add_server_list(const char* value, size_t size) {
+  server_list_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:libevrpc.CenterClient.server_list)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+CenterClient::server_list() const {
+  // @@protoc_insertion_point(field_list:libevrpc.CenterClient.server_list)
+  return server_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+CenterClient::mutable_server_list() {
+  // @@protoc_insertion_point(field_mutable_list:libevrpc.CenterClient.server_list)
+  return &server_list_;
+}
 
 
 // @@protoc_insertion_point(namespace_scope)

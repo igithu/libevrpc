@@ -34,7 +34,9 @@ void protobuf_AssignDesc_center_5fclient_2eproto() {
       "center_client.proto");
   GOOGLE_CHECK(file != NULL);
   CenterClient_descriptor_ = file->message_type(0);
-  static const int CenterClient_offsets_[1] = {
+  static const int CenterClient_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterClient, center_list_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterClient, server_list_),
   };
   CenterClient_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -79,7 +81,8 @@ void protobuf_AddDesc_center_5fclient_2eproto() {
   ::libevrpc::protobuf_AddDesc_center_5ftype_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\023center_client.proto\022\010libevrpc\032\021center_"
-    "type.proto\"\016\n\014CenterClient", 66);
+    "type.proto\"8\n\014CenterClient\022\023\n\013center_lis"
+    "t\030\001 \003(\t\022\023\n\013server_list\030\002 \003(\t", 108);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "center_client.proto", &protobuf_RegisterTypes);
   CenterClient::default_instance_ = new CenterClient();
@@ -97,6 +100,8 @@ struct StaticDescriptorInitializer_center_5fclient_2eproto {
 // ===================================================================
 
 #ifndef _MSC_VER
+const int CenterClient::kCenterListFieldNumber;
+const int CenterClient::kServerListFieldNumber;
 #endif  // !_MSC_VER
 
 CenterClient::CenterClient()
@@ -116,6 +121,7 @@ CenterClient::CenterClient(const CenterClient& from)
 }
 
 void CenterClient::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -152,6 +158,8 @@ CenterClient* CenterClient::New() const {
 }
 
 void CenterClient::Clear() {
+  center_list_.Clear();
+  server_list_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -165,14 +173,57 @@ bool CenterClient::MergePartialFromCodedStream(
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
     tag = p.first;
     if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0 ||
-        ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-        ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-      goto success;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated string center_list = 1;
+      case 1: {
+        if (tag == 10) {
+         parse_center_list:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_center_list()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->center_list(this->center_list_size() - 1).data(),
+            this->center_list(this->center_list_size() - 1).length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "center_list");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(10)) goto parse_center_list;
+        if (input->ExpectTag(18)) goto parse_server_list;
+        break;
+      }
+
+      // repeated string server_list = 2;
+      case 2: {
+        if (tag == 18) {
+         parse_server_list:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_server_list()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->server_list(this->server_list_size() - 1).data(),
+            this->server_list(this->server_list_size() - 1).length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "server_list");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(18)) goto parse_server_list;
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
     }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, mutable_unknown_fields()));
   }
 success:
   // @@protoc_insertion_point(parse_success:libevrpc.CenterClient)
@@ -186,6 +237,26 @@ failure:
 void CenterClient::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:libevrpc.CenterClient)
+  // repeated string center_list = 1;
+  for (int i = 0; i < this->center_list_size(); i++) {
+  ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+    this->center_list(i).data(), this->center_list(i).length(),
+    ::google::protobuf::internal::WireFormat::SERIALIZE,
+    "center_list");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->center_list(i), output);
+  }
+
+  // repeated string server_list = 2;
+  for (int i = 0; i < this->server_list_size(); i++) {
+  ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+    this->server_list(i).data(), this->server_list(i).length(),
+    ::google::protobuf::internal::WireFormat::SERIALIZE,
+    "server_list");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      2, this->server_list(i), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -196,6 +267,26 @@ void CenterClient::SerializeWithCachedSizes(
 ::google::protobuf::uint8* CenterClient::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:libevrpc.CenterClient)
+  // repeated string center_list = 1;
+  for (int i = 0; i < this->center_list_size(); i++) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->center_list(i).data(), this->center_list(i).length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "center_list");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(1, this->center_list(i), target);
+  }
+
+  // repeated string server_list = 2;
+  for (int i = 0; i < this->server_list_size(); i++) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->server_list(i).data(), this->server_list(i).length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "server_list");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(2, this->server_list(i), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -206,6 +297,20 @@ void CenterClient::SerializeWithCachedSizes(
 
 int CenterClient::ByteSize() const {
   int total_size = 0;
+
+  // repeated string center_list = 1;
+  total_size += 1 * this->center_list_size();
+  for (int i = 0; i < this->center_list_size(); i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->center_list(i));
+  }
+
+  // repeated string server_list = 2;
+  total_size += 1 * this->server_list_size();
+  for (int i = 0; i < this->server_list_size(); i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->server_list(i));
+  }
 
   if (!unknown_fields().empty()) {
     total_size +=
@@ -232,6 +337,8 @@ void CenterClient::MergeFrom(const ::google::protobuf::Message& from) {
 
 void CenterClient::MergeFrom(const CenterClient& from) {
   GOOGLE_CHECK_NE(&from, this);
+  center_list_.MergeFrom(from.center_list_);
+  server_list_.MergeFrom(from.server_list_);
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
@@ -254,6 +361,9 @@ bool CenterClient::IsInitialized() const {
 
 void CenterClient::Swap(CenterClient* other) {
   if (other != this) {
+    center_list_.Swap(&other->center_list_);
+    server_list_.Swap(&other->server_list_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
   }

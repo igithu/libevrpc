@@ -27,7 +27,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "center_type.pb.h"
 #include "center_client.pb.h"
-#include "center_cluster.pb.h"
+#include "rpc_cluster_server.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace libevrpc {
@@ -199,6 +199,18 @@ class CentersProto : public ::google::protobuf::Message {
   inline ::std::string* release_leader_center();
   inline void set_allocated_leader_center(::std::string* leader_center);
 
+  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+  inline int server_infos_list_size() const;
+  inline void clear_server_infos_list();
+  static const int kServerInfosListFieldNumber = 8;
+  inline const ::libevrpc::RpcClusterServer& server_infos_list(int index) const;
+  inline ::libevrpc::RpcClusterServer* mutable_server_infos_list(int index);
+  inline ::libevrpc::RpcClusterServer* add_server_infos_list();
+  inline const ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer >&
+      server_infos_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer >*
+      mutable_server_infos_list();
+
   // @@protoc_insertion_point(class_scope:libevrpc.CentersProto)
  private:
   inline void set_has_from_center_addr();
@@ -227,6 +239,7 @@ class CentersProto : public ::google::protobuf::Message {
   ::google::protobuf::uint64 lc_start_time_;
   ::google::protobuf::uint64 logical_clock_;
   ::std::string* leader_center_;
+  ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer > server_infos_list_;
   friend void  protobuf_AddDesc_centers_2eproto();
   friend void protobuf_AssignDesc_centers_2eproto();
   friend void protobuf_ShutdownFile_centers_2eproto();
@@ -513,6 +526,36 @@ inline void CentersProto::set_allocated_leader_center(::std::string* leader_cent
     leader_center_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
   // @@protoc_insertion_point(field_set_allocated:libevrpc.CentersProto.leader_center)
+}
+
+// repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+inline int CentersProto::server_infos_list_size() const {
+  return server_infos_list_.size();
+}
+inline void CentersProto::clear_server_infos_list() {
+  server_infos_list_.Clear();
+}
+inline const ::libevrpc::RpcClusterServer& CentersProto::server_infos_list(int index) const {
+  // @@protoc_insertion_point(field_get:libevrpc.CentersProto.server_infos_list)
+  return server_infos_list_.Get(index);
+}
+inline ::libevrpc::RpcClusterServer* CentersProto::mutable_server_infos_list(int index) {
+  // @@protoc_insertion_point(field_mutable:libevrpc.CentersProto.server_infos_list)
+  return server_infos_list_.Mutable(index);
+}
+inline ::libevrpc::RpcClusterServer* CentersProto::add_server_infos_list() {
+  // @@protoc_insertion_point(field_add:libevrpc.CentersProto.server_infos_list)
+  return server_infos_list_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer >&
+CentersProto::server_infos_list() const {
+  // @@protoc_insertion_point(field_list:libevrpc.CentersProto.server_infos_list)
+  return server_infos_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer >*
+CentersProto::mutable_server_infos_list() {
+  // @@protoc_insertion_point(field_mutable_list:libevrpc.CentersProto.server_infos_list)
+  return &server_infos_list_;
 }
 
 

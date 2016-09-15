@@ -36,7 +36,7 @@ void protobuf_AssignDesc_centers_2eproto() {
       "centers.proto");
   GOOGLE_CHECK(file != NULL);
   CentersProto_descriptor_ = file->message_type(0);
-  static const int CentersProto_offsets_[7] = {
+  static const int CentersProto_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, from_center_addr_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, center_status_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, center_action_),
@@ -44,6 +44,7 @@ void protobuf_AssignDesc_centers_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, lc_start_time_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, logical_clock_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, leader_center_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, server_infos_list_),
   };
   CentersProto_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -89,21 +90,23 @@ void protobuf_AddDesc_centers_2eproto() {
 
   ::libevrpc::protobuf_AddDesc_center_5ftype_2eproto();
   ::libevrpc::protobuf_AddDesc_center_5fclient_2eproto();
-  ::libevrpc::protobuf_AddDesc_center_5fcluster_2eproto();
+  ::libevrpc::protobuf_AddDesc_rpc_5fcluster_5fserver_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\rcenters.proto\022\010libevrpc\032\021center_type.p"
-    "roto\032\023center_client.proto\032\024center_cluste"
-    "r.proto\"\337\001\n\014CentersProto\022\030\n\020from_center_"
-    "addr\030\001 \001(\t\022-\n\rcenter_status\030\002 \001(\0162\026.libe"
-    "vrpc.CenterStatus\022-\n\rcenter_action\030\003 \001(\016"
-    "2\026.libevrpc.CenterAction\022\022\n\nstart_time\030\004"
-    " \001(\004\022\025\n\rlc_start_time\030\005 \001(\004\022\025\n\rlogical_c"
-    "lock\030\006 \001(\004\022\025\n\rleader_center\030\007 \001(\t*\\\n\014Cen"
-    "terStatus\022\013\n\007LOOKING\020\000\022\r\n\tFOLLOWING\020\001\022\r\n"
-    "\tOBSERVING\020\002\022\013\n\007LEADING\020\003\022\n\n\006UNKONW\020\004\022\010\n"
-    "\004DEAD\020\005*i\n\014CenterAction\022\013\n\007INQUIRY\020\000\022\014\n\010"
-    "PROPOSAL\020\001\022\022\n\016LEADER_CONFIRM\020\002\022\n\n\006ACCEPT"
-    "\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFOLLOWER_PING\020\005", 514);
+    "roto\032\023center_client.proto\032\030rpc_cluster_s"
+    "erver.proto\"\226\002\n\014CentersProto\022\030\n\020from_cen"
+    "ter_addr\030\001 \001(\t\022-\n\rcenter_status\030\002 \001(\0162\026."
+    "libevrpc.CenterStatus\022-\n\rcenter_action\030\003"
+    " \001(\0162\026.libevrpc.CenterAction\022\022\n\nstart_ti"
+    "me\030\004 \001(\004\022\025\n\rlc_start_time\030\005 \001(\004\022\025\n\rlogic"
+    "al_clock\030\006 \001(\004\022\025\n\rleader_center\030\007 \001(\t\0225\n"
+    "\021server_infos_list\030\010 \003(\0132\032.libevrpc.RpcC"
+    "lusterServer*\\\n\014CenterStatus\022\013\n\007LOOKING\020"
+    "\000\022\r\n\tFOLLOWING\020\001\022\r\n\tOBSERVING\020\002\022\013\n\007LEADI"
+    "NG\020\003\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*i\n\014CenterActi"
+    "on\022\013\n\007INQUIRY\020\000\022\014\n\010PROPOSAL\020\001\022\022\n\016LEADER_"
+    "CONFIRM\020\002\022\n\n\006ACCEPT\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFO"
+    "LLOWER_PING\020\005", 573);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "centers.proto", &protobuf_RegisterTypes);
   CentersProto::default_instance_ = new CentersProto();
@@ -164,6 +167,7 @@ const int CentersProto::kStartTimeFieldNumber;
 const int CentersProto::kLcStartTimeFieldNumber;
 const int CentersProto::kLogicalClockFieldNumber;
 const int CentersProto::kLeaderCenterFieldNumber;
+const int CentersProto::kServerInfosListFieldNumber;
 #endif  // !_MSC_VER
 
 CentersProto::CentersProto()
@@ -260,6 +264,7 @@ void CentersProto::Clear() {
 #undef OFFSET_OF_FIELD_
 #undef ZR_
 
+  server_infos_list_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -388,6 +393,20 @@ bool CentersProto::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(66)) goto parse_server_infos_list;
+        break;
+      }
+
+      // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+      case 8: {
+        if (tag == 66) {
+         parse_server_infos_list:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_server_infos_list()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(66)) goto parse_server_infos_list;
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -464,6 +483,12 @@ void CentersProto::SerializeWithCachedSizes(
       7, this->leader_center(), output);
   }
 
+  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+  for (int i = 0; i < this->server_infos_list_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      8, this->server_infos_list(i), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -521,6 +546,13 @@ void CentersProto::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         7, this->leader_center(), target);
+  }
+
+  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+  for (int i = 0; i < this->server_infos_list_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        8, this->server_infos_list(i), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -583,6 +615,14 @@ int CentersProto::ByteSize() const {
     }
 
   }
+  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+  total_size += 1 * this->server_infos_list_size();
+  for (int i = 0; i < this->server_infos_list_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->server_infos_list(i));
+  }
+
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -608,6 +648,7 @@ void CentersProto::MergeFrom(const ::google::protobuf::Message& from) {
 
 void CentersProto::MergeFrom(const CentersProto& from) {
   GOOGLE_CHECK_NE(&from, this);
+  server_infos_list_.MergeFrom(from.server_infos_list_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_from_center_addr()) {
       set_from_center_addr(from.from_center_addr());
@@ -660,6 +701,7 @@ void CentersProto::Swap(CentersProto* other) {
     std::swap(lc_start_time_, other->lc_start_time_);
     std::swap(logical_clock_, other->logical_clock_);
     std::swap(leader_center_, other->leader_center_);
+    server_infos_list_.Swap(&other->server_infos_list_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

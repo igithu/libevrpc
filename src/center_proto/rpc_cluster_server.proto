@@ -3,7 +3,7 @@ package libevrpc;
 import "center_type.proto";
 
 // 中心与RPC集群之间的信息协议
-message CenterCluster {
+message RpcClusterServer {
     optional string cluster_server_addr = 1;
     optional float load = 2;
     optional float cpu_used = 3;

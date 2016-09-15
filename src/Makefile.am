@@ -48,20 +48,20 @@ CENTER_INCLUDES =                                 \
 		center_proto/centers.pb.h                 \
 		center_proto/center_type.pb.h             \
 		center_proto/center_client.pb.h           \
-		center_proto/center_cluster.pb.h          \
+		center_proto/rpc_cluster_server.pb.h      \
 		${COMMON_INCLUDES}
 
 
-CENTER_SRCS =                               \
-		rpc_center/rpc_center.cpp           \
-		rpc_center/center_server_thread.cpp \
-		rpc_center/election_thread.cpp      \
-		rpc_center/leader_thread.cpp        \
-		rpc_center/reporter_thread.cpp      \
-		center_proto/centers.pb.cc          \
-		center_proto/center_type.pb.cc      \
-		center_proto/center_client.pb.cc    \
-		center_proto/center_cluster.pb.cc   \
+CENTER_SRCS =                                   \
+		rpc_center/rpc_center.cpp               \
+		rpc_center/center_server_thread.cpp     \
+		rpc_center/election_thread.cpp          \
+		rpc_center/leader_thread.cpp            \
+		rpc_center/reporter_thread.cpp          \
+		center_proto/centers.pb.cc              \
+		center_proto/center_type.pb.cc          \
+		center_proto/center_client.pb.cc        \
+		center_proto/rpc_cluster_server.pb.cc   \
 		${COMMON_SRCS}
 
 
