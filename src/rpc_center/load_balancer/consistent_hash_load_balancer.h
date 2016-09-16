@@ -34,10 +34,11 @@ namespace libevrpc {
  * 虚拟节点, 对应多个实际RpcServer
  */
 struct VirtualNode {
-    float vn_load
+    uint32_t vid;
     std::vector<std::string> py_node_list;
 };
 
+typedef std::shared_ptr<RpcClusterServer> PN_PTR;
 typedef std::shared_ptr<VirtualNode> VN_PTR;
 typedef std::map<uint32_t, VN_PTR> VN_HASH_MAP;
 
@@ -48,7 +49,7 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
 
         bool InitBalancer();
         void SetConfigFile(const std::string& file_name)
-        bool AddRpcServer(const std::string& rpc_server);
+        bool AddRpcServer(const RpcClusterServer& rpc_server);
         void GetRpcServer(const std::string& rpc_client,
                           std::vector<string>& rpc_server_list);
 
@@ -60,7 +61,7 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
         int32_t virtual_node_num_;
 
         VN_HASH_MAP* vn_map_ptr_;
-        std::vector<std::string> py_server_list_;
+        std::vector<PN_PTR>* py_server_list_ptr_;
 };
 
 }  // end of namespace
