@@ -61,13 +61,15 @@ bool ConsistentHashLoadBalancer::AddRpcServer(const RpcClusterServer& rpc_server
     py_server_list_ptr_->push_back(rcs_ptr);
 
     for (int32_t i = 0; i < virtual_node_num_; ++i) {
-        vn_map_ptr_->insert(std::make_pair(MurMurHash2("SHARD-" + rcs_ptr->cluster_server_addr() + "-NODE-" + i), rcs_ptr));
+        string hash_str = "SHARD-" + rcs_ptr->cluster_server_addr() + "-NODE-" + (char)i;
+        vn_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), rcs_ptr));
     }
     return true;
 }
 
 void ConsistentHashLoadBalancer::GetRpcServer(
         const string& rpc_client, vector<string>& rpc_server_list) {
+    uint32_t hash_id = MurMurHash2(rpc_client.c_str(), rpc_client.size());
 }
 
 bool ConsistentHashLoadBalancer::BuildConsistentHashMap() {
