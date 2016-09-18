@@ -60,6 +60,7 @@ bool ConsistentHashLoadBalancer::AddRpcServer(const RpcClusterServer& rpc_server
     rcs_ptr->CopyFrom(rpc_center);
     py_server_list_ptr_->push_back(rcs_ptr);
 
+    WriteLockGuard wguard(vmap_rwlock_);
     for (int32_t i = 0; i < virtual_node_num_; ++i) {
         string hash_str = "SHARD-" + rcs_ptr->cluster_server_addr() + "-NODE-" + (char)i;
         vn_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), rcs_ptr));
@@ -70,6 +71,10 @@ bool ConsistentHashLoadBalancer::AddRpcServer(const RpcClusterServer& rpc_server
 void ConsistentHashLoadBalancer::GetRpcServer(
         const string& rpc_client, vector<string>& rpc_server_list) {
     uint32_t hash_id = MurMurHash2(rpc_client.c_str(), rpc_client.size());
+    VN_HASH_MAP::::const_iterator vn_iter = vn_map_ptr_->find(hash_id);
+    if (vn_map_ptr_->end != vn_iter) {
+    }
+
 }
 
 bool ConsistentHashLoadBalancer::BuildConsistentHashMap() {

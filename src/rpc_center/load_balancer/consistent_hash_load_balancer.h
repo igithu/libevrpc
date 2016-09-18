@@ -26,6 +26,7 @@
 #include <unordered_map>
 #include <map>
 
+#include "util/pthread_rwlock.h"
 #include "center_proto/rpc_cluster_server.pb.h"
 
 namespace libevrpc {
@@ -62,6 +63,8 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
 
         VN_HASH_MAP* vn_map_ptr_;
         std::vector<PN_PTR>* py_server_list_ptr_;
+
+        RWLock vmap_rwlock_;
 };
 
 }  // end of namespace
