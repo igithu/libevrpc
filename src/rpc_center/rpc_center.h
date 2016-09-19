@@ -28,6 +28,7 @@
 #include "election_thread.h"
 #include "reporter_thread.h"
 #include "leader_thread.h"
+#include "rpc_center/load_balancer/load_balancer.h"
 #include "center_proto/centers.pb.h"
 #include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
@@ -180,6 +181,10 @@ class RpcCenter {
         ReporterThread* reporter_thread_;
         LeaderThread* leader_thread_;
 
+        /*
+         * 负载均衡插件
+         */
+        LoadBalancer* load_balancer_ptr_;
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);
 };

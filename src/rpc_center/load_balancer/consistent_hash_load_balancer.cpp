@@ -68,13 +68,22 @@ bool ConsistentHashLoadBalancer::AddRpcServer(const RpcClusterServer& rpc_server
     return true;
 }
 
-void ConsistentHashLoadBalancer::GetRpcServer(
+bool ConsistentHashLoadBalancer::GetRpcServer(
         const string& rpc_client, vector<string>& rpc_server_list) {
     uint32_t hash_id = MurMurHash2(rpc_client.c_str(), rpc_client.size());
-    VN_HASH_MAP::::const_iterator vn_iter = vn_map_ptr_->find(hash_id);
-    if (vn_map_ptr_->end != vn_iter) {
-    }
 
+    ReadLockGuard rguard(vmap_rwlock_);
+    VN_HASH_MAP::::const_iterator vn_iter = vn_map_ptr_->lower_bound(hash_id);
+    if (vn_map_ptr_->end == vn_iter) {
+        return false;
+    }
+    VirtualNode& vn = vn_iter->second;
+    vector<string>& py_vec = vn.py_node_list;
+
+    for (vector<string>::iterator iter = py_vec.begin(); iter != py_vec.end(); ++iter) {
+        rpc_server_list.push_back(*iter);
+    }
+    return true;
 }
 
 bool ConsistentHashLoadBalancer::BuildConsistentHashMap() {

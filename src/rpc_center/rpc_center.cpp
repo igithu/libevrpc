@@ -49,7 +49,8 @@ RpcCenter::RpcCenter(const string& config_file) :
     center_server_thread_(NULL),
     election_thread_(NULL),
     reporter_thread_(NULL),
-    leader_thread_(NULL) {
+    leader_thread_(NULL),
+    load_balancer_ptr_(NULL) {
 
     leader_infos_ptr_->lc_start_time = start_time_;
     leader_infos_ptr_->leader_center = GetLocalAddress();
@@ -84,6 +85,10 @@ RpcCenter::~RpcCenter() {
 
     if (NULL != leader_thread_) {
         delete leader_thread_;
+    }
+
+    if (NULL != load_balancer_ptr_) {
+        delete load_balancer_ptr_;
     }
 }
 
@@ -138,6 +143,17 @@ bool RpcCenter::InitRpcCenter() {
     election_thread_ = new ElectionThread();
     reporter_thread_ = new ReporterThread();
     leader_thread_ = new LeaderThread();
+
+    /*
+     * 初始化负载均衡
+     */
+    int32_t load_balancer_policy = config_parser_instance_.IniGetInt("rpc_center:load_balancer_policy", 1);
+    switch (load_balancer_policy) {
+        case 1 : load_balancer_ptr_ = new ConsistentHashLoadBalancer(); break;
+        default: load_balancer_ptr_ = new ConsistentHashLoadBalancer();
+    }
+    load_balancer_ptr_->SetConfigFile(g_config_file);
+    load_balancer_ptr_->InitBalancer()
 
     return true;
 }
