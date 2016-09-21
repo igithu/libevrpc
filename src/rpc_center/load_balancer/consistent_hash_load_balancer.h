@@ -27,7 +27,7 @@
 #include <map>
 
 #include "util/pthread_rwlock.h"
-#include "center_proto/rpc_cluster_server.pb.h"
+#include "center_proto/center_cluster.pb.h"
 
 namespace libevrpc {
 

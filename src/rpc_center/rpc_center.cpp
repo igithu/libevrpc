@@ -25,7 +25,7 @@
 
 #include "center_proto/center_type.pb.h"
 #include "center_proto/center_client.pb.h"
-#include "center_proto/rpc_cluster_server.pb.h"
+#include "center_proto/center_cluster.pb.h"
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
 
@@ -518,7 +518,15 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
              * 处理来自RPC服务集群的请求
              */
             RpcClusterServer rpc_cluster_server;
-            rpc_cluster_server.ParseFromString(recv_message);
+            if (!rpc_cluster_server.ParseFromString(recv_message)) {
+                return false;
+            }
+            switch (rpc_cluster_server.cluster_action()) {
+                case REGISTER:
+                    load_balancer_ptr_->AddRpcServer(rpc_cluster_server);
+                    break;
+                default:
+            }
             break;
        }
        default:

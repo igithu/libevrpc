@@ -27,7 +27,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "center_type.pb.h"
 #include "center_client.pb.h"
-#include "rpc_cluster_server.pb.h"
+#include "center_cluster.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace libevrpc {

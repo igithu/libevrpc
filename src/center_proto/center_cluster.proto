@@ -1,0 +1,21 @@
+package libevrpc;
+
+import "center_type.proto";
+
+enum ClusteAction {
+    REGISTER = 0;
+    CLUSTER_PING = 1;
+}
+
+
+// 中心与RPC集群之间的信息协议
+message RpcClusterServer {
+    optional ClusteAction cluster_action = 1;
+    optional string cluster_server_addr = 2;
+    optional float load = 3;
+    optional float cpu_used = 4;
+    optional int32 connection_num = 5;
+}
+
+
+

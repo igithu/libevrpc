@@ -48,7 +48,7 @@ CENTER_INCLUDES =                                 \
 		center_proto/centers.pb.h                 \
 		center_proto/center_type.pb.h             \
 		center_proto/center_client.pb.h           \
-		center_proto/rpc_cluster_server.pb.h      \
+		center_proto/center_cluster.pb.h          \
 		${COMMON_INCLUDES}
 
 
@@ -61,7 +61,7 @@ CENTER_SRCS =                                   \
 		center_proto/centers.pb.cc              \
 		center_proto/center_type.pb.cc          \
 		center_proto/center_client.pb.cc        \
-		center_proto/rpc_cluster_server.pb.cc   \
+		center_proto/center_cluster.pb.cc       \
 		${COMMON_SRCS}
 
 
