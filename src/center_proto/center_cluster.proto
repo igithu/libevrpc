@@ -3,8 +3,12 @@ package libevrpc;
 import "center_type.proto";
 
 enum ClusteAction {
-    REGISTER = 0;
-    CLUSTER_PING = 1;
+    REGISTER = 1;
+    CLUSTER_PING = 2;
+}
+
+enum CenterAction {
+    CLUSTER_RESP = 1;
 }
 
 
@@ -17,5 +21,9 @@ message RpcClusterServer {
     optional int32 connection_num = 5;
 }
 
+message CenterResponseCluster {
+    optional CenterAction center_action = 1;
+    optional string should_reporter_center = 2;
+}
 
 
