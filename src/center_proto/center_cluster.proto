@@ -23,7 +23,7 @@ message RpcClusterServer {
 
 message CenterResponseCluster {
     optional CenterAction center_action = 1;
-    optional string should_reporter_center = 2;
+    repeated string should_reporter_center = 2;
 }
 
 
