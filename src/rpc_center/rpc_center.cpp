@@ -50,7 +50,8 @@ RpcCenter::RpcCenter(const string& config_file) :
     election_thread_(NULL),
     reporter_thread_(NULL),
     leader_thread_(NULL),
-    load_balancer_ptr_(NULL) {
+    load_balancer_ptr_(NULL),
+    center_hash_map_ptr_(new CENTER_HASH_MAP()) {
 
     leader_infos_ptr_->lc_start_time = start_time_;
     leader_infos_ptr_->leader_center = GetLocalAddress();
@@ -89,6 +90,10 @@ RpcCenter::~RpcCenter() {
 
     if (NULL != load_balancer_ptr_) {
         delete load_balancer_ptr_;
+    }
+
+    if (NULL != center_hash_map_ptr_) {
+        delete center_hash_map_ptr_;
     }
 }
 
@@ -132,6 +137,7 @@ bool RpcCenter::InitRpcCenter() {
         oc_ptr->center_status = UNKONW;
         memset(oc_ptr.get(), 0, sizeof(OtherCenter));
         other_centers_ptr_->insert(std::make_pair(line, oc_ptr));
+        RegistNewCenter(line);
     }
 
     election_done_num_ = (other_centers_ptr_->size() + 1) / 2 + 1;
@@ -651,6 +657,15 @@ void RpcCenter::SetFastLeaderRunning(bool is_running) {
 bool RpcCenter::IsFastLeaderRunning() {
     ReadLockGuard rguard(fle_running_rwlock_);
     return fastleader_election_running_;
+}
+
+bool RpcCenter::RegistNewCenter(const string& new_center) {
+    WriteLockGuard wguard(center_hash_map_rwlock_);
+    for (int32_t i = 0; i < 50; ++i) {
+        string hash_str = "SHARD-" + new_center + "-NODE-" + static_cast<char>(i);
+        center_hash_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), line));
+    }
+    return true;
 }
 
 

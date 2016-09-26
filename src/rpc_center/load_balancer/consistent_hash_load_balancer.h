@@ -22,9 +22,9 @@
 
 #include "load_balancer.h"
 
+#include <map>
 #include <memory>
 #include <unordered_map>
-#include <map>
 
 #include "util/pthread_rwlock.h"
 #include "center_proto/center_cluster.pb.h"

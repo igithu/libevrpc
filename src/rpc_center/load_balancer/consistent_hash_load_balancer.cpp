@@ -47,7 +47,7 @@ bool ConsistentHashLoadBalancer::InitBalancer() {
         return false;
     }
     ConfigParser& config_parser_instance = ConfigParser::GetInstance(config_file_);
-    int32_t virtual_node_num_ = config_parser_instance.IniGetInt("rpc_center:virtual_node_num", 20);
+    virtual_node_num_ = config_parser_instance.IniGetInt("rpc_center:virtual_node_num", 20);
     return true;
 }
 
@@ -62,7 +62,7 @@ bool ConsistentHashLoadBalancer::AddRpcServer(const RpcClusterServer& rpc_server
 
     WriteLockGuard wguard(vmap_rwlock_);
     for (int32_t i = 0; i < virtual_node_num_; ++i) {
-        string hash_str = "SHARD-" + rcs_ptr->cluster_server_addr() + "-NODE-" + (char)i;
+        string hash_str = "SHARD-" + rcs_ptr->cluster_server_addr() + "-NODE-" + static_cast<char>(i);
         vn_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), rcs_ptr));
     }
     return true;

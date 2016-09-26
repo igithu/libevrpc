@@ -20,9 +20,10 @@
 #ifndef __RPC_CENTER_H
 #define __RPC_CENTER_H
 
+#include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <memory>
 
 #include "center_server_thread.h"
 #include "election_thread.h"
@@ -61,6 +62,7 @@ struct LeaderInfos {
 typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
+typedef std::map<uint32_t, std::string> CENTER_HASH_MAP;
 
 extern std::string g_config_file;
 
@@ -128,6 +130,8 @@ class RpcCenter {
 
         bool IsFastLeaderRunning();
 
+        bool RegistNewCenter(const std::string& new_center);
+
     private:
         /*
          * Center服务器统一端口
@@ -172,6 +176,7 @@ class RpcCenter {
         RWLock lc_rwlock_;
         RWLock logical_clock_rwlock_;
         RWLock fle_running_rwlock_;
+        RWLock center_hash_map_rwlock_;
 
         /*
          * 各种线程
@@ -185,6 +190,11 @@ class RpcCenter {
          * 负载均衡插件
          */
         LoadBalancer* load_balancer_ptr_;
+
+        /*
+         * Center机器Hash表
+         */
+        CENTER_HASH_MAP* center_hash_map_ptr_;
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);
 };
