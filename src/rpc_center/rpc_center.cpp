@@ -530,6 +530,19 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             switch (rpc_cluster_server.cluster_action()) {
                 case REGISTER:
                     load_balancer_ptr_->AddRpcServer(rpc_cluster_server);
+                    CenterResponseCluster crc;
+                    crc.set_center_response_action(CLUSTER_RESP);
+
+                    string& server_addr = rpc_cluster_server.cluster_server_addr()
+                    uint32_t hash_id = MurMurHash2(server_addr.c_str(), server_addr.size());
+                    {
+                        ReadLockGuard rguard();
+                        CENTER_HASH_MAP::itertor iter = center_hash_map_ptr_->lower_bound(hash_id);
+                        for (int32_t i = 0; i < 3; ++i) {
+                            if (center_hash_map_ptr_->end() != iter) {
+                            }
+                        }
+                    }
                     break;
                 default:
             }

@@ -73,7 +73,7 @@ bool ConsistentHashLoadBalancer::GetRpcServer(
     uint32_t hash_id = MurMurHash2(rpc_client.c_str(), rpc_client.size());
 
     ReadLockGuard rguard(vmap_rwlock_);
-    VN_HASH_MAP::::const_iterator vn_iter = vn_map_ptr_->lower_bound(hash_id);
+    VN_HASH_MAP::const_iterator vn_iter = vn_map_ptr_->lower_bound(hash_id);
     if (vn_map_ptr_->end == vn_iter) {
         return false;
     }
