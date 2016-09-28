@@ -27,7 +27,6 @@
 #include <unordered_map>
 
 #include "util/pthread_rwlock.h"
-#include "center_proto/center_cluster.pb.h"
 
 namespace libevrpc {
 
@@ -49,11 +48,11 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
         virtual ~ConsistentHashLoadBalancer();
 
         bool InitBalancer();
-        void SetConfigFile(const std::string& file_name)
+        void SetConfigFile(const std::string& file_name);
         bool AddRpcServer(const RpcClusterServer& rpc_server);
         bool GetRpcServer(
                 const std::string& rpc_client,
-                std::vector<string>& rpc_server_list);
+                std::vector<std::string>& rpc_server_list);
 
     private:
         bool BuildConsistentHashMap();

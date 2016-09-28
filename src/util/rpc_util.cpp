@@ -62,7 +62,7 @@ uint32_t MurMurHash2(const char* key_str, int32_t len) {
     unsigned int h = seed ^ len;
 
     // Mix 4 bytes at a time into the hash
-    const unsigned char *data = (const unsigned char *)key;
+    const unsigned char *data = (const unsigned char *)key_str;
     while (len >= 4) {
         unsigned int k = *(unsigned int *)data;
         k *= m;

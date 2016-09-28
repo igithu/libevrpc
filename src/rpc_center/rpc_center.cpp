@@ -26,6 +26,7 @@
 #include "center_proto/center_type.pb.h"
 #include "center_proto/center_client.pb.h"
 #include "center_proto/center_cluster.pb.h"
+#include "load_balancer/consistent_hash_load_balancer.h"
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
 
@@ -159,7 +160,7 @@ bool RpcCenter::InitRpcCenter() {
         default: load_balancer_ptr_ = new ConsistentHashLoadBalancer();
     }
     load_balancer_ptr_->SetConfigFile(g_config_file);
-    load_balancer_ptr_->InitBalancer()
+    load_balancer_ptr_->InitBalancer();
 
     return true;
 }
@@ -533,18 +534,27 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     CenterResponseCluster crc;
                     crc.set_center_response_action(CLUSTER_RESP);
 
-                    string& server_addr = rpc_cluster_server.cluster_server_addr()
+                    string server_addr = rpc_cluster_server.cluster_server_addr();
                     uint32_t hash_id = MurMurHash2(server_addr.c_str(), server_addr.size());
                     {
-                        ReadLockGuard rguard();
-                        CENTER_HASH_MAP::itertor iter = center_hash_map_ptr_->lower_bound(hash_id);
+                        ReadLockGuard rguard(center_hash_map_rwlock_);
+                        CENTER_HASH_MAP::iterator iter = center_hash_map_ptr_->lower_bound(hash_id);
                         for (int32_t i = 0; i < 3; ++i) {
                             if (center_hash_map_ptr_->end() != iter) {
+                                crc.add_should_reporter_center(iter->second);
+                                ++iter;
+                            } else {
+                                iter = center_hash_map_ptr_->begin();
                             }
                         }
                     }
+                    string send_str;
+                    if (crc.SerializeToString(&send_str)) {
+                        if (!RpcSend(conn_fd, CENTER2CLUSTER, send_str, true)) {
+                            return true;
+                        }
+                    }
                     break;
-                default:
             }
             break;
        }
@@ -676,7 +686,7 @@ bool RpcCenter::RegistNewCenter(const string& new_center) {
     WriteLockGuard wguard(center_hash_map_rwlock_);
     for (int32_t i = 0; i < 50; ++i) {
         string hash_str = "SHARD-" + new_center + "-NODE-" + static_cast<char>(i);
-        center_hash_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), line));
+        center_hash_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), new_center));
     }
     return true;
 }

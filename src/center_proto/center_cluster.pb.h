@@ -36,10 +36,11 @@ void protobuf_AssignDesc_center_5fcluster_2eproto();
 void protobuf_ShutdownFile_center_5fcluster_2eproto();
 
 class RpcClusterServer;
+class CenterResponseCluster;
 
 enum ClusteAction {
-  REGISTER = 0,
-  CLUSTER_PING = 1
+  REGISTER = 1,
+  CLUSTER_PING = 2
 };
 bool ClusteAction_IsValid(int value);
 const ClusteAction ClusteAction_MIN = REGISTER;
@@ -55,6 +56,24 @@ inline bool ClusteAction_Parse(
     const ::std::string& name, ClusteAction* value) {
   return ::google::protobuf::internal::ParseNamedEnum<ClusteAction>(
     ClusteAction_descriptor(), name, value);
+}
+enum CenterResponseAction {
+  CLUSTER_RESP = 1
+};
+bool CenterResponseAction_IsValid(int value);
+const CenterResponseAction CenterResponseAction_MIN = CLUSTER_RESP;
+const CenterResponseAction CenterResponseAction_MAX = CLUSTER_RESP;
+const int CenterResponseAction_ARRAYSIZE = CenterResponseAction_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* CenterResponseAction_descriptor();
+inline const ::std::string& CenterResponseAction_Name(CenterResponseAction value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    CenterResponseAction_descriptor(), value);
+}
+inline bool CenterResponseAction_Parse(
+    const ::std::string& name, CenterResponseAction* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<CenterResponseAction>(
+    CenterResponseAction_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -180,6 +199,102 @@ class RpcClusterServer : public ::google::protobuf::Message {
   void InitAsDefaultInstance();
   static RpcClusterServer* default_instance_;
 };
+// -------------------------------------------------------------------
+
+class CenterResponseCluster : public ::google::protobuf::Message {
+ public:
+  CenterResponseCluster();
+  virtual ~CenterResponseCluster();
+
+  CenterResponseCluster(const CenterResponseCluster& from);
+
+  inline CenterResponseCluster& operator=(const CenterResponseCluster& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const CenterResponseCluster& default_instance();
+
+  void Swap(CenterResponseCluster* other);
+
+  // implements Message ----------------------------------------------
+
+  CenterResponseCluster* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const CenterResponseCluster& from);
+  void MergeFrom(const CenterResponseCluster& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional .libevrpc.CenterResponseAction center_response_action = 1;
+  inline bool has_center_response_action() const;
+  inline void clear_center_response_action();
+  static const int kCenterResponseActionFieldNumber = 1;
+  inline ::libevrpc::CenterResponseAction center_response_action() const;
+  inline void set_center_response_action(::libevrpc::CenterResponseAction value);
+
+  // repeated string should_reporter_center = 2;
+  inline int should_reporter_center_size() const;
+  inline void clear_should_reporter_center();
+  static const int kShouldReporterCenterFieldNumber = 2;
+  inline const ::std::string& should_reporter_center(int index) const;
+  inline ::std::string* mutable_should_reporter_center(int index);
+  inline void set_should_reporter_center(int index, const ::std::string& value);
+  inline void set_should_reporter_center(int index, const char* value);
+  inline void set_should_reporter_center(int index, const char* value, size_t size);
+  inline ::std::string* add_should_reporter_center();
+  inline void add_should_reporter_center(const ::std::string& value);
+  inline void add_should_reporter_center(const char* value);
+  inline void add_should_reporter_center(const char* value, size_t size);
+  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& should_reporter_center() const;
+  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_should_reporter_center();
+
+  // @@protoc_insertion_point(class_scope:libevrpc.CenterResponseCluster)
+ private:
+  inline void set_has_center_response_action();
+  inline void clear_has_center_response_action();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> should_reporter_center_;
+  int center_response_action_;
+  friend void  protobuf_AddDesc_center_5fcluster_2eproto();
+  friend void protobuf_AssignDesc_center_5fcluster_2eproto();
+  friend void protobuf_ShutdownFile_center_5fcluster_2eproto();
+
+  void InitAsDefaultInstance();
+  static CenterResponseCluster* default_instance_;
+};
 // ===================================================================
 
 
@@ -198,7 +313,7 @@ inline void RpcClusterServer::clear_has_cluster_action() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void RpcClusterServer::clear_cluster_action() {
-  cluster_action_ = 0;
+  cluster_action_ = 1;
   clear_has_cluster_action();
 }
 inline ::libevrpc::ClusteAction RpcClusterServer::cluster_action() const {
@@ -360,6 +475,89 @@ inline void RpcClusterServer::set_connection_num(::google::protobuf::int32 value
   // @@protoc_insertion_point(field_set:libevrpc.RpcClusterServer.connection_num)
 }
 
+// -------------------------------------------------------------------
+
+// CenterResponseCluster
+
+// optional .libevrpc.CenterResponseAction center_response_action = 1;
+inline bool CenterResponseCluster::has_center_response_action() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void CenterResponseCluster::set_has_center_response_action() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void CenterResponseCluster::clear_has_center_response_action() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void CenterResponseCluster::clear_center_response_action() {
+  center_response_action_ = 1;
+  clear_has_center_response_action();
+}
+inline ::libevrpc::CenterResponseAction CenterResponseCluster::center_response_action() const {
+  // @@protoc_insertion_point(field_get:libevrpc.CenterResponseCluster.center_response_action)
+  return static_cast< ::libevrpc::CenterResponseAction >(center_response_action_);
+}
+inline void CenterResponseCluster::set_center_response_action(::libevrpc::CenterResponseAction value) {
+  assert(::libevrpc::CenterResponseAction_IsValid(value));
+  set_has_center_response_action();
+  center_response_action_ = value;
+  // @@protoc_insertion_point(field_set:libevrpc.CenterResponseCluster.center_response_action)
+}
+
+// repeated string should_reporter_center = 2;
+inline int CenterResponseCluster::should_reporter_center_size() const {
+  return should_reporter_center_.size();
+}
+inline void CenterResponseCluster::clear_should_reporter_center() {
+  should_reporter_center_.Clear();
+}
+inline const ::std::string& CenterResponseCluster::should_reporter_center(int index) const {
+  // @@protoc_insertion_point(field_get:libevrpc.CenterResponseCluster.should_reporter_center)
+  return should_reporter_center_.Get(index);
+}
+inline ::std::string* CenterResponseCluster::mutable_should_reporter_center(int index) {
+  // @@protoc_insertion_point(field_mutable:libevrpc.CenterResponseCluster.should_reporter_center)
+  return should_reporter_center_.Mutable(index);
+}
+inline void CenterResponseCluster::set_should_reporter_center(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:libevrpc.CenterResponseCluster.should_reporter_center)
+  should_reporter_center_.Mutable(index)->assign(value);
+}
+inline void CenterResponseCluster::set_should_reporter_center(int index, const char* value) {
+  should_reporter_center_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:libevrpc.CenterResponseCluster.should_reporter_center)
+}
+inline void CenterResponseCluster::set_should_reporter_center(int index, const char* value, size_t size) {
+  should_reporter_center_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.CenterResponseCluster.should_reporter_center)
+}
+inline ::std::string* CenterResponseCluster::add_should_reporter_center() {
+  return should_reporter_center_.Add();
+}
+inline void CenterResponseCluster::add_should_reporter_center(const ::std::string& value) {
+  should_reporter_center_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:libevrpc.CenterResponseCluster.should_reporter_center)
+}
+inline void CenterResponseCluster::add_should_reporter_center(const char* value) {
+  should_reporter_center_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:libevrpc.CenterResponseCluster.should_reporter_center)
+}
+inline void CenterResponseCluster::add_should_reporter_center(const char* value, size_t size) {
+  should_reporter_center_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:libevrpc.CenterResponseCluster.should_reporter_center)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+CenterResponseCluster::should_reporter_center() const {
+  // @@protoc_insertion_point(field_list:libevrpc.CenterResponseCluster.should_reporter_center)
+  return should_reporter_center_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+CenterResponseCluster::mutable_should_reporter_center() {
+  // @@protoc_insertion_point(field_mutable_list:libevrpc.CenterResponseCluster.should_reporter_center)
+  return &should_reporter_center_;
+}
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -373,6 +571,11 @@ template <> struct is_proto_enum< ::libevrpc::ClusteAction> : ::google::protobuf
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::libevrpc::ClusteAction>() {
   return ::libevrpc::ClusteAction_descriptor();
+}
+template <> struct is_proto_enum< ::libevrpc::CenterResponseAction> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::libevrpc::CenterResponseAction>() {
+  return ::libevrpc::CenterResponseAction_descriptor();
 }
 
 }  // namespace google

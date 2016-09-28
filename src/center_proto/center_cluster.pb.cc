@@ -23,7 +23,11 @@ namespace {
 const ::google::protobuf::Descriptor* RpcClusterServer_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   RpcClusterServer_reflection_ = NULL;
+const ::google::protobuf::Descriptor* CenterResponseCluster_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  CenterResponseCluster_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* ClusteAction_descriptor_ = NULL;
+const ::google::protobuf::EnumDescriptor* CenterResponseAction_descriptor_ = NULL;
 
 }  // namespace
 
@@ -53,7 +57,24 @@ void protobuf_AssignDesc_center_5fcluster_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RpcClusterServer));
+  CenterResponseCluster_descriptor_ = file->message_type(1);
+  static const int CenterResponseCluster_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterResponseCluster, center_response_action_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterResponseCluster, should_reporter_center_),
+  };
+  CenterResponseCluster_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      CenterResponseCluster_descriptor_,
+      CenterResponseCluster::default_instance_,
+      CenterResponseCluster_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterResponseCluster, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterResponseCluster, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(CenterResponseCluster));
   ClusteAction_descriptor_ = file->enum_type(0);
+  CenterResponseAction_descriptor_ = file->enum_type(1);
 }
 
 namespace {
@@ -68,6 +89,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     RpcClusterServer_descriptor_, &RpcClusterServer::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    CenterResponseCluster_descriptor_, &CenterResponseCluster::default_instance());
 }
 
 }  // namespace
@@ -75,6 +98,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void protobuf_ShutdownFile_center_5fcluster_2eproto() {
   delete RpcClusterServer::default_instance_;
   delete RpcClusterServer_reflection_;
+  delete CenterResponseCluster::default_instance_;
+  delete CenterResponseCluster_reflection_;
 }
 
 void protobuf_AddDesc_center_5fcluster_2eproto() {
@@ -90,12 +115,18 @@ void protobuf_AddDesc_center_5fcluster_2eproto() {
     "ter_action\030\001 \001(\0162\026.libevrpc.ClusteAction"
     "\022\033\n\023cluster_server_addr\030\002 \001(\t\022\014\n\004load\030\003 "
     "\001(\002\022\020\n\010cpu_used\030\004 \001(\002\022\026\n\016connection_num\030"
-    "\005 \001(\005*.\n\014ClusteAction\022\014\n\010REGISTER\020\000\022\020\n\014C"
-    "LUSTER_PING\020\001", 253);
+    "\005 \001(\005\"w\n\025CenterResponseCluster\022>\n\026center"
+    "_response_action\030\001 \001(\0162\036.libevrpc.Center"
+    "ResponseAction\022\036\n\026should_reporter_center"
+    "\030\002 \003(\t*.\n\014ClusteAction\022\014\n\010REGISTER\020\001\022\020\n\014"
+    "CLUSTER_PING\020\002*(\n\024CenterResponseAction\022\020"
+    "\n\014CLUSTER_RESP\020\001", 416);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "center_cluster.proto", &protobuf_RegisterTypes);
   RpcClusterServer::default_instance_ = new RpcClusterServer();
+  CenterResponseCluster::default_instance_ = new CenterResponseCluster();
   RpcClusterServer::default_instance_->InitAsDefaultInstance();
+  CenterResponseCluster::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_center_5fcluster_2eproto);
 }
 
@@ -111,7 +142,20 @@ const ::google::protobuf::EnumDescriptor* ClusteAction_descriptor() {
 }
 bool ClusteAction_IsValid(int value) {
   switch(value) {
-    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::google::protobuf::EnumDescriptor* CenterResponseAction_descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return CenterResponseAction_descriptor_;
+}
+bool CenterResponseAction_IsValid(int value) {
+  switch(value) {
     case 1:
       return true;
     default:
@@ -149,7 +193,7 @@ RpcClusterServer::RpcClusterServer(const RpcClusterServer& from)
 void RpcClusterServer::SharedCtor() {
   ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
-  cluster_action_ = 0;
+  cluster_action_ = 1;
   cluster_server_addr_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   load_ = 0;
   cpu_used_ = 0;
@@ -203,7 +247,8 @@ void RpcClusterServer::Clear() {
   } while (0)
 
   if (_has_bits_[0 / 32] & 31) {
-    ZR_(cluster_action_, connection_num_);
+    ZR_(load_, connection_num_);
+    cluster_action_ = 1;
     if (has_cluster_server_addr()) {
       if (cluster_server_addr_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
         cluster_server_addr_->clear();
@@ -530,6 +575,285 @@ void RpcClusterServer::Swap(RpcClusterServer* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = RpcClusterServer_descriptor_;
   metadata.reflection = RpcClusterServer_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int CenterResponseCluster::kCenterResponseActionFieldNumber;
+const int CenterResponseCluster::kShouldReporterCenterFieldNumber;
+#endif  // !_MSC_VER
+
+CenterResponseCluster::CenterResponseCluster()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:libevrpc.CenterResponseCluster)
+}
+
+void CenterResponseCluster::InitAsDefaultInstance() {
+}
+
+CenterResponseCluster::CenterResponseCluster(const CenterResponseCluster& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:libevrpc.CenterResponseCluster)
+}
+
+void CenterResponseCluster::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  center_response_action_ = 1;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+CenterResponseCluster::~CenterResponseCluster() {
+  // @@protoc_insertion_point(destructor:libevrpc.CenterResponseCluster)
+  SharedDtor();
+}
+
+void CenterResponseCluster::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void CenterResponseCluster::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* CenterResponseCluster::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return CenterResponseCluster_descriptor_;
+}
+
+const CenterResponseCluster& CenterResponseCluster::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_center_5fcluster_2eproto();
+  return *default_instance_;
+}
+
+CenterResponseCluster* CenterResponseCluster::default_instance_ = NULL;
+
+CenterResponseCluster* CenterResponseCluster::New() const {
+  return new CenterResponseCluster;
+}
+
+void CenterResponseCluster::Clear() {
+  center_response_action_ = 1;
+  should_reporter_center_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool CenterResponseCluster::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:libevrpc.CenterResponseCluster)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional .libevrpc.CenterResponseAction center_response_action = 1;
+      case 1: {
+        if (tag == 8) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::libevrpc::CenterResponseAction_IsValid(value)) {
+            set_center_response_action(static_cast< ::libevrpc::CenterResponseAction >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(1, value);
+          }
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(18)) goto parse_should_reporter_center;
+        break;
+      }
+
+      // repeated string should_reporter_center = 2;
+      case 2: {
+        if (tag == 18) {
+         parse_should_reporter_center:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_should_reporter_center()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->should_reporter_center(this->should_reporter_center_size() - 1).data(),
+            this->should_reporter_center(this->should_reporter_center_size() - 1).length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "should_reporter_center");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(18)) goto parse_should_reporter_center;
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:libevrpc.CenterResponseCluster)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:libevrpc.CenterResponseCluster)
+  return false;
+#undef DO_
+}
+
+void CenterResponseCluster::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:libevrpc.CenterResponseCluster)
+  // optional .libevrpc.CenterResponseAction center_response_action = 1;
+  if (has_center_response_action()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      1, this->center_response_action(), output);
+  }
+
+  // repeated string should_reporter_center = 2;
+  for (int i = 0; i < this->should_reporter_center_size(); i++) {
+  ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+    this->should_reporter_center(i).data(), this->should_reporter_center(i).length(),
+    ::google::protobuf::internal::WireFormat::SERIALIZE,
+    "should_reporter_center");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      2, this->should_reporter_center(i), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:libevrpc.CenterResponseCluster)
+}
+
+::google::protobuf::uint8* CenterResponseCluster::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:libevrpc.CenterResponseCluster)
+  // optional .libevrpc.CenterResponseAction center_response_action = 1;
+  if (has_center_response_action()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      1, this->center_response_action(), target);
+  }
+
+  // repeated string should_reporter_center = 2;
+  for (int i = 0; i < this->should_reporter_center_size(); i++) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->should_reporter_center(i).data(), this->should_reporter_center(i).length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "should_reporter_center");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(2, this->should_reporter_center(i), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:libevrpc.CenterResponseCluster)
+  return target;
+}
+
+int CenterResponseCluster::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional .libevrpc.CenterResponseAction center_response_action = 1;
+    if (has_center_response_action()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->center_response_action());
+    }
+
+  }
+  // repeated string should_reporter_center = 2;
+  total_size += 1 * this->should_reporter_center_size();
+  for (int i = 0; i < this->should_reporter_center_size(); i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->should_reporter_center(i));
+  }
+
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void CenterResponseCluster::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const CenterResponseCluster* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const CenterResponseCluster*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void CenterResponseCluster::MergeFrom(const CenterResponseCluster& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  should_reporter_center_.MergeFrom(from.should_reporter_center_);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_center_response_action()) {
+      set_center_response_action(from.center_response_action());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void CenterResponseCluster::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CenterResponseCluster::CopyFrom(const CenterResponseCluster& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CenterResponseCluster::IsInitialized() const {
+
+  return true;
+}
+
+void CenterResponseCluster::Swap(CenterResponseCluster* other) {
+  if (other != this) {
+    std::swap(center_response_action_, other->center_response_action_);
+    should_reporter_center_.Swap(&other->should_reporter_center_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata CenterResponseCluster::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = CenterResponseCluster_descriptor_;
+  metadata.reflection = CenterResponseCluster_reflection_;
   return metadata;
 }
 
