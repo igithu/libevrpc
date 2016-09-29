@@ -30,7 +30,7 @@ ConsistentHashLoadBalancer::ConsistentHashLoadBalancer() :
     config_file_(""),
     virtual_node_num_(20),
     vn_map_ptr_(new VN_HASH_MAP()),
-    py_server_list_ptr_(new PN_PTR()) {
+    py_server_list_ptr_(new vector<PN_PTR>()) {
 }
 
 ConsistentHashLoadBalancer::~ConsistentHashLoadBalancer() {
@@ -57,13 +57,18 @@ void ConsistentHashLoadBalancer::SetConfigFile(const std::string& file_name) {
 
 bool ConsistentHashLoadBalancer::AddRpcServer(const RpcClusterServer& rpc_server) {
     PN_PTR rcs_ptr(new RpcClusterServer());
-    rcs_ptr->CopyFrom(rpc_center);
+    rcs_ptr->CopyFrom(rpc_server);
     py_server_list_ptr_->push_back(rcs_ptr);
+
+    VN_PTR vn_ptr = new VirtualNode();
+    for (int32_t i = 0; i < rcs_ptr->should_reporter_center_size(); ++i) {
+        vn_ptr->py_node_list.push_back(rcs_ptr->should_reporter_center(i))
+    }
 
     WriteLockGuard wguard(vmap_rwlock_);
     for (int32_t i = 0; i < virtual_node_num_; ++i) {
         string hash_str = "SHARD-" + rcs_ptr->cluster_server_addr() + "-NODE-" + static_cast<char>(i);
-        vn_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), rcs_ptr));
+        vn_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), vn_ptr));
     }
     return true;
 }
@@ -73,12 +78,12 @@ bool ConsistentHashLoadBalancer::GetRpcServer(
     uint32_t hash_id = MurMurHash2(rpc_client.c_str(), rpc_client.size());
 
     ReadLockGuard rguard(vmap_rwlock_);
-    VN_HASH_MAP::const_iterator vn_iter = vn_map_ptr_->lower_bound(hash_id);
-    if (vn_map_ptr_->end == vn_iter) {
+    VN_HASH_MAP::iterator vn_iter = vn_map_ptr_->lower_bound(hash_id);
+    if (vn_map_ptr_->end() == vn_iter) {
         return false;
     }
-    VirtualNode& vn = vn_iter->second;
-    vector<string>& py_vec = vn.py_node_list;
+    VN_PTR& vn = vn_iter->second;
+    vector<string>& py_vec = vn->py_node_list;
 
     for (vector<string>::iterator iter = py_vec.begin(); iter != py_vec.end(); ++iter) {
         rpc_server_list.push_back(*iter);

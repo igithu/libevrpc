@@ -38,30 +38,32 @@ SERVER_SRCS =                                   \
 		rpc_server/rpc_heartbeat_server.cpp
 
 
-CENTER_INCLUDES =                                 \
-		rpc_center/rpc_center.h                   \
-		rpc_center/center_server_thread.h         \
-		rpc_center/election_thread.h              \
-		rpc_center/leader_thread.h                \
-		rpc_center/load_balancer/load_balancer.h  \
-		rpc_center/reporter_thread.h              \
-		center_proto/centers.pb.h                 \
-		center_proto/center_type.pb.h             \
-		center_proto/center_client.pb.h           \
-		center_proto/center_cluster.pb.h          \
+CENTER_INCLUDES =                                                \
+		rpc_center/rpc_center.h                                  \
+		rpc_center/center_server_thread.h                        \
+		rpc_center/election_thread.h                             \
+		rpc_center/leader_thread.h                               \
+		rpc_center/load_balancer/load_balancer.h                 \
+		rpc_center/load_balancer/consistent_hash_load_balancer.h \
+		rpc_center/reporter_thread.h                             \
+		center_proto/centers.pb.h                                \
+		center_proto/center_type.pb.h                            \
+		center_proto/center_client.pb.h                          \
+		center_proto/center_cluster.pb.h                         \
 		${COMMON_INCLUDES}
 
 
-CENTER_SRCS =                                   \
-		rpc_center/rpc_center.cpp               \
-		rpc_center/center_server_thread.cpp     \
-		rpc_center/election_thread.cpp          \
-		rpc_center/leader_thread.cpp            \
-		rpc_center/reporter_thread.cpp          \
-		center_proto/centers.pb.cc              \
-		center_proto/center_type.pb.cc          \
-		center_proto/center_client.pb.cc        \
-		center_proto/center_cluster.pb.cc       \
+CENTER_SRCS =                                                     \
+		rpc_center/rpc_center.cpp                                 \
+		rpc_center/center_server_thread.cpp                       \
+		rpc_center/election_thread.cpp                            \
+		rpc_center/leader_thread.cpp                              \
+		rpc_center/reporter_thread.cpp                            \
+		rpc_center/load_balancer/consistent_hash_load_balancer.cpp\
+		center_proto/centers.pb.cc                                \
+		center_proto/center_type.pb.cc                            \
+		center_proto/center_client.pb.cc                          \
+		center_proto/center_cluster.pb.cc                         \
 		${COMMON_SRCS}
 
 
