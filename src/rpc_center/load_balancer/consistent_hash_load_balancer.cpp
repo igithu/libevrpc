@@ -15,8 +15,9 @@
  **/
 
 
-#include "consistent_hash_load_balancer.h"
+#include "rpc_center/load_balancer/consistent_hash_load_balancer.h"
 
+#include "center_proto/center_cluster.pb.h"
 #include "config_parser/config_parser.h"
 #include "util/rpc_util.h"
 
@@ -26,20 +27,24 @@ namespace libevrpc {
 using std::string;
 using std::vector;
 
-ConsistentHashLoadBalancer::ConsistentHashLoadBalancer() :
-    config_file_(""),
-    virtual_node_num_(20),
-    vn_map_ptr_(new VN_HASH_MAP()),
-    py_server_list_ptr_(new vector<PN_PTR>()) {
+ConsistentHashLoadBalancer::ConsistentHashLoadBalancer(const string& config_file) : LoadBalancer(config_file){
+    // :
+    // config_file_(config_file),
+    // virtual_node_num_(20),
+    // vn_map_ptr_(new VN_HASH_MAP()) {
+
+    config_file_ = config_file;
+    virtual_node_num_ =20;
+    vn_map_ptr_ = new VN_HASH_MAP();
 }
 
 ConsistentHashLoadBalancer::~ConsistentHashLoadBalancer() {
     if (NULL != vn_map_ptr_) {
         delete vn_map_ptr_;
     }
-    if (NULL != py_server_list_ptr_) {
-        delete py_server_list_ptr_;
-    }
+    // if (NULL != py_server_list_ptr_) {
+    //     delete py_server_list_ptr_;
+    // }
 }
 
 bool ConsistentHashLoadBalancer::InitBalancer() {
@@ -55,20 +60,12 @@ void ConsistentHashLoadBalancer::SetConfigFile(const std::string& file_name) {
     config_file_ = file_name;
 }
 
-bool ConsistentHashLoadBalancer::AddRpcServer(const RpcClusterServer& rpc_server) {
-    PN_PTR rcs_ptr(new RpcClusterServer());
-    rcs_ptr->CopyFrom(rpc_server);
-    py_server_list_ptr_->push_back(rcs_ptr);
-
-    VN_PTR vn_ptr = new VirtualNode();
-    for (int32_t i = 0; i < rcs_ptr->should_reporter_center_size(); ++i) {
-        vn_ptr->py_node_list.push_back(rcs_ptr->should_reporter_center(i))
-    }
-
+bool ConsistentHashLoadBalancer::AddRpcServer(const string& rpc_server) {
     WriteLockGuard wguard(vmap_rwlock_);
     for (int32_t i = 0; i < virtual_node_num_; ++i) {
-        string hash_str = "SHARD-" + rcs_ptr->cluster_server_addr() + "-NODE-" + static_cast<char>(i);
-        vn_map_ptr_->insert(std::make_pair(MurMurHash2(hash_str.c_str(), hash_str.size()), vn_ptr));
+        string hash_str = "SHARD-" + rpc_server + "-NODE-" + static_cast<char>(i);
+        uint32_t hash_id = MurMurHash2(hash_str.c_str(), hash_str.size());
+        vn_map_ptr_->insert(std::make_pair(hash_id, rpc_server));
     }
     return true;
 }
@@ -82,12 +79,7 @@ bool ConsistentHashLoadBalancer::GetRpcServer(
     if (vn_map_ptr_->end() == vn_iter) {
         return false;
     }
-    VN_PTR& vn = vn_iter->second;
-    vector<string>& py_vec = vn->py_node_list;
-
-    for (vector<string>::iterator iter = py_vec.begin(); iter != py_vec.end(); ++iter) {
-        rpc_server_list.push_back(*iter);
-    }
+    rpc_server_list.push_back(vn_iter->second);
     return true;
 }
 

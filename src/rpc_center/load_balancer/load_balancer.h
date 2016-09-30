@@ -23,8 +23,6 @@
 #include <string>
 #include <vector>
 
-#include "center_proto/center_cluster.pb.h"
-
 namespace libevrpc {
 
 class LoadBalancer {
@@ -34,7 +32,7 @@ class LoadBalancer {
 
         virtual bool InitBalancer() = 0;
         virtual void SetConfigFile(const std::string& file_name) = 0;
-        virtual bool AddRpcServer(const RpcClusterServer& rpc_server) = 0;
+        virtual bool AddRpcServer(const std::string& rpc_server) = 0;
         virtual bool GetRpcServer(const std::string& rpc_client, std::vector<std::string>& rpc_server_list) = 0;
 
 };  // end of namespace libevrpc

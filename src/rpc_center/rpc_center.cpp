@@ -26,10 +26,9 @@
 #include "center_proto/center_type.pb.h"
 #include "center_proto/center_client.pb.h"
 #include "center_proto/center_cluster.pb.h"
-#include "load_balancer/consistent_hash_load_balancer.h"
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
-
+#include "rpc_center/load_balancer/consistent_hash_load_balancer.h"
 
 namespace libevrpc {
 
@@ -156,8 +155,8 @@ bool RpcCenter::InitRpcCenter() {
      */
     int32_t load_balancer_policy = config_parser_instance_.IniGetInt("rpc_center:load_balancer_policy", 1);
     switch (load_balancer_policy) {
-        case 1 : load_balancer_ptr_ = new ConsistentHashLoadBalancer(); break;
-        default: load_balancer_ptr_ = new ConsistentHashLoadBalancer();
+        case 1 : load_balancer_ptr_ = new ConsistentHashLoadBalancer(g_config_file); break;
+        default: load_balancer_ptr_ = new ConsistentHashLoadBalancer(g_config_file);
     }
     load_balancer_ptr_->SetConfigFile(g_config_file);
     load_balancer_ptr_->InitBalancer();
@@ -530,11 +529,11 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             }
             switch (rpc_cluster_server.cluster_action()) {
                 case REGISTER:
-                    load_balancer_ptr_->AddRpcServer(rpc_cluster_server);
                     CenterResponseCluster crc;
                     crc.set_center_response_action(CLUSTER_RESP);
 
                     string server_addr = rpc_cluster_server.cluster_server_addr();
+                    load_balancer_ptr_->AddRpcServer(server_addr);
                     uint32_t hash_id = MurMurHash2(server_addr.c_str(), server_addr.size());
                     {
                         ReadLockGuard rguard(center_hash_map_rwlock_);

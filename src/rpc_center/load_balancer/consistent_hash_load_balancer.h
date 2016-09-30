@@ -20,10 +20,11 @@
 #ifndef __CONSISTENT_HASH_LOAD_BALANCER_H
 #define __CONSISTENT_HASH_LOAD_BALANCER_H
 
-#include "load_balancer.h"
+#include "rpc_center/load_balancer/load_balancer.h"
 
 #include <map>
 #include <memory>
+#include <string>
 #include <unordered_map>
 
 #include "util/pthread_rwlock.h"
@@ -38,18 +39,18 @@ struct VirtualNode {
     std::vector<std::string> py_node_list;
 };
 
-typedef std::shared_ptr<RpcClusterServer> PN_PTR;
+// typedef std::shared_ptr<RpcClusterServer> PN_PTR;
 typedef std::shared_ptr<VirtualNode> VN_PTR;
-typedef std::map<uint32_t, VN_PTR> VN_HASH_MAP;
+typedef std::map<uint32_t, std::string> VN_HASH_MAP;
 
 class ConsistentHashLoadBalancer : public LoadBalancer {
     public:
-        ConsistentHashLoadBalancer();
+        ConsistentHashLoadBalancer(const std::string& config_file);
         virtual ~ConsistentHashLoadBalancer();
 
         bool InitBalancer();
         void SetConfigFile(const std::string& file_name);
-        bool AddRpcServer(const RpcClusterServer& rpc_server);
+        bool AddRpcServer(const std::string& rpc_server);
         bool GetRpcServer(
                 const std::string& rpc_client,
                 std::vector<std::string>& rpc_server_list);
@@ -62,7 +63,6 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
         int32_t virtual_node_num_;
 
         VN_HASH_MAP* vn_map_ptr_;
-        std::vector<PN_PTR>* py_server_list_ptr_;
 
         RWLock vmap_rwlock_;
 };
