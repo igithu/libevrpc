@@ -27,15 +27,11 @@ namespace libevrpc {
 using std::string;
 using std::vector;
 
-ConsistentHashLoadBalancer::ConsistentHashLoadBalancer(const string& config_file) : LoadBalancer(config_file){
-    // :
-    // config_file_(config_file),
-    // virtual_node_num_(20),
-    // vn_map_ptr_(new VN_HASH_MAP()) {
+ConsistentHashLoadBalancer::ConsistentHashLoadBalancer(const string& config_file) :
+    config_file_(config_file),
+    virtual_node_num_(20),
+    vn_map_ptr_(new VN_HASH_MAP()) {
 
-    config_file_ = config_file;
-    virtual_node_num_ =20;
-    vn_map_ptr_ = new VN_HASH_MAP();
 }
 
 ConsistentHashLoadBalancer::~ConsistentHashLoadBalancer() {
