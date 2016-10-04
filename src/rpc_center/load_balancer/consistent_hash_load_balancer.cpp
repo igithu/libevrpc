@@ -15,7 +15,7 @@
  **/
 
 
-#include "rpc_center/load_balancer/consistent_hash_load_balancer.h"
+#include "consistent_hash_load_balancer.h"
 
 #include "center_proto/center_cluster.pb.h"
 #include "config_parser/config_parser.h"

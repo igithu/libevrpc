@@ -20,7 +20,7 @@
 #ifndef __CONSISTENT_HASH_LOAD_BALANCER_H
 #define __CONSISTENT_HASH_LOAD_BALANCER_H
 
-#include "rpc_center/load_balancer/load_balancer.h"
+#include "load_balancer.h"
 
 #include <map>
 #include <memory>

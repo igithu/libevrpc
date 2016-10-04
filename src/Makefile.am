@@ -123,6 +123,7 @@ librpc_server_la_SOURCES =   \
 
 
 AM_LDFLAGS = -lz -lrt -lm -lpthread -std=c++11 -lprotobuf
+#AM_LDFLAGS = -lz -lm -lpthread -std=c++11
 bin_PROGRAMS = rpc_center_server
 rpc_center_server_SOURCES = rpc_center/rpc_center_server.cc ${CENTER_INCLUDES} ${CENTER_SRCS}
 rpc_center_server_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a

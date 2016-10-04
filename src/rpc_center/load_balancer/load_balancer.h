@@ -27,8 +27,7 @@ namespace libevrpc {
 
 class LoadBalancer {
     public:
-        LoadBalancer(const std::string& config_file);
-        virtual ~LoadBalancer();
+        virtual ~LoadBalancer() {}
 
         virtual bool InitBalancer() = 0;
         virtual void SetConfigFile(const std::string& file_name) = 0;
