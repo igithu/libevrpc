@@ -17,7 +17,6 @@
 
 #include "rpc_center.h"
 
-// #include <io.h>
 #include <unistd.h>
 #include <time.h>
 #include <fstream>

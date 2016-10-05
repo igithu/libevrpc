@@ -35,11 +35,6 @@
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_rwlock.h"
 
-// /**
-//  * 供其他CPP代码使用
-//  */
-// #define g_rpc_center RpcCenter::GetInstance()
-
 namespace libevrpc {
 
 class RpcCenter;

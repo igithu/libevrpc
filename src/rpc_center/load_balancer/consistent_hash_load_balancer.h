@@ -39,7 +39,6 @@ struct VirtualNode {
     std::vector<std::string> py_node_list;
 };
 
-// typedef std::shared_ptr<RpcClusterServer> PN_PTR;
 typedef std::shared_ptr<VirtualNode> VN_PTR;
 typedef std::map<uint32_t, std::string> VN_HASH_MAP;
 
