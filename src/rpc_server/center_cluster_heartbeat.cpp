@@ -24,10 +24,13 @@
 
 namespace libevrpc {
 
-CenterClusterHeartbeat::CenterClusterHeartbeat() {
+CenterClusterHeartbeat::CenterClusterHeartbeat() : center_addrs_ptr_(new ADDRS_LIST_TYPE()) {
 }
 
 CenterClusterHeartbeat::~CenterClusterHeartbeat() {
+    if (NULL != center_addrs_ptr_) {
+        delete center_addrs_ptr_;
+    }
 }
 
 bool CenterClusterHeartbeat::InitCenterClusterHB() {
@@ -47,6 +50,7 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
         if (strcmp(line.c_str(), local_addr) == 0) {
             continue;
         }
+        center_addrs_ptr_->push_back(line);
     }
     return true;
 }

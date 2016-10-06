@@ -20,10 +20,13 @@
 #ifndef __CENTER_CLUSTER_HEARTBEAT_H
 #define __CENTER_CLUSTER_HEARTBEAT_H
 
+#include <vector>
 
 #include "util/thread.h"
 
 namespace libevrpc {
+
+typedef std::vector<string> ADDRS_LIST_TYPE;
 
 class CenterClusterHeartbeat : public Thread {
     public:
@@ -35,6 +38,7 @@ class CenterClusterHeartbeat : public Thread {
         virtual void Run();
 
     private:
+        ADDRS_LIST_TYPE* center_addrs_ptr_;
 };
 
 }  // end of namespace libevrpc
