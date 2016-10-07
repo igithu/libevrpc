@@ -56,6 +56,9 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 }
 
 void CenterClusterHeartbeat::Run() {
+    if (!InitCenterClusterHB()) {
+        return;
+    }
 }
 
 
