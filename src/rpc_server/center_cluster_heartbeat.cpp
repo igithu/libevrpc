@@ -20,16 +20,25 @@
 #include <time.h>
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
+
+#define random(x) (rand()%x)
 
 
 namespace libevrpc {
 
-CenterClusterHeartbeat::CenterClusterHeartbeat() : center_addrs_ptr_(new ADDRS_LIST_TYPE()) {
+CenterClusterHeartbeat::CenterClusterHeartbeat() :
+    center_addrs_ptr_(new ADDRS_LIST_TYPE()),
+    reporter_center_addrs_ptr_(new ADDRS_LIST_TYPE()) {
 }
 
 CenterClusterHeartbeat::~CenterClusterHeartbeat() {
     if (NULL != center_addrs_ptr_) {
         delete center_addrs_ptr_;
+    }
+
+    if (NULL != reporter_center_addrs_ptr_) {
+        delete reporter_center_addrs_ptr_;
     }
 }
 
@@ -52,6 +61,36 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
         }
         center_addrs_ptr_->push_back(line);
     }
+
+    int32_t random_index = random(center_addrs_ptr_->size());
+
+    int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port, 15);
+    if (conn_fd <= 0) {
+        return false;
+    }
+
+    /*
+     * 在RpcCenter注册本地RpcServer, 获取Report机器地址`
+     */
+    RpcClusterServer rcs;
+    rcs.set_cluster_action(REGISTER);
+    rcs.set_cluster_server_addr(GetLocalAddress());
+
+    string rcs_str;
+    if (!rcs.SerializeToString(&rcs_str)) {
+        return false;
+    }
+    if (!RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, false)) {
+        return false;
+    }
+
+    string crc;
+    if (RpcRecv(conn_fd, crc, true) < 0) {
+        return false;
+    }
+
+    // TODO
+
     return true;
 }
 
