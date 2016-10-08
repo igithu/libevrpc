@@ -27,6 +27,7 @@
 #include "dispatch_thread.h"
 #include "connection_timer_manager.h"
 #include "libev_thread_pool.h"
+#include "center_cluster_heartbeat.h"
 #include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_mutex.h"
@@ -101,11 +102,15 @@ class RpcServer {
          */
         HashMap method_hashmap_;
 
+        std::string config_file_;
+
         DispatchThread*  dispatcher_thread_ptr_;
         LibevThreadPool* worker_threads_ptr_;
         LibevThreadPool* reader_threads_ptr_;
         LibevThreadPool* writer_threads_ptr_;
         RpcController* rpc_controller_ptr_;
+        CenterClusterHeartbeat* center_cluster_heartbeat_ptr_;
+
         ConfigParser& config_parser_instance_;
         ConnectionTimerManager& connection_timer_manager_;
 

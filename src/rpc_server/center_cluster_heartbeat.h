@@ -21,16 +21,17 @@
 #define __CENTER_CLUSTER_HEARTBEAT_H
 
 #include <vector>
+#include <string>
 
 #include "util/thread.h"
 
 namespace libevrpc {
 
-typedef std::vector<string> ADDRS_LIST_TYPE;
+typedef std::vector<std::string> ADDRS_LIST_TYPE;
 
 class CenterClusterHeartbeat : public Thread {
     public:
-        CenterClusterHeartbeat();
+        CenterClusterHeartbeat(const std::string& config_file);
         ~CenterClusterHeartbeat();
 
         bool InitCenterClusterHB();
@@ -38,6 +39,7 @@ class CenterClusterHeartbeat : public Thread {
         virtual void Run();
 
     private:
+        std::string config_file_;
         ADDRS_LIST_TYPE* center_addrs_ptr_;
         ADDRS_LIST_TYPE* reporter_center_addrs_ptr_;
 };

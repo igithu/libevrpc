@@ -27,6 +27,7 @@ SERVER_INCLUDES =                               \
 		rpc_server/libev_thread_pool.h          \
 		rpc_server/server_rpc_controller.h      \
 		rpc_server/connection_timer_manager.h   \
+		rpc_server/center_cluster_heartbeat.h   \
 		rpc_server/rpc_heartbeat_server.h
 
 SERVER_SRCS =                                   \
@@ -35,6 +36,7 @@ SERVER_SRCS =                                   \
 		rpc_server/libev_thread_pool.cpp        \
 		rpc_server/server_rpc_controller.cpp    \
 		rpc_server/connection_timer_manager.cpp \
+		rpc_server/center_cluster_heartbeat.cpp \
 		rpc_server/rpc_heartbeat_server.cpp
 
 

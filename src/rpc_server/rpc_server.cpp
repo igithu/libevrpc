@@ -33,10 +33,12 @@ namespace libevrpc {
 using std::string;
 
 RpcServer::RpcServer(const string& config_file) :
+    config_file_(config_file),
     dispatcher_thread_ptr_(NULL),
     worker_threads_ptr_(NULL),
     reader_threads_ptr_(NULL),
     writer_threads_ptr_(NULL),
+    center_cluster_heartbeat_ptr_(NULL),
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
     connection_timer_manager_(ConnectionTimerManager::GetInstance(config_file.c_str())),
     connection_timer_open_(false) {
@@ -68,6 +70,10 @@ RpcServer::~RpcServer() {
 
     if (NULL != dispatcher_thread_ptr_) {
         delete dispatcher_thread_ptr_;
+    }
+
+    if (NULL != center_cluster_heartbeat_ptr_) {
+        delete center_cluster_heartbeat_ptr_;
     }
 
 }
@@ -144,6 +150,7 @@ bool RpcServer::Start() {
     int32_t thread_num = config_parser_instance_.IniGetInt("rpc_server:thread_num", 10);
     int32_t reader_thread_num = config_parser_instance_.IniGetInt("rpc_server:reader_thread_num", 0);
     int32_t writer_thread_num = config_parser_instance_.IniGetInt("rpc_server:writer_thread_num", 0);
+    bool p2c_mode = config_parser_instance_.IniGetBool("rpc_server:p2c_mode", false);
 
     dispatcher_thread_ptr_ = new DispatchThread();
     dispatcher_thread_ptr_->InitializeService(server_addr, server_port, &RpcServer::RpcCall, (void*)this);
@@ -167,6 +174,11 @@ bool RpcServer::Start() {
         writer_threads_ptr_ = new LibevThreadPool();
         writer_threads_ptr_->Start(writer_thread_num);
     }
+
+    if (p2c_mode) {
+        center_cluster_heartbeat_ptr_ = new CenterClusterHeartbeat(config_file_);
+        center_cluster_heartbeat_ptr_->Start();
+    }
 }
 
 bool RpcServer::Wait() {
@@ -188,6 +200,10 @@ bool RpcServer::Wait() {
 
     if (NULL != writer_threads_ptr_) {
         writer_threads_ptr_->Wait();
+    }
+
+    if (NULL != center_cluster_heartbeat_ptr_) {
+        center_cluster_heartbeat_ptr_->Wait();
     }
 
     return true;
