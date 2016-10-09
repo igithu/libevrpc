@@ -127,6 +127,8 @@ class RpcCenter {
 
         bool RegistNewCenter(const std::string& new_center);
 
+        bool CenterIsReady();
+
     private:
         /*
          * Center服务器统一端口

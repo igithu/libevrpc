@@ -467,10 +467,12 @@ CenterAction RpcCenter::LeaderPredicate(const CentersProto& centers_proto) {
 
 bool RpcCenter::CenterProcessor(int32_t conn_fd) {
     string recv_message;
-    int32_t center_type = RpcRecv(conn_fd, recv_message, true);
+    int32_t center_type = RpcRecv(conn_fd, recv_message, false);
     if (center_type < 0) {
+        close(conn_fd);
         return false;
     }
+
     switch (center_type) {
        case CENTER2CENTER : {
             /*
@@ -485,7 +487,8 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     if (NULL == election_thread_) {
                         return false;
                     }
-                    election_thread_->PushElectionMessage(conn_fd,response_proto);
+                    election_thread_->PushElectionMessage(conn_fd, response_proto);
+                    break;
                 }
                 case FOLLOWER_PING: {
                     CentersProto response_proto;
@@ -519,6 +522,16 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             break;
        }
        case CENTER2CLUSTER : {
+            if (!CenterIsReady()) {
+                CenterResponseCluster crc;
+                crc.set_center_response_action(CLIENT_NOT_READY);
+
+                string response_str;
+                crc.SerializeToString(&response_str);
+                RpcSend(conn_fd, CENTER2CLUSTER, response_str, false);
+                return false;
+            }
+
             /*
              * 处理来自RPC服务集群的请求
              */
@@ -549,7 +562,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     string send_str;
                     if (crc.SerializeToString(&send_str)) {
                         if (!RpcSend(conn_fd, CENTER2CLUSTER, send_str, true)) {
-                            return true;
+                            return false;
                         }
                     }
                     break;
@@ -689,6 +702,14 @@ bool RpcCenter::RegistNewCenter(const string& new_center) {
     return true;
 }
 
+bool RpcCenter::CenterIsReady() {
+    CenterStatus cs = GetCenterStatus();
+    if (FOLLOWING != cs && LEADING != cs) {
+        return false;
+    }
+
+    return true;
+}
 
 }  // end of namespace libevrpc
 

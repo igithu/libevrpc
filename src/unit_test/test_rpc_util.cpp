@@ -14,6 +14,10 @@
  *
  **/
 
+#include <stdio.h>
+
+#include <string>
+
 #include "../util/rpc_util.h"
 
 using namespace libevrpc;
@@ -22,6 +26,13 @@ using namespace libevrpc;
 int main() {
 
     PrintErrorInfo("Test");
+
+    std::string ip_addr = "10.189.192.213";
+    printf("out test\n");
+
+    uint32_t hash_id = MurMurHash2(ip_addr.c_str(), ip_addr.size());
+
+    printf("the hash id is %u", hash_id);
 
     return 0;
 }
