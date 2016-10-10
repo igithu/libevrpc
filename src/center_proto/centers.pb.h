@@ -68,11 +68,12 @@ enum CenterAction {
   LEADER_CONFIRM = 2,
   ACCEPT = 3,
   REFUSED = 4,
-  FOLLOWER_PING = 5
+  FOLLOWER_PING = 5,
+  CENTER_REPORTER = 6
 };
 bool CenterAction_IsValid(int value);
 const CenterAction CenterAction_MIN = INQUIRY;
-const CenterAction CenterAction_MAX = FOLLOWER_PING;
+const CenterAction CenterAction_MAX = CENTER_REPORTER;
 const int CenterAction_ARRAYSIZE = CenterAction_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* CenterAction_descriptor();

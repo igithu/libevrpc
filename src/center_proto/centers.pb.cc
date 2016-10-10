@@ -103,10 +103,10 @@ void protobuf_AddDesc_centers_2eproto() {
     "ver_infos_list\030\010 \003(\0132\032.libevrpc.RpcClust"
     "erServer*\\\n\014CenterStatus\022\013\n\007LOOKING\020\000\022\r\n"
     "\tFOLLOWING\020\001\022\r\n\tOBSERVING\020\002\022\013\n\007LEADING\020\003"
-    "\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*i\n\014CenterAction\022\013"
+    "\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*~\n\014CenterAction\022\013"
     "\n\007INQUIRY\020\000\022\014\n\010PROPOSAL\020\001\022\022\n\016LEADER_CONF"
     "IRM\020\002\022\n\n\006ACCEPT\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFOLLOW"
-    "ER_PING\020\005", 569);
+    "ER_PING\020\005\022\023\n\017CENTER_REPORTER\020\006", 590);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "centers.proto", &protobuf_RegisterTypes);
   CentersProto::default_instance_ = new CentersProto();
@@ -150,6 +150,7 @@ bool CenterAction_IsValid(int value) {
     case 3:
     case 4:
     case 5:
+    case 6:
       return true;
     default:
       return false;

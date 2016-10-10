@@ -127,9 +127,9 @@ void CenterServerThread::Processor(struct ev_loop *loop, struct ev_io *watcher, 
     }
     RpcCenter::GetInstance(g_config_file).CenterProcessor(watcher->fd);
     /*
-     * control by CenterProcessor
+     * 每一次执行结束, 关闭链接
      */
-    // close(watcher->fd);
+    close(watcher->fd);
 }
 
 CEIO_ITEM* CenterServerThread::NewCEIO() {

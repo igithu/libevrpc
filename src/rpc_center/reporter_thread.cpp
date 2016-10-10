@@ -70,10 +70,11 @@ void ReporterThread::Run() {
     }
 
     RpcCenter& rc = RpcCenter::GetInstance(g_config_file);
-    conn_fd_ = TcpConnect(leader_addr_, leader_port_, 15);
 
     int failed_cnt = 10, retry_time = 3;
     while (reporter_running_) {
+        conn_fd_ = TcpConnect(leader_addr_, leader_port_, 15);
+
         if (failed_cnt > 0 && !rc.ReporterProcessor(conn_fd_)) {
             --failed_cnt;
         }
@@ -100,9 +101,9 @@ void ReporterThread::Run() {
                 break;
             }
         }
+        close(conn_fd_);
         sleep(10);
     }
-    close(conn_fd_);
 }
 
 }  // end of namespace libevrpc

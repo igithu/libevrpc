@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "center_server_thread.h"
 #include "election_thread.h"
@@ -58,6 +59,7 @@ typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
 typedef std::map<uint32_t, std::string> CENTER_HASH_MAP;
+typedef std::unordered_set<std::string> SERVER_SET;
 
 extern std::string g_config_file;
 
@@ -129,6 +131,8 @@ class RpcCenter {
 
         bool CenterIsReady();
 
+        bool AddRpcServerToBuf(const std::string& rpc_server_addr);
+
     private:
         /*
          * Center服务器统一端口
@@ -174,6 +178,7 @@ class RpcCenter {
         RWLock logical_clock_rwlock_;
         RWLock fle_running_rwlock_;
         RWLock center_hash_map_rwlock_;
+        RWLock rpc_server_buf_rwlock_;
 
         /*
          * 各种线程
@@ -192,6 +197,10 @@ class RpcCenter {
          * Center机器Hash表
          */
         CENTER_HASH_MAP* center_hash_map_ptr_;
+        /*
+         * 记录前来注册的机器地址列表
+         */
+        SERVER_SET* rpc_server_buf_ptr_;
 
         DISALLOW_COPY_AND_ASSIGN(RpcCenter);
 };

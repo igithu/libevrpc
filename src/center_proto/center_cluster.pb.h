@@ -58,11 +58,12 @@ inline bool ClusteAction_Parse(
     ClusteAction_descriptor(), name, value);
 }
 enum CenterResponseAction {
-  CLUSTER_RESP = 1
+  CLUSTER_RESP = 1,
+  CLIENT_NOT_READY = 2
 };
 bool CenterResponseAction_IsValid(int value);
 const CenterResponseAction CenterResponseAction_MIN = CLUSTER_RESP;
-const CenterResponseAction CenterResponseAction_MAX = CLUSTER_RESP;
+const CenterResponseAction CenterResponseAction_MAX = CLIENT_NOT_READY;
 const int CenterResponseAction_ARRAYSIZE = CenterResponseAction_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* CenterResponseAction_descriptor();

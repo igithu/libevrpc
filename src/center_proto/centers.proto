@@ -21,6 +21,7 @@ enum CenterAction {
     ACCEPT = 3;
     REFUSED = 4;
     FOLLOWER_PING = 5;
+    CENTER_REPORTER = 6;
 }
 
 message CentersProto {
