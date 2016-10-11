@@ -9,7 +9,7 @@ enum ClusteAction {
 
 enum CenterResponseAction {
     CLUSTER_RESP = 1;
-    CLIENT_NOT_READY = 2;
+    CENTER_NOT_READY = 2;
 }
 
 

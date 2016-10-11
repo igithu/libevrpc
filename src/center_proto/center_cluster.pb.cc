@@ -120,7 +120,7 @@ void protobuf_AddDesc_center_5fcluster_2eproto() {
     "ResponseAction\022\036\n\026should_reporter_center"
     "\030\002 \003(\t*.\n\014ClusteAction\022\014\n\010REGISTER\020\001\022\020\n\014"
     "CLUSTER_PING\020\002*>\n\024CenterResponseAction\022\020"
-    "\n\014CLUSTER_RESP\020\001\022\024\n\020CLIENT_NOT_READY\020\002", 438);
+    "\n\014CLUSTER_RESP\020\001\022\024\n\020CENTER_NOT_READY\020\002", 438);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "center_cluster.proto", &protobuf_RegisterTypes);
   RpcClusterServer::default_instance_ = new RpcClusterServer();

@@ -532,7 +532,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
        case CENTER2CLUSTER : {
             if (!CenterIsReady()) {
                 CenterResponseCluster crc;
-                crc.set_center_response_action(CLIENT_NOT_READY);
+                crc.set_center_response_action(CENTER_NOT_READY);
 
                 string response_str;
                 crc.SerializeToString(&response_str);
@@ -692,6 +692,21 @@ bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
     CentersProto centers_proto;
     centers_proto.set_from_center_addr(GetLocalAddress());
     centers_proto.set_center_action(FOLLOWER_PING);
+
+    /*
+     * 取出Buf中的数据, 然后将这些收集到的汇报给Leader机器, 由Leader机器统一计算做负载均衡计算等操作
+     */
+    if (NULL != rpc_server_buf_ptr_ && !rpc_server_buf_ptr_->empty()) {
+        ReadLockGuard rguard(rpc_server_buf_rwlock_);
+        for (SERVER_SET::iterator iter = rpc_server_buf_ptr_->begin();
+             iter != rpc_server_buf_ptr_->end();
+             ++iter) {
+            RpcClusterServer rcs;
+            rcs.add_should_reporter_center(*iter);
+            centers_proto.mutable_server_infos_list->push_back(rcs);
+        }
+    }
+
     string ping_str;
     if (!centers_proto.SerializeToString(&ping_str)) {
         return false;
@@ -726,7 +741,6 @@ bool RpcCenter::CenterIsReady() {
     if (FOLLOWING != cs && LEADING != cs) {
         return false;
     }
-
     return true;
 }
 
