@@ -200,17 +200,21 @@ class CentersProto : public ::google::protobuf::Message {
   inline ::std::string* release_leader_center();
   inline void set_allocated_leader_center(::std::string* leader_center);
 
-  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+  // repeated string server_infos_list = 8;
   inline int server_infos_list_size() const;
   inline void clear_server_infos_list();
   static const int kServerInfosListFieldNumber = 8;
-  inline const ::libevrpc::RpcClusterServer& server_infos_list(int index) const;
-  inline ::libevrpc::RpcClusterServer* mutable_server_infos_list(int index);
-  inline ::libevrpc::RpcClusterServer* add_server_infos_list();
-  inline const ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer >&
-      server_infos_list() const;
-  inline ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer >*
-      mutable_server_infos_list();
+  inline const ::std::string& server_infos_list(int index) const;
+  inline ::std::string* mutable_server_infos_list(int index);
+  inline void set_server_infos_list(int index, const ::std::string& value);
+  inline void set_server_infos_list(int index, const char* value);
+  inline void set_server_infos_list(int index, const char* value, size_t size);
+  inline ::std::string* add_server_infos_list();
+  inline void add_server_infos_list(const ::std::string& value);
+  inline void add_server_infos_list(const char* value);
+  inline void add_server_infos_list(const char* value, size_t size);
+  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& server_infos_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_server_infos_list();
 
   // @@protoc_insertion_point(class_scope:libevrpc.CentersProto)
  private:
@@ -240,7 +244,7 @@ class CentersProto : public ::google::protobuf::Message {
   ::google::protobuf::uint64 lc_start_time_;
   ::google::protobuf::uint64 logical_clock_;
   ::std::string* leader_center_;
-  ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer > server_infos_list_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> server_infos_list_;
   friend void  protobuf_AddDesc_centers_2eproto();
   friend void protobuf_AssignDesc_centers_2eproto();
   friend void protobuf_ShutdownFile_centers_2eproto();
@@ -529,31 +533,55 @@ inline void CentersProto::set_allocated_leader_center(::std::string* leader_cent
   // @@protoc_insertion_point(field_set_allocated:libevrpc.CentersProto.leader_center)
 }
 
-// repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+// repeated string server_infos_list = 8;
 inline int CentersProto::server_infos_list_size() const {
   return server_infos_list_.size();
 }
 inline void CentersProto::clear_server_infos_list() {
   server_infos_list_.Clear();
 }
-inline const ::libevrpc::RpcClusterServer& CentersProto::server_infos_list(int index) const {
+inline const ::std::string& CentersProto::server_infos_list(int index) const {
   // @@protoc_insertion_point(field_get:libevrpc.CentersProto.server_infos_list)
   return server_infos_list_.Get(index);
 }
-inline ::libevrpc::RpcClusterServer* CentersProto::mutable_server_infos_list(int index) {
+inline ::std::string* CentersProto::mutable_server_infos_list(int index) {
   // @@protoc_insertion_point(field_mutable:libevrpc.CentersProto.server_infos_list)
   return server_infos_list_.Mutable(index);
 }
-inline ::libevrpc::RpcClusterServer* CentersProto::add_server_infos_list() {
-  // @@protoc_insertion_point(field_add:libevrpc.CentersProto.server_infos_list)
+inline void CentersProto::set_server_infos_list(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:libevrpc.CentersProto.server_infos_list)
+  server_infos_list_.Mutable(index)->assign(value);
+}
+inline void CentersProto::set_server_infos_list(int index, const char* value) {
+  server_infos_list_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:libevrpc.CentersProto.server_infos_list)
+}
+inline void CentersProto::set_server_infos_list(int index, const char* value, size_t size) {
+  server_infos_list_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.CentersProto.server_infos_list)
+}
+inline ::std::string* CentersProto::add_server_infos_list() {
   return server_infos_list_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer >&
+inline void CentersProto::add_server_infos_list(const ::std::string& value) {
+  server_infos_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:libevrpc.CentersProto.server_infos_list)
+}
+inline void CentersProto::add_server_infos_list(const char* value) {
+  server_infos_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:libevrpc.CentersProto.server_infos_list)
+}
+inline void CentersProto::add_server_infos_list(const char* value, size_t size) {
+  server_infos_list_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:libevrpc.CentersProto.server_infos_list)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
 CentersProto::server_infos_list() const {
   // @@protoc_insertion_point(field_list:libevrpc.CentersProto.server_infos_list)
   return server_infos_list_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::libevrpc::RpcClusterServer >*
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
 CentersProto::mutable_server_infos_list() {
   // @@protoc_insertion_point(field_mutable_list:libevrpc.CentersProto.server_infos_list)
   return &server_infos_list_;

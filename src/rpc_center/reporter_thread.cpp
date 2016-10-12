@@ -71,7 +71,7 @@ void ReporterThread::Run() {
 
     RpcCenter& rc = RpcCenter::GetInstance(g_config_file);
 
-    int failed_cnt = 10, retry_time = 3;
+    int32_t failed_cnt = 10, retry_time = 3;
     while (reporter_running_) {
         conn_fd_ = TcpConnect(leader_addr_, leader_port_, 15);
 
@@ -98,6 +98,7 @@ void ReporterThread::Run() {
                  * Leader彻底无法连接 开始新一轮选举 并且当前线程退出
                  */
                 rc.StartFastLeaderElection();
+                close(conn_fd_);
                 break;
             }
         }

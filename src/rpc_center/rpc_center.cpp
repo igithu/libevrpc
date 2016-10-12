@@ -22,6 +22,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <google/protobuf/repeated_field.h>
+
 #include "center_proto/center_type.pb.h"
 #include "center_proto/center_client.pb.h"
 #include "center_proto/center_cluster.pb.h"
@@ -32,6 +34,7 @@
 namespace libevrpc {
 
 using std::string;
+using ::google::protobuf::RepeatedPtrField;
 
 extern string g_config_file = "";
 
@@ -495,7 +498,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     election_thread_->PushElectionMessage(conn_fd, response_proto);
                     break;
                 }
-                case FOLLOWER_PING: {
+                default: {
                     CentersProto response_proto;
                     if (GetCenterStatus() != LEADING) {
                         /*
@@ -513,9 +516,6 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     } else {
                         leader_thread_->PushFollowerMessage(conn_fd, response_proto);
                     }
-                    break;
-                }
-                case CENTER_REPORTER : {
                     break;
                 }
             }
@@ -646,6 +646,14 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             break;
         }
         case FOLLOWER_PING: {
+             const RepeatedPtrField<string>& server_infos_list = centers_proto.server_infos_list();
+             for (RepeatedPtrField<string>::const_iterator iter = server_infos_list->begin();
+                  iter != server_infos_list->end();
+                  ++iter) {
+                 load_balancer->AddRpcServer(*iter);
+             }
+
+            // TODO
             break;
         }
         default:
@@ -701,9 +709,7 @@ bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
         for (SERVER_SET::iterator iter = rpc_server_buf_ptr_->begin();
              iter != rpc_server_buf_ptr_->end();
              ++iter) {
-            RpcClusterServer rcs;
-            rcs.add_should_reporter_center(*iter);
-            centers_proto.mutable_server_infos_list->push_back(rcs);
+            centers_proto.add_server_infos_list(*iter);
         }
     }
 
@@ -714,7 +720,8 @@ bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
     if (!RpcSend(conn_fd, CENTER2CENTER, ping_str)) {
         return false;
     }
-    return CenterProcessor(conn_fd);
+    // return CenterProcessor(conn_fd);
+    return true;
 }
 
 void RpcCenter::SetFastLeaderRunning(bool is_running) {

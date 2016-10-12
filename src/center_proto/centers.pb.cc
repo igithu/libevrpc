@@ -94,19 +94,19 @@ void protobuf_AddDesc_centers_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\rcenters.proto\022\010libevrpc\032\021center_type.p"
     "roto\032\023center_client.proto\032\024center_cluste"
-    "r.proto\"\226\002\n\014CentersProto\022\030\n\020from_center_"
+    "r.proto\"\372\001\n\014CentersProto\022\030\n\020from_center_"
     "addr\030\001 \001(\t\022-\n\rcenter_status\030\002 \001(\0162\026.libe"
     "vrpc.CenterStatus\022-\n\rcenter_action\030\003 \001(\016"
     "2\026.libevrpc.CenterAction\022\022\n\nstart_time\030\004"
     " \001(\004\022\025\n\rlc_start_time\030\005 \001(\004\022\025\n\rlogical_c"
-    "lock\030\006 \001(\004\022\025\n\rleader_center\030\007 \001(\t\0225\n\021ser"
-    "ver_infos_list\030\010 \003(\0132\032.libevrpc.RpcClust"
-    "erServer*\\\n\014CenterStatus\022\013\n\007LOOKING\020\000\022\r\n"
-    "\tFOLLOWING\020\001\022\r\n\tOBSERVING\020\002\022\013\n\007LEADING\020\003"
-    "\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*~\n\014CenterAction\022\013"
-    "\n\007INQUIRY\020\000\022\014\n\010PROPOSAL\020\001\022\022\n\016LEADER_CONF"
-    "IRM\020\002\022\n\n\006ACCEPT\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFOLLOW"
-    "ER_PING\020\005\022\023\n\017CENTER_REPORTER\020\006", 590);
+    "lock\030\006 \001(\004\022\025\n\rleader_center\030\007 \001(\t\022\031\n\021ser"
+    "ver_infos_list\030\010 \003(\t*\\\n\014CenterStatus\022\013\n\007"
+    "LOOKING\020\000\022\r\n\tFOLLOWING\020\001\022\r\n\tOBSERVING\020\002\022"
+    "\013\n\007LEADING\020\003\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*~\n\014Ce"
+    "nterAction\022\013\n\007INQUIRY\020\000\022\014\n\010PROPOSAL\020\001\022\022\n"
+    "\016LEADER_CONFIRM\020\002\022\n\n\006ACCEPT\020\003\022\013\n\007REFUSED"
+    "\020\004\022\021\n\rFOLLOWER_PING\020\005\022\023\n\017CENTER_REPORTER"
+    "\020\006", 562);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "centers.proto", &protobuf_RegisterTypes);
   CentersProto::default_instance_ = new CentersProto();
@@ -398,12 +398,17 @@ bool CentersProto::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+      // repeated string server_infos_list = 8;
       case 8: {
         if (tag == 66) {
          parse_server_infos_list:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-                input, add_server_infos_list()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_server_infos_list()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->server_infos_list(this->server_infos_list_size() - 1).data(),
+            this->server_infos_list(this->server_infos_list_size() - 1).length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "server_infos_list");
         } else {
           goto handle_unusual;
         }
@@ -484,9 +489,13 @@ void CentersProto::SerializeWithCachedSizes(
       7, this->leader_center(), output);
   }
 
-  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+  // repeated string server_infos_list = 8;
   for (int i = 0; i < this->server_infos_list_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+  ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+    this->server_infos_list(i).data(), this->server_infos_list(i).length(),
+    ::google::protobuf::internal::WireFormat::SERIALIZE,
+    "server_infos_list");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
       8, this->server_infos_list(i), output);
   }
 
@@ -549,11 +558,14 @@ void CentersProto::SerializeWithCachedSizes(
         7, this->leader_center(), target);
   }
 
-  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+  // repeated string server_infos_list = 8;
   for (int i = 0; i < this->server_infos_list_size(); i++) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->server_infos_list(i).data(), this->server_infos_list(i).length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "server_infos_list");
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        8, this->server_infos_list(i), target);
+      WriteStringToArray(8, this->server_infos_list(i), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -616,12 +628,11 @@ int CentersProto::ByteSize() const {
     }
 
   }
-  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
+  // repeated string server_infos_list = 8;
   total_size += 1 * this->server_infos_list_size();
   for (int i = 0; i < this->server_infos_list_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->server_infos_list(i));
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->server_infos_list(i));
   }
 
   if (!unknown_fields().empty()) {
