@@ -26,6 +26,7 @@ namespace libevrpc {
 
 using std::string;
 using std::vector;
+using ::google::protobuf::RepeatedPtrField;
 
 ConsistentHashLoadBalancer::ConsistentHashLoadBalancer(const string& config_file) :
     config_file_(config_file),
@@ -76,6 +77,11 @@ bool ConsistentHashLoadBalancer::GetRpcServer(
         return false;
     }
     rpc_server_list.push_back(vn_iter->second);
+    return true;
+}
+
+
+bool ConsistentHashLoadBalancer::GetCurrentLBResult(RepeatedPtrField<LoadBalancerMetaData>& lb_result_list) {
     return true;
 }
 

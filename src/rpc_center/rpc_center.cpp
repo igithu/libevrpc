@@ -646,12 +646,17 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             break;
         }
         case FOLLOWER_PING: {
-             const RepeatedPtrField<string>& server_infos_list = centers_proto.server_infos_list();
-             for (RepeatedPtrField<string>::const_iterator iter = server_infos_list->begin();
-                  iter != server_infos_list->end();
-                  ++iter) {
-                 load_balancer->AddRpcServer(*iter);
-             }
+            const RepeatedPtrField<string>& server_infos_list = centers_proto.server_infos_list();
+            for (RepeatedPtrField<string>::const_iterator iter = server_infos_list.begin();
+                 iter != server_infos_list.end();
+                 ++iter) {
+                load_balancer_ptr_->AddRpcServer(*iter);
+            }
+
+            CentersProto cp_response;
+            cp_response.set_center_action(LEADER_PINR_RESPONSE);
+            RepeatedPtrField<LoadBalancerMetaData>* lb_result_list = cp_response.mutable_lb_result();
+            load_balancer_ptr_->GetCurrentLBResult(*lb_result_list);
 
             // TODO
             break;

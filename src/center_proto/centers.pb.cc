@@ -20,6 +20,9 @@ namespace libevrpc {
 
 namespace {
 
+const ::google::protobuf::Descriptor* LoadBalancerMetaData_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  LoadBalancerMetaData_reflection_ = NULL;
 const ::google::protobuf::Descriptor* CentersProto_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   CentersProto_reflection_ = NULL;
@@ -35,8 +38,24 @@ void protobuf_AssignDesc_centers_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "centers.proto");
   GOOGLE_CHECK(file != NULL);
-  CentersProto_descriptor_ = file->message_type(0);
-  static const int CentersProto_offsets_[8] = {
+  LoadBalancerMetaData_descriptor_ = file->message_type(0);
+  static const int LoadBalancerMetaData_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoadBalancerMetaData, vid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoadBalancerMetaData, server_addr_),
+  };
+  LoadBalancerMetaData_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      LoadBalancerMetaData_descriptor_,
+      LoadBalancerMetaData::default_instance_,
+      LoadBalancerMetaData_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoadBalancerMetaData, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LoadBalancerMetaData, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(LoadBalancerMetaData));
+  CentersProto_descriptor_ = file->message_type(1);
+  static const int CentersProto_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, from_center_addr_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, center_status_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, center_action_),
@@ -45,6 +64,7 @@ void protobuf_AssignDesc_centers_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, logical_clock_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, leader_center_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, server_infos_list_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CentersProto, lb_result_),
   };
   CentersProto_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -72,12 +92,16 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    LoadBalancerMetaData_descriptor_, &LoadBalancerMetaData::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     CentersProto_descriptor_, &CentersProto::default_instance());
 }
 
 }  // namespace
 
 void protobuf_ShutdownFile_centers_2eproto() {
+  delete LoadBalancerMetaData::default_instance_;
+  delete LoadBalancerMetaData_reflection_;
   delete CentersProto::default_instance_;
   delete CentersProto_reflection_;
 }
@@ -94,22 +118,27 @@ void protobuf_AddDesc_centers_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\rcenters.proto\022\010libevrpc\032\021center_type.p"
     "roto\032\023center_client.proto\032\024center_cluste"
-    "r.proto\"\372\001\n\014CentersProto\022\030\n\020from_center_"
-    "addr\030\001 \001(\t\022-\n\rcenter_status\030\002 \001(\0162\026.libe"
-    "vrpc.CenterStatus\022-\n\rcenter_action\030\003 \001(\016"
-    "2\026.libevrpc.CenterAction\022\022\n\nstart_time\030\004"
-    " \001(\004\022\025\n\rlc_start_time\030\005 \001(\004\022\025\n\rlogical_c"
-    "lock\030\006 \001(\004\022\025\n\rleader_center\030\007 \001(\t\022\031\n\021ser"
-    "ver_infos_list\030\010 \003(\t*\\\n\014CenterStatus\022\013\n\007"
-    "LOOKING\020\000\022\r\n\tFOLLOWING\020\001\022\r\n\tOBSERVING\020\002\022"
-    "\013\n\007LEADING\020\003\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*~\n\014Ce"
-    "nterAction\022\013\n\007INQUIRY\020\000\022\014\n\010PROPOSAL\020\001\022\022\n"
-    "\016LEADER_CONFIRM\020\002\022\n\n\006ACCEPT\020\003\022\013\n\007REFUSED"
-    "\020\004\022\021\n\rFOLLOWER_PING\020\005\022\023\n\017CENTER_REPORTER"
-    "\020\006", 562);
+    "r.proto\"8\n\024LoadBalancerMetaData\022\013\n\003vid\030\001"
+    " \001(\r\022\023\n\013server_addr\030\002 \001(\t\"\255\002\n\014CentersPro"
+    "to\022\030\n\020from_center_addr\030\001 \001(\t\022-\n\rcenter_s"
+    "tatus\030\002 \001(\0162\026.libevrpc.CenterStatus\022-\n\rc"
+    "enter_action\030\003 \001(\0162\026.libevrpc.CenterActi"
+    "on\022\022\n\nstart_time\030\004 \001(\004\022\025\n\rlc_start_time\030"
+    "\005 \001(\004\022\025\n\rlogical_clock\030\006 \001(\004\022\025\n\rleader_c"
+    "enter\030\007 \001(\t\022\031\n\021server_infos_list\030\010 \003(\t\0221"
+    "\n\tlb_result\030\t \003(\0132\036.libevrpc.LoadBalance"
+    "rMetaData*\\\n\014CenterStatus\022\013\n\007LOOKING\020\000\022\r"
+    "\n\tFOLLOWING\020\001\022\r\n\tOBSERVING\020\002\022\013\n\007LEADING\020"
+    "\003\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*\230\001\n\014CenterAction"
+    "\022\013\n\007INQUIRY\020\000\022\014\n\010PROPOSAL\020\001\022\022\n\016LEADER_CO"
+    "NFIRM\020\002\022\n\n\006ACCEPT\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFOLL"
+    "OWER_PING\020\005\022\030\n\024LEADER_PINR_RESPONSE\020\006\022\023\n"
+    "\017CENTER_REPORTER\020\007", 698);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "centers.proto", &protobuf_RegisterTypes);
+  LoadBalancerMetaData::default_instance_ = new LoadBalancerMetaData();
   CentersProto::default_instance_ = new CentersProto();
+  LoadBalancerMetaData::default_instance_->InitAsDefaultInstance();
   CentersProto::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_centers_2eproto);
 }
@@ -151,10 +180,295 @@ bool CenterAction_IsValid(int value) {
     case 4:
     case 5:
     case 6:
+    case 7:
       return true;
     default:
       return false;
   }
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int LoadBalancerMetaData::kVidFieldNumber;
+const int LoadBalancerMetaData::kServerAddrFieldNumber;
+#endif  // !_MSC_VER
+
+LoadBalancerMetaData::LoadBalancerMetaData()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:libevrpc.LoadBalancerMetaData)
+}
+
+void LoadBalancerMetaData::InitAsDefaultInstance() {
+}
+
+LoadBalancerMetaData::LoadBalancerMetaData(const LoadBalancerMetaData& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:libevrpc.LoadBalancerMetaData)
+}
+
+void LoadBalancerMetaData::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  vid_ = 0u;
+  server_addr_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+LoadBalancerMetaData::~LoadBalancerMetaData() {
+  // @@protoc_insertion_point(destructor:libevrpc.LoadBalancerMetaData)
+  SharedDtor();
+}
+
+void LoadBalancerMetaData::SharedDtor() {
+  if (server_addr_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete server_addr_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void LoadBalancerMetaData::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* LoadBalancerMetaData::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return LoadBalancerMetaData_descriptor_;
+}
+
+const LoadBalancerMetaData& LoadBalancerMetaData::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_centers_2eproto();
+  return *default_instance_;
+}
+
+LoadBalancerMetaData* LoadBalancerMetaData::default_instance_ = NULL;
+
+LoadBalancerMetaData* LoadBalancerMetaData::New() const {
+  return new LoadBalancerMetaData;
+}
+
+void LoadBalancerMetaData::Clear() {
+  if (_has_bits_[0 / 32] & 3) {
+    vid_ = 0u;
+    if (has_server_addr()) {
+      if (server_addr_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        server_addr_->clear();
+      }
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool LoadBalancerMetaData::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:libevrpc.LoadBalancerMetaData)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional uint32 vid = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &vid_)));
+          set_has_vid();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(18)) goto parse_server_addr;
+        break;
+      }
+
+      // optional string server_addr = 2;
+      case 2: {
+        if (tag == 18) {
+         parse_server_addr:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_server_addr()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->server_addr().data(), this->server_addr().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "server_addr");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:libevrpc.LoadBalancerMetaData)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:libevrpc.LoadBalancerMetaData)
+  return false;
+#undef DO_
+}
+
+void LoadBalancerMetaData::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:libevrpc.LoadBalancerMetaData)
+  // optional uint32 vid = 1;
+  if (has_vid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->vid(), output);
+  }
+
+  // optional string server_addr = 2;
+  if (has_server_addr()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->server_addr().data(), this->server_addr().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "server_addr");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->server_addr(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:libevrpc.LoadBalancerMetaData)
+}
+
+::google::protobuf::uint8* LoadBalancerMetaData::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:libevrpc.LoadBalancerMetaData)
+  // optional uint32 vid = 1;
+  if (has_vid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->vid(), target);
+  }
+
+  // optional string server_addr = 2;
+  if (has_server_addr()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->server_addr().data(), this->server_addr().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "server_addr");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->server_addr(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:libevrpc.LoadBalancerMetaData)
+  return target;
+}
+
+int LoadBalancerMetaData::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional uint32 vid = 1;
+    if (has_vid()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->vid());
+    }
+
+    // optional string server_addr = 2;
+    if (has_server_addr()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->server_addr());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void LoadBalancerMetaData::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const LoadBalancerMetaData* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const LoadBalancerMetaData*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void LoadBalancerMetaData::MergeFrom(const LoadBalancerMetaData& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_vid()) {
+      set_vid(from.vid());
+    }
+    if (from.has_server_addr()) {
+      set_server_addr(from.server_addr());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void LoadBalancerMetaData::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void LoadBalancerMetaData::CopyFrom(const LoadBalancerMetaData& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool LoadBalancerMetaData::IsInitialized() const {
+
+  return true;
+}
+
+void LoadBalancerMetaData::Swap(LoadBalancerMetaData* other) {
+  if (other != this) {
+    std::swap(vid_, other->vid_);
+    std::swap(server_addr_, other->server_addr_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata LoadBalancerMetaData::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = LoadBalancerMetaData_descriptor_;
+  metadata.reflection = LoadBalancerMetaData_reflection_;
+  return metadata;
 }
 
 
@@ -169,6 +483,7 @@ const int CentersProto::kLcStartTimeFieldNumber;
 const int CentersProto::kLogicalClockFieldNumber;
 const int CentersProto::kLeaderCenterFieldNumber;
 const int CentersProto::kServerInfosListFieldNumber;
+const int CentersProto::kLbResultFieldNumber;
 #endif  // !_MSC_VER
 
 CentersProto::CentersProto()
@@ -266,6 +581,7 @@ void CentersProto::Clear() {
 #undef ZR_
 
   server_infos_list_.Clear();
+  lb_result_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -413,6 +729,20 @@ bool CentersProto::MergePartialFromCodedStream(
           goto handle_unusual;
         }
         if (input->ExpectTag(66)) goto parse_server_infos_list;
+        if (input->ExpectTag(74)) goto parse_lb_result;
+        break;
+      }
+
+      // repeated .libevrpc.LoadBalancerMetaData lb_result = 9;
+      case 9: {
+        if (tag == 74) {
+         parse_lb_result:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_lb_result()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(74)) goto parse_lb_result;
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -499,6 +829,12 @@ void CentersProto::SerializeWithCachedSizes(
       8, this->server_infos_list(i), output);
   }
 
+  // repeated .libevrpc.LoadBalancerMetaData lb_result = 9;
+  for (int i = 0; i < this->lb_result_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      9, this->lb_result(i), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -568,6 +904,13 @@ void CentersProto::SerializeWithCachedSizes(
       WriteStringToArray(8, this->server_infos_list(i), target);
   }
 
+  // repeated .libevrpc.LoadBalancerMetaData lb_result = 9;
+  for (int i = 0; i < this->lb_result_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        9, this->lb_result(i), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -635,6 +978,14 @@ int CentersProto::ByteSize() const {
       this->server_infos_list(i));
   }
 
+  // repeated .libevrpc.LoadBalancerMetaData lb_result = 9;
+  total_size += 1 * this->lb_result_size();
+  for (int i = 0; i < this->lb_result_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->lb_result(i));
+  }
+
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -661,6 +1012,7 @@ void CentersProto::MergeFrom(const ::google::protobuf::Message& from) {
 void CentersProto::MergeFrom(const CentersProto& from) {
   GOOGLE_CHECK_NE(&from, this);
   server_infos_list_.MergeFrom(from.server_infos_list_);
+  lb_result_.MergeFrom(from.lb_result_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_from_center_addr()) {
       set_from_center_addr(from.from_center_addr());
@@ -714,6 +1066,7 @@ void CentersProto::Swap(CentersProto* other) {
     std::swap(logical_clock_, other->logical_clock_);
     std::swap(leader_center_, other->leader_center_);
     server_infos_list_.Swap(&other->server_infos_list_);
+    lb_result_.Swap(&other->lb_result_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

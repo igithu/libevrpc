@@ -37,6 +37,7 @@ void  protobuf_AddDesc_centers_2eproto();
 void protobuf_AssignDesc_centers_2eproto();
 void protobuf_ShutdownFile_centers_2eproto();
 
+class LoadBalancerMetaData;
 class CentersProto;
 
 enum CenterStatus {
@@ -69,7 +70,8 @@ enum CenterAction {
   ACCEPT = 3,
   REFUSED = 4,
   FOLLOWER_PING = 5,
-  CENTER_REPORTER = 6
+  LEADER_PINR_RESPONSE = 6,
+  CENTER_REPORTER = 7
 };
 bool CenterAction_IsValid(int value);
 const CenterAction CenterAction_MIN = INQUIRY;
@@ -87,6 +89,100 @@ inline bool CenterAction_Parse(
     CenterAction_descriptor(), name, value);
 }
 // ===================================================================
+
+class LoadBalancerMetaData : public ::google::protobuf::Message {
+ public:
+  LoadBalancerMetaData();
+  virtual ~LoadBalancerMetaData();
+
+  LoadBalancerMetaData(const LoadBalancerMetaData& from);
+
+  inline LoadBalancerMetaData& operator=(const LoadBalancerMetaData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const LoadBalancerMetaData& default_instance();
+
+  void Swap(LoadBalancerMetaData* other);
+
+  // implements Message ----------------------------------------------
+
+  LoadBalancerMetaData* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const LoadBalancerMetaData& from);
+  void MergeFrom(const LoadBalancerMetaData& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional uint32 vid = 1;
+  inline bool has_vid() const;
+  inline void clear_vid();
+  static const int kVidFieldNumber = 1;
+  inline ::google::protobuf::uint32 vid() const;
+  inline void set_vid(::google::protobuf::uint32 value);
+
+  // optional string server_addr = 2;
+  inline bool has_server_addr() const;
+  inline void clear_server_addr();
+  static const int kServerAddrFieldNumber = 2;
+  inline const ::std::string& server_addr() const;
+  inline void set_server_addr(const ::std::string& value);
+  inline void set_server_addr(const char* value);
+  inline void set_server_addr(const char* value, size_t size);
+  inline ::std::string* mutable_server_addr();
+  inline ::std::string* release_server_addr();
+  inline void set_allocated_server_addr(::std::string* server_addr);
+
+  // @@protoc_insertion_point(class_scope:libevrpc.LoadBalancerMetaData)
+ private:
+  inline void set_has_vid();
+  inline void clear_has_vid();
+  inline void set_has_server_addr();
+  inline void clear_has_server_addr();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::std::string* server_addr_;
+  ::google::protobuf::uint32 vid_;
+  friend void  protobuf_AddDesc_centers_2eproto();
+  friend void protobuf_AssignDesc_centers_2eproto();
+  friend void protobuf_ShutdownFile_centers_2eproto();
+
+  void InitAsDefaultInstance();
+  static LoadBalancerMetaData* default_instance_;
+};
+// -------------------------------------------------------------------
 
 class CentersProto : public ::google::protobuf::Message {
  public:
@@ -216,6 +312,18 @@ class CentersProto : public ::google::protobuf::Message {
   inline const ::google::protobuf::RepeatedPtrField< ::std::string>& server_infos_list() const;
   inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_server_infos_list();
 
+  // repeated .libevrpc.LoadBalancerMetaData lb_result = 9;
+  inline int lb_result_size() const;
+  inline void clear_lb_result();
+  static const int kLbResultFieldNumber = 9;
+  inline const ::libevrpc::LoadBalancerMetaData& lb_result(int index) const;
+  inline ::libevrpc::LoadBalancerMetaData* mutable_lb_result(int index);
+  inline ::libevrpc::LoadBalancerMetaData* add_lb_result();
+  inline const ::google::protobuf::RepeatedPtrField< ::libevrpc::LoadBalancerMetaData >&
+      lb_result() const;
+  inline ::google::protobuf::RepeatedPtrField< ::libevrpc::LoadBalancerMetaData >*
+      mutable_lb_result();
+
   // @@protoc_insertion_point(class_scope:libevrpc.CentersProto)
  private:
   inline void set_has_from_center_addr();
@@ -245,6 +353,7 @@ class CentersProto : public ::google::protobuf::Message {
   ::google::protobuf::uint64 logical_clock_;
   ::std::string* leader_center_;
   ::google::protobuf::RepeatedPtrField< ::std::string> server_infos_list_;
+  ::google::protobuf::RepeatedPtrField< ::libevrpc::LoadBalancerMetaData > lb_result_;
   friend void  protobuf_AddDesc_centers_2eproto();
   friend void protobuf_AssignDesc_centers_2eproto();
   friend void protobuf_ShutdownFile_centers_2eproto();
@@ -256,6 +365,110 @@ class CentersProto : public ::google::protobuf::Message {
 
 
 // ===================================================================
+
+// LoadBalancerMetaData
+
+// optional uint32 vid = 1;
+inline bool LoadBalancerMetaData::has_vid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void LoadBalancerMetaData::set_has_vid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void LoadBalancerMetaData::clear_has_vid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void LoadBalancerMetaData::clear_vid() {
+  vid_ = 0u;
+  clear_has_vid();
+}
+inline ::google::protobuf::uint32 LoadBalancerMetaData::vid() const {
+  // @@protoc_insertion_point(field_get:libevrpc.LoadBalancerMetaData.vid)
+  return vid_;
+}
+inline void LoadBalancerMetaData::set_vid(::google::protobuf::uint32 value) {
+  set_has_vid();
+  vid_ = value;
+  // @@protoc_insertion_point(field_set:libevrpc.LoadBalancerMetaData.vid)
+}
+
+// optional string server_addr = 2;
+inline bool LoadBalancerMetaData::has_server_addr() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void LoadBalancerMetaData::set_has_server_addr() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void LoadBalancerMetaData::clear_has_server_addr() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void LoadBalancerMetaData::clear_server_addr() {
+  if (server_addr_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    server_addr_->clear();
+  }
+  clear_has_server_addr();
+}
+inline const ::std::string& LoadBalancerMetaData::server_addr() const {
+  // @@protoc_insertion_point(field_get:libevrpc.LoadBalancerMetaData.server_addr)
+  return *server_addr_;
+}
+inline void LoadBalancerMetaData::set_server_addr(const ::std::string& value) {
+  set_has_server_addr();
+  if (server_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    server_addr_ = new ::std::string;
+  }
+  server_addr_->assign(value);
+  // @@protoc_insertion_point(field_set:libevrpc.LoadBalancerMetaData.server_addr)
+}
+inline void LoadBalancerMetaData::set_server_addr(const char* value) {
+  set_has_server_addr();
+  if (server_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    server_addr_ = new ::std::string;
+  }
+  server_addr_->assign(value);
+  // @@protoc_insertion_point(field_set_char:libevrpc.LoadBalancerMetaData.server_addr)
+}
+inline void LoadBalancerMetaData::set_server_addr(const char* value, size_t size) {
+  set_has_server_addr();
+  if (server_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    server_addr_ = new ::std::string;
+  }
+  server_addr_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.LoadBalancerMetaData.server_addr)
+}
+inline ::std::string* LoadBalancerMetaData::mutable_server_addr() {
+  set_has_server_addr();
+  if (server_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    server_addr_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:libevrpc.LoadBalancerMetaData.server_addr)
+  return server_addr_;
+}
+inline ::std::string* LoadBalancerMetaData::release_server_addr() {
+  clear_has_server_addr();
+  if (server_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = server_addr_;
+    server_addr_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void LoadBalancerMetaData::set_allocated_server_addr(::std::string* server_addr) {
+  if (server_addr_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete server_addr_;
+  }
+  if (server_addr) {
+    set_has_server_addr();
+    server_addr_ = server_addr;
+  } else {
+    clear_has_server_addr();
+    server_addr_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libevrpc.LoadBalancerMetaData.server_addr)
+}
+
+// -------------------------------------------------------------------
 
 // CentersProto
 
@@ -585,6 +798,36 @@ inline ::google::protobuf::RepeatedPtrField< ::std::string>*
 CentersProto::mutable_server_infos_list() {
   // @@protoc_insertion_point(field_mutable_list:libevrpc.CentersProto.server_infos_list)
   return &server_infos_list_;
+}
+
+// repeated .libevrpc.LoadBalancerMetaData lb_result = 9;
+inline int CentersProto::lb_result_size() const {
+  return lb_result_.size();
+}
+inline void CentersProto::clear_lb_result() {
+  lb_result_.Clear();
+}
+inline const ::libevrpc::LoadBalancerMetaData& CentersProto::lb_result(int index) const {
+  // @@protoc_insertion_point(field_get:libevrpc.CentersProto.lb_result)
+  return lb_result_.Get(index);
+}
+inline ::libevrpc::LoadBalancerMetaData* CentersProto::mutable_lb_result(int index) {
+  // @@protoc_insertion_point(field_mutable:libevrpc.CentersProto.lb_result)
+  return lb_result_.Mutable(index);
+}
+inline ::libevrpc::LoadBalancerMetaData* CentersProto::add_lb_result() {
+  // @@protoc_insertion_point(field_add:libevrpc.CentersProto.lb_result)
+  return lb_result_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::libevrpc::LoadBalancerMetaData >&
+CentersProto::lb_result() const {
+  // @@protoc_insertion_point(field_list:libevrpc.CentersProto.lb_result)
+  return lb_result_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::libevrpc::LoadBalancerMetaData >*
+CentersProto::mutable_lb_result() {
+  // @@protoc_insertion_point(field_mutable_list:libevrpc.CentersProto.lb_result)
+  return &lb_result_;
 }
 
 

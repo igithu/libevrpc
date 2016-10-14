@@ -53,6 +53,8 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
         bool GetRpcServer(
                 const std::string& rpc_client,
                 std::vector<std::string>& rpc_server_list);
+         bool GetCurrentLBResult(
+                 ::google::protobuf::RepeatedPtrField<LoadBalancerMetaData>& lb_result_list);
 
     private:
         bool BuildConsistentHashMap();
