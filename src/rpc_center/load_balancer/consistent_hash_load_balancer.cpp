@@ -72,16 +72,28 @@ bool ConsistentHashLoadBalancer::GetRpcServer(
     uint32_t hash_id = MurMurHash2(rpc_client.c_str(), rpc_client.size());
 
     ReadLockGuard rguard(vmap_rwlock_);
-    VN_HASH_MAP::iterator vn_iter = vn_map_ptr_->lower_bound(hash_id);
-    if (vn_map_ptr_->end() == vn_iter) {
+    if (vn_map_ptr_->empty()) {
         return false;
     }
-    rpc_server_list.push_back(vn_iter->second);
+    VN_HASH_MAP::iterator vn_iter = vn_map_ptr_->lower_bound(hash_id);
+    if (vn_map_ptr_->end() == vn_iter) {
+        rpc_server_list.push_back(*(vn_map_ptr_->begin()));
+    } else {
+        rpc_server_list.push_back(vn_iter->second);
+    }
     return true;
 }
 
 
 bool ConsistentHashLoadBalancer::GetCurrentLBResult(RepeatedPtrField<LoadBalancerMetaData>& lb_result_list) {
+    ReadLockGuard rguard(vmap_rwlock_);
+    for (VN_HASH_MAP::iterator iter = vn_map_ptr_->begin();
+         iter != vn_map_ptr_->end();
+         ++iter) {
+        LoadBalancerMetaData* lb_mdata_ptr = lb_result_list.add_lb_result();
+        lb_mdata_ptr->set_vid(iter->first);
+        lb_mdata_ptr->set_server_addr(iter->second);
+    }
     return true;
 }
 
