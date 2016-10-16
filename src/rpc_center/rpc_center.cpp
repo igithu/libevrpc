@@ -658,7 +658,14 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             RepeatedPtrField<LoadBalancerMetaData>* lb_result_list = cp_response.mutable_lb_result();
             load_balancer_ptr_->GetCurrentLBResult(*lb_result_list);
 
-            // TODO
+            string cp_response_str;
+            if (!cp_response.SerializeToString(&cp_response_str)) {
+                return false;
+            }
+            if (!RpcSend(fd, CENTER2CENTER, cp_response_str)) {
+                fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
+            }
+
             break;
         }
         default:
