@@ -654,7 +654,7 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             }
 
             CentersProto cp_response;
-            cp_response.set_center_action(LEADER_PINR_RESPONSE);
+            cp_response.set_center_action(LEADER_PING_RESPONSE);
             RepeatedPtrField<LoadBalancerMetaData>* lb_result_list = cp_response.mutable_lb_result();
             load_balancer_ptr_->GetCurrentLBResult(*lb_result_list);
 
@@ -666,6 +666,11 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
                 fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
             }
 
+            break;
+        }
+        case LEADER_PING_RESPONSE: {
+            // for (RepeatedPtrField<LoadBalancerMetaData>::iterator iter = ) {
+            // }
             break;
         }
         default:
@@ -732,8 +737,8 @@ bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
     if (!RpcSend(conn_fd, CENTER2CENTER, ping_str)) {
         return false;
     }
-    // return CenterProcessor(conn_fd);
-    return true;
+    return CenterProcessor(conn_fd);
+    // return true;
 }
 
 void RpcCenter::SetFastLeaderRunning(bool is_running) {

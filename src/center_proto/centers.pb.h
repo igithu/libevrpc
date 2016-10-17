@@ -70,7 +70,7 @@ enum CenterAction {
   ACCEPT = 3,
   REFUSED = 4,
   FOLLOWER_PING = 5,
-  LEADER_PINR_RESPONSE = 6,
+  LEADER_PING_RESPONSE = 6,
   CENTER_REPORTER = 7
 };
 bool CenterAction_IsValid(int value);
