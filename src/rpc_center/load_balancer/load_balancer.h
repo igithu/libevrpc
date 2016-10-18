@@ -36,6 +36,8 @@ class LoadBalancer {
         virtual bool AddRpcServer(const std::string& rpc_server) = 0;
         virtual bool GetRpcServer(const std::string& rpc_client, std::vector<std::string>& rpc_server_list) = 0;
         virtual bool GetCurrentLBResult(::google::protobuf::RepeatedPtrField<LoadBalancerMetaData>& lb_result_list) = 0;
+        virtual bool UpdateLBResult(const ::google::protobuf::RepeatedPtrField<LoadBalancerMetaData>& lb_result_list) = 0;
+
 
 };  // end of namespace libevrpc
 

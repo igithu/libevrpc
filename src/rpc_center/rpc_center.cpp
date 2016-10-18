@@ -669,13 +669,15 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             break;
         }
         case LEADER_PING_RESPONSE: {
-            // for (RepeatedPtrField<LoadBalancerMetaData>::iterator iter = ) {
-            // }
+            // const RepeatedPtrField<LoadBalancerMetaData>* lb_result_list_ptr = centers_proto.mutable_lb_result();
+            const RepeatedPtrField<LoadBalancerMetaData>& lb_result_list = centers_proto.lb_result();
+            load_balancer_ptr_->UpdateLBResult(lb_result_list);
             break;
         }
         default:
             break;
     }
+    close(fd);
     return true;
 }
 
