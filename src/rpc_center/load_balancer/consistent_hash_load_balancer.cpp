@@ -77,7 +77,10 @@ bool ConsistentHashLoadBalancer::GetRpcServer(
     }
     VN_HASH_MAP::iterator vn_iter = vn_map_ptr_->lower_bound(hash_id);
     if (vn_map_ptr_->end() == vn_iter) {
-        // rpc_server_list.push_back(*(vn_map_ptr_->begin()));
+        VN_HASH_MAP::iterator sub_iter = vn_map_ptr_->begin();
+        if (sub_iter != vn_map_ptr_->end()) {
+            rpc_server_list.push_back(sub_iter->second);
+        }
     } else {
         rpc_server_list.push_back(vn_iter->second);
     }
@@ -90,7 +93,7 @@ bool ConsistentHashLoadBalancer::GetCurrentLBResult(RepeatedPtrField<LoadBalance
     for (VN_HASH_MAP::iterator iter = vn_map_ptr_->begin();
          iter != vn_map_ptr_->end();
          ++iter) {
-        LoadBalancerMetaData* lb_mdata_ptr = lb_result_list.add_lb_result();
+        LoadBalancerMetaData* lb_mdata_ptr = lb_result_list.Add();
         lb_mdata_ptr->set_vid(iter->first);
         lb_mdata_ptr->set_server_addr(iter->second);
     }
@@ -102,7 +105,7 @@ bool ConsistentHashLoadBalancer::UpdateLBResult(const RepeatedPtrField<LoadBalan
     for (RepeatedPtrField<LoadBalancerMetaData>::const_iterator iter = lb_result_list.begin();
          iter != lb_result_list.end();
          ++iter) {
-        vn_map_ptr_->insert(std::make_pair(iter->vid, iter->server_addr));
+        vn_map_ptr_->insert(std::make_pair(iter->vid(), iter->server_addr()));
     }
     return true;
 }
