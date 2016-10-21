@@ -40,7 +40,8 @@ using std::string;
 CenterClusterHeartbeat::CenterClusterHeartbeat(const string& config_file) :
     config_file_(config_file),
     center_addrs_ptr_(new ADDRS_LIST_TYPE()),
-    reporter_center_addrs_ptr_(new ADDRS_LIST_TYPE()) {
+    reporter_center_addrs_ptr_(new ADDRS_LIST_TYPE()),
+    running_(false) {
 }
 
 CenterClusterHeartbeat::~CenterClusterHeartbeat() {
@@ -113,6 +114,8 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
          ++iter) {
         reporter_center_addrs_ptr_->push_back(std::move(*iter));
     }
+
+    running_ = true;
 
     return true;
 }

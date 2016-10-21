@@ -42,6 +42,8 @@ class CenterClusterHeartbeat : public Thread {
         std::string config_file_;
         ADDRS_LIST_TYPE* center_addrs_ptr_;
         ADDRS_LIST_TYPE* reporter_center_addrs_ptr_;
+
+        bool running_;
 };
 
 }  // end of namespace libevrpc
