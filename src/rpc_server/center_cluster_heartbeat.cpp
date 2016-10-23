@@ -124,6 +124,9 @@ void CenterClusterHeartbeat::Run() {
     if (!InitCenterClusterHB()) {
         return;
     }
+
+    while (running_) {
+    }
 }
 
 

@@ -536,7 +536,9 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
 
                 string response_str;
                 crc.SerializeToString(&response_str);
-                RpcSend(conn_fd, CENTER2CLUSTER, response_str);
+                if (!RpcSend(conn_fd, CENTER2CLUSTER, response_str)) {
+                    return false;
+                }
                 return false;
             }
 
