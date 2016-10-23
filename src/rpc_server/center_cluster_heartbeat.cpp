@@ -122,6 +122,7 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 
 void CenterClusterHeartbeat::Run() {
     if (!InitCenterClusterHB()) {
+        fprintf(stderr, "Center Init HeartBeat failed!\n");
         return;
     }
 
