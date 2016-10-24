@@ -37,11 +37,14 @@ namespace libevrpc {
 using ::google::protobuf::RepeatedPtrField;
 using std::string;
 
+const int32_t sleep_time = 10;
+
 CenterClusterHeartbeat::CenterClusterHeartbeat(const string& config_file) :
     config_file_(config_file),
     center_addrs_ptr_(new ADDRS_LIST_TYPE()),
     reporter_center_addrs_ptr_(new ADDRS_LIST_TYPE()),
-    running_(false) {
+    running_(false),
+    center_port_(NULL) {
 }
 
 CenterClusterHeartbeat::~CenterClusterHeartbeat() {
@@ -51,6 +54,10 @@ CenterClusterHeartbeat::~CenterClusterHeartbeat() {
 
     if (NULL != reporter_center_addrs_ptr_) {
         delete reporter_center_addrs_ptr_;
+    }
+
+    if (NULL != center_port_) {
+        free(center_port_);
     }
 }
 
@@ -65,6 +72,8 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
         return false;
     }
     const char* center_port = ConfigParser::GetInstance(config_file_).IniGetString("rpc_center:port", "8899");
+    strcpy(center_port_ = (char*)malloc(strlen(center_port) + 1), center_port);
+
     std::ifstream in(cfile);
     string line;
 
@@ -78,7 +87,7 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 
     int32_t random_index = random(center_addrs_ptr_->size());
 
-    int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port, 15);
+    int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
     if (conn_fd <= 0) {
         return false;
     }
@@ -121,12 +130,35 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 }
 
 void CenterClusterHeartbeat::Run() {
-    if (!InitCenterClusterHB()) {
+    int32_t rca_size = reporter_center_addrs_ptr_->size();
+
+    if (!InitCenterClusterHB() || 0 == rca_size) {
         fprintf(stderr, "Center Init HeartBeat failed!\n");
         return;
     }
 
+    int32_t random_index = random(rca_size), ;
     while (running_) {
+        int32_t conn_fd = TcpConnect(reporter_center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
+        if (conn_fd < 0) {
+            random_index = random(rca_size);
+            sleep(sleep_time);
+            continue;
+        }
+        RpcClusterServer rcs_proto;
+        rcs_proto.set_cluster_action(CLUSTER_PING);
+        rcs_proto.set_cluster_server_addr(GetLocalAddress());
+        // rcs_proto.set_load();
+        // rcs_proto.set_cpu_used();
+        string rcs_str;
+        if (!rcs_proto.SerializeToString(&rcs_str)) {
+            close(conn_fd);
+            continue;
+        }
+        if (!RpcSend(conn_fd, CENTER2CLUSTER, rcs_str)) {
+            // TODO
+        }
+        close(conn_fd);
     }
 }
 

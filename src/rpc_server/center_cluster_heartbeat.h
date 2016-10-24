@@ -44,6 +44,7 @@ class CenterClusterHeartbeat : public Thread {
         ADDRS_LIST_TYPE* reporter_center_addrs_ptr_;
 
         bool running_;
+        char* center_port_;
 };
 
 }  // end of namespace libevrpc
