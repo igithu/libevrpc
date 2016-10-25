@@ -21,6 +21,8 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
+#include <sys/sysinfo.h>
+#include <linux/kernel>
 
 #include <google/protobuf/repeated_field.h>
 
@@ -137,7 +139,7 @@ void CenterClusterHeartbeat::Run() {
         return;
     }
 
-    int32_t random_index = random(rca_size), ;
+    int32_t random_index = random(rca_size);
     while (running_) {
         int32_t conn_fd = TcpConnect(reporter_center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
         if (conn_fd < 0) {
@@ -145,6 +147,14 @@ void CenterClusterHeartbeat::Run() {
             sleep(sleep_time);
             continue;
         }
+
+        /**
+         * 获取本地机器信息 CPU LOAD5等
+         */
+        struct sysinfo s_info;
+        int32_t error_no = 
+
+
         RpcClusterServer rcs_proto;
         rcs_proto.set_cluster_action(CLUSTER_PING);
         rcs_proto.set_cluster_server_addr(GetLocalAddress());
