@@ -22,7 +22,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <sys/sysinfo.h>
-#include <linux/kernel>
+#include <linux/kernel.h>
 
 #include <google/protobuf/repeated_field.h>
 
@@ -152,7 +152,7 @@ void CenterClusterHeartbeat::Run() {
          * 获取本地机器信息 CPU LOAD5等
          */
         struct sysinfo s_info;
-        int32_t error_no = 
+        int32_t error_no = sysinfo(&s_info);
 
 
         RpcClusterServer rcs_proto;
