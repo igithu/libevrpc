@@ -260,6 +260,7 @@ bool RpcCenter::UpdateOCStatus(const CentersProto& centers_proto) {
             oc_ptr->start_time = 0;
             oc_ptr->center_status = LOOKING;
             oc_ptr->vote_count = 1;
+            other_centers_ptr_->insert(std::make_pair(addr, oc_ptr));
         } else {
             OCPTR& oc_ptr = leader_iter->second;
             vote_count = ++oc_ptr->vote_count;
@@ -616,6 +617,7 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
 
             string response_str;
             if (!response_proto.SerializeToString(&response_str)) {
+                close(fd);
                 return false;
             }
 
@@ -662,6 +664,7 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
 
             string cp_response_str;
             if (!cp_response.SerializeToString(&cp_response_str)) {
+                close(fd);
                 return false;
             }
             if (!RpcSend(fd, CENTER2CENTER, cp_response_str)) {
