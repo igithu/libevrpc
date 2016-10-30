@@ -57,8 +57,9 @@ void ConsistentHashLoadBalancer::SetConfigFile(const std::string& file_name) {
     config_file_ = file_name;
 }
 
-bool ConsistentHashLoadBalancer::AddRpcServer(const string& rpc_server) {
+bool ConsistentHashLoadBalancer::AddRpcServer(const RpcClusterServer& rpc_cluster_server) {
     WriteLockGuard wguard(vmap_rwlock_);
+    string& rpc_server = rpc_cluster_server.cluster_server_addr();
     for (int32_t i = 0; i < virtual_node_num_; ++i) {
         string hash_str = "SHARD-" + rpc_server + "-NODE-" + static_cast<char>(i);
         uint32_t hash_id = MurMurHash2(hash_str.c_str(), hash_str.size());

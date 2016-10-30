@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "center_proto/centers.pb.h"
+#include "center_proto/center_cluster.pb.h"
 
 namespace libevrpc {
 
@@ -33,7 +34,7 @@ class LoadBalancer {
 
         virtual bool InitBalancer() = 0;
         virtual void SetConfigFile(const std::string& file_name) = 0;
-        virtual bool AddRpcServer(const std::string& rpc_server) = 0;
+        virtual bool AddRpcServer(const RpcClusterServer& rpc_cluster_server) = 0;
         virtual bool GetRpcServer(const std::string& rpc_client, std::vector<std::string>& rpc_server_list) = 0;
         virtual bool GetCurrentLBResult(::google::protobuf::RepeatedPtrField<LoadBalancerMetaData>& lb_result_list) = 0;
         virtual bool UpdateLBResult(const ::google::protobuf::RepeatedPtrField<LoadBalancerMetaData>& lb_result_list) = 0;

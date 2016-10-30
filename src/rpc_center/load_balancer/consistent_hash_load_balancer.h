@@ -49,7 +49,7 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
 
         bool InitBalancer();
         void SetConfigFile(const std::string& file_name);
-        bool AddRpcServer(const std::string& rpc_server);
+        bool AddRpcServer(const RpcClusterServer& rpc_cluster_server);
         bool GetRpcServer(
                 const std::string& rpc_client,
                 std::vector<std::string>& rpc_server_list);

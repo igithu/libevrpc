@@ -119,21 +119,22 @@ void protobuf_AddDesc_centers_2eproto() {
     "\n\rcenters.proto\022\010libevrpc\032\021center_type.p"
     "roto\032\023center_client.proto\032\024center_cluste"
     "r.proto\"8\n\024LoadBalancerMetaData\022\013\n\003vid\030\001"
-    " \001(\r\022\023\n\013server_addr\030\002 \001(\t\"\255\002\n\014CentersPro"
+    " \001(\r\022\023\n\013server_addr\030\002 \001(\t\"\311\002\n\014CentersPro"
     "to\022\030\n\020from_center_addr\030\001 \001(\t\022-\n\rcenter_s"
     "tatus\030\002 \001(\0162\026.libevrpc.CenterStatus\022-\n\rc"
     "enter_action\030\003 \001(\0162\026.libevrpc.CenterActi"
     "on\022\022\n\nstart_time\030\004 \001(\004\022\025\n\rlc_start_time\030"
     "\005 \001(\004\022\025\n\rlogical_clock\030\006 \001(\004\022\025\n\rleader_c"
-    "enter\030\007 \001(\t\022\031\n\021server_infos_list\030\010 \003(\t\0221"
-    "\n\tlb_result\030\t \003(\0132\036.libevrpc.LoadBalance"
-    "rMetaData*\\\n\014CenterStatus\022\013\n\007LOOKING\020\000\022\r"
-    "\n\tFOLLOWING\020\001\022\r\n\tOBSERVING\020\002\022\013\n\007LEADING\020"
-    "\003\022\n\n\006UNKONW\020\004\022\010\n\004DEAD\020\005*\230\001\n\014CenterAction"
-    "\022\013\n\007INQUIRY\020\000\022\014\n\010PROPOSAL\020\001\022\022\n\016LEADER_CO"
-    "NFIRM\020\002\022\n\n\006ACCEPT\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFOLL"
-    "OWER_PING\020\005\022\030\n\024LEADER_PING_RESPONSE\020\006\022\023\n"
-    "\017CENTER_REPORTER\020\007", 698);
+    "enter\030\007 \001(\t\0225\n\021server_infos_list\030\010 \003(\0132\032"
+    ".libevrpc.RpcClusterServer\0221\n\tlb_result\030"
+    "\t \003(\0132\036.libevrpc.LoadBalancerMetaData*\\\n"
+    "\014CenterStatus\022\013\n\007LOOKING\020\000\022\r\n\tFOLLOWING\020"
+    "\001\022\r\n\tOBSERVING\020\002\022\013\n\007LEADING\020\003\022\n\n\006UNKONW\020"
+    "\004\022\010\n\004DEAD\020\005*\230\001\n\014CenterAction\022\013\n\007INQUIRY\020"
+    "\000\022\014\n\010PROPOSAL\020\001\022\022\n\016LEADER_CONFIRM\020\002\022\n\n\006A"
+    "CCEPT\020\003\022\013\n\007REFUSED\020\004\022\021\n\rFOLLOWER_PING\020\005\022"
+    "\030\n\024LEADER_PING_RESPONSE\020\006\022\023\n\017CENTER_REPO"
+    "RTER\020\007", 726);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "centers.proto", &protobuf_RegisterTypes);
   LoadBalancerMetaData::default_instance_ = new LoadBalancerMetaData();
@@ -714,17 +715,12 @@ bool CentersProto::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated string server_infos_list = 8;
+      // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
       case 8: {
         if (tag == 66) {
          parse_server_infos_list:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->add_server_infos_list()));
-          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->server_infos_list(this->server_infos_list_size() - 1).data(),
-            this->server_infos_list(this->server_infos_list_size() - 1).length(),
-            ::google::protobuf::internal::WireFormat::PARSE,
-            "server_infos_list");
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_server_infos_list()));
         } else {
           goto handle_unusual;
         }
@@ -819,13 +815,9 @@ void CentersProto::SerializeWithCachedSizes(
       7, this->leader_center(), output);
   }
 
-  // repeated string server_infos_list = 8;
+  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
   for (int i = 0; i < this->server_infos_list_size(); i++) {
-  ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-    this->server_infos_list(i).data(), this->server_infos_list(i).length(),
-    ::google::protobuf::internal::WireFormat::SERIALIZE,
-    "server_infos_list");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       8, this->server_infos_list(i), output);
   }
 
@@ -894,14 +886,11 @@ void CentersProto::SerializeWithCachedSizes(
         7, this->leader_center(), target);
   }
 
-  // repeated string server_infos_list = 8;
+  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
   for (int i = 0; i < this->server_infos_list_size(); i++) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->server_infos_list(i).data(), this->server_infos_list(i).length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "server_infos_list");
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(8, this->server_infos_list(i), target);
+      WriteMessageNoVirtualToArray(
+        8, this->server_infos_list(i), target);
   }
 
   // repeated .libevrpc.LoadBalancerMetaData lb_result = 9;
@@ -971,11 +960,12 @@ int CentersProto::ByteSize() const {
     }
 
   }
-  // repeated string server_infos_list = 8;
+  // repeated .libevrpc.RpcClusterServer server_infos_list = 8;
   total_size += 1 * this->server_infos_list_size();
   for (int i = 0; i < this->server_infos_list_size(); i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
-      this->server_infos_list(i));
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->server_infos_list(i));
   }
 
   // repeated .libevrpc.LoadBalancerMetaData lb_result = 9;

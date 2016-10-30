@@ -558,14 +558,14 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                      * 2.如果接收的Center是Follower机器, 则将当前RpcServer机器先写入本地的Buf中,然后由本地心跳线程将Buff中的数据
                      *   汇报Leader机器中 进行LoadBalancer计算
                      */
-                    string server_addr = rpc_cluster_server.cluster_server_addr();
                     CenterStatus cur_cs = GetCenterStatus();
                     if (LEADING == cur_cs) {
-                        load_balancer_ptr_->AddRpcServer(server_addr);
+                        load_balancer_ptr_->AddRpcServer(rpc_cluster_server);
                     } else {
-                        AddRpcServerToBuf(server_addr);
+                        AddRpcServerToBuf(rpc_cluster_server);
                     }
 
+                    string server_addr = rpc_cluster_server.cluster_server_addr();
                     CenterResponseCluster crc;
                     crc.set_center_response_action(CLUSTER_RESP);
                     uint32_t hash_id = MurMurHash2(server_addr.c_str(), server_addr.size());
@@ -736,7 +736,8 @@ bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
         for (SERVER_SET::iterator iter = rpc_server_buf_ptr_->begin();
              iter != rpc_server_buf_ptr_->end();
              ++iter) {
-            centers_proto.add_server_infos_list(*iter);
+            RpcClusterServer* rcs = centers_proto.add_server_infos_list();
+            rcs->CopyFrom(*iter);
         }
     }
 
@@ -778,9 +779,9 @@ bool RpcCenter::CenterIsReady() {
     return true;
 }
 
-bool RpcCenter::AddRpcServerToBuf(const string& rpc_server_addr) {
+bool RpcCenter::AddRpcServerToBuf(const RpcClusterServer& rpc_cluster_server) {
     WriteLockGuard wguard(rpc_server_buf_rwlock_);
-    rpc_server_buf_ptr_->insert(rpc_server_addr);
+    rpc_server_buf_ptr_->insert(rpc_cluster_server);
     return true;
 }
 

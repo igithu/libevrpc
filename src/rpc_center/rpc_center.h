@@ -59,7 +59,7 @@ typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
 typedef std::map<uint32_t, std::string> CENTER_HASH_MAP;
-typedef std::unordered_set<std::string> SERVER_SET;
+typedef std::unordered_set<RpcClusterServer> SERVER_SET;
 
 extern std::string g_config_file;
 
@@ -131,7 +131,7 @@ class RpcCenter {
 
         bool CenterIsReady();
 
-        bool AddRpcServerToBuf(const std::string& rpc_server_addr);
+        bool AddRpcServerToBuf(const RpcClusterServer& rpc_cluster_server);
 
     private:
         /*
