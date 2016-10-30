@@ -590,6 +590,9 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     break;
             }
             break;
+            case CLUSTER_PING: {
+                    break;
+            }
        }
        default:
             return false;
