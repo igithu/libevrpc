@@ -32,6 +32,7 @@
 #include "leader_thread.h"
 #include "rpc_center/load_balancer/load_balancer.h"
 #include "center_proto/centers.pb.h"
+#include "center_proto/center_cluster.pb.h"
 #include "config_parser/config_parser.h"
 #include "util/disallow_copy_and_assign.h"
 #include "util/pthread_rwlock.h"
@@ -54,12 +55,27 @@ struct LeaderInfos {
     std::string leader_center;
 };
 
+class ServerSetHash {
+    public:
+        size_t operator()(const  RpcClusterServer& rcs) const {
+            // TODO
+            return 0;
+        }
+};
+
+class ServerSetCmp {
+    public:
+        bool operator()(const RpcClusterServer& rcs1, const RpcClusterServer& rcs2) const {
+            // TODO
+            return true;
+        }
+};
 
 typedef std::shared_ptr<OtherCenter> OCPTR;
 typedef std::unordered_map<std::string, OCPTR> HashMap;
 typedef std::unordered_map<std::string, int32_t> CountMap;
 typedef std::map<uint32_t, std::string> CENTER_HASH_MAP;
-typedef std::unordered_set<RpcClusterServer> SERVER_SET;
+typedef std::unordered_set<RpcClusterServer, ServerSetHash, ServerSetCmp> SERVER_SET;
 
 extern std::string g_config_file;
 

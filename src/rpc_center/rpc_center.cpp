@@ -26,7 +26,6 @@
 
 #include "center_proto/center_type.pb.h"
 #include "center_proto/center_client.pb.h"
-#include "center_proto/center_cluster.pb.h"
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
 #include "rpc_center/load_balancer/consistent_hash_load_balancer.h"
@@ -551,7 +550,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                 return false;
             }
             switch (rpc_cluster_server.cluster_action()) {
-                case REGISTER:
+                case REGISTER: {
                     /*
                      * 1.如果接收的Center是Leader机器, 则将当前RpcServer机器信息直接写进到LoadBalancer(但是通常架构中
                      *   RpcServer 应该不会向Leader机器直接请求信息)
@@ -588,11 +587,12 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                         }
                     }
                     break;
+                }
+                case CLUSTER_PING: {
+                    break;
+                }
             }
             break;
-            case CLUSTER_PING: {
-                    break;
-            }
        }
        default:
             return false;
@@ -653,8 +653,8 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             break;
         }
         case FOLLOWER_PING: {
-            const RepeatedPtrField<string>& server_infos_list = centers_proto.server_infos_list();
-            for (RepeatedPtrField<string>::const_iterator iter = server_infos_list.begin();
+            const RepeatedPtrField<RpcClusterServer>& server_infos_list = centers_proto.server_infos_list();
+            for (RepeatedPtrField<RpcClusterServer>::const_iterator iter = server_infos_list.begin();
                  iter != server_infos_list.end();
                  ++iter) {
                 load_balancer_ptr_->AddRpcServer(*iter);
