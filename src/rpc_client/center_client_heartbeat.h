@@ -20,19 +20,33 @@
 #ifndef __CENTER_CLIENT_HEARTBEAT_H
 #define __CENTER_CLIENT_HEARTBEAT_H
 
+#include <vector>
+#include <string>
+
 #include "util/thread.h"
 
 namespace libevrpc {
 
+typedef std::vector<std::string> ADDRS_LIST_TYPE;
+
 class CenterClientHeartbeat : public Thread {
     public:
-        CenterClientHeartbeat();
+        CenterClientHeartbeat(const std::string& config_file);
 
         ~CenterClientHeartbeat();
 
         virtual void Run();
 
     private:
+        bool InitCenterClientHB();
+
+    private:
+        std::string config_file_;
+        ADDRS_LIST_TYPE* center_addrs_ptr_;
+        ADDRS_LIST_TYPE* updatecenter_addrs_ptr_;
+
+        bool running_;
+        char* center_port_;
 };
 
 }  // end of namespace libevrpc
