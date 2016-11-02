@@ -57,17 +57,15 @@ struct LeaderInfos {
 
 class ServerSetHash {
     public:
-        size_t operator()(const  RpcClusterServer& rcs) const {
-            // TODO
-            return 0;
+        size_t operator()(const RpcClusterServer& rcs) const {
+            return std::hash<std::string>{}(rcs.cluster_server_addr());
         }
 };
 
 class ServerSetCmp {
     public:
         bool operator()(const RpcClusterServer& rcs1, const RpcClusterServer& rcs2) const {
-            // TODO
-            return true;
+            return rcs1.cluster_server_addr() == rcs2.cluster_server_addr();
         }
 };
 
