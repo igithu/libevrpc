@@ -23,6 +23,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/extension_set.h>
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "center_type.pb.h"
 // @@protoc_insertion_point(includes)
@@ -34,18 +35,36 @@ void  protobuf_AddDesc_center_5fclient_2eproto();
 void protobuf_AssignDesc_center_5fclient_2eproto();
 void protobuf_ShutdownFile_center_5fclient_2eproto();
 
-class CenterClient;
+class CenterResponseClient;
 
+enum ResponseClientAction {
+  CLIENT_RESP = 1
+};
+bool ResponseClientAction_IsValid(int value);
+const ResponseClientAction ResponseClientAction_MIN = CLIENT_RESP;
+const ResponseClientAction ResponseClientAction_MAX = CLIENT_RESP;
+const int ResponseClientAction_ARRAYSIZE = ResponseClientAction_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* ResponseClientAction_descriptor();
+inline const ::std::string& ResponseClientAction_Name(ResponseClientAction value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    ResponseClientAction_descriptor(), value);
+}
+inline bool ResponseClientAction_Parse(
+    const ::std::string& name, ResponseClientAction* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<ResponseClientAction>(
+    ResponseClientAction_descriptor(), name, value);
+}
 // ===================================================================
 
-class CenterClient : public ::google::protobuf::Message {
+class CenterResponseClient : public ::google::protobuf::Message {
  public:
-  CenterClient();
-  virtual ~CenterClient();
+  CenterResponseClient();
+  virtual ~CenterResponseClient();
 
-  CenterClient(const CenterClient& from);
+  CenterResponseClient(const CenterResponseClient& from);
 
-  inline CenterClient& operator=(const CenterClient& from) {
+  inline CenterResponseClient& operator=(const CenterResponseClient& from) {
     CopyFrom(from);
     return *this;
   }
@@ -59,17 +78,17 @@ class CenterClient : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const CenterClient& default_instance();
+  static const CenterResponseClient& default_instance();
 
-  void Swap(CenterClient* other);
+  void Swap(CenterResponseClient* other);
 
   // implements Message ----------------------------------------------
 
-  CenterClient* New() const;
+  CenterResponseClient* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const CenterClient& from);
-  void MergeFrom(const CenterClient& from);
+  void CopyFrom(const CenterResponseClient& from);
+  void MergeFrom(const CenterResponseClient& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -91,167 +110,131 @@ class CenterClient : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // repeated string center_list = 1;
-  inline int center_list_size() const;
-  inline void clear_center_list();
-  static const int kCenterListFieldNumber = 1;
-  inline const ::std::string& center_list(int index) const;
-  inline ::std::string* mutable_center_list(int index);
-  inline void set_center_list(int index, const ::std::string& value);
-  inline void set_center_list(int index, const char* value);
-  inline void set_center_list(int index, const char* value, size_t size);
-  inline ::std::string* add_center_list();
-  inline void add_center_list(const ::std::string& value);
-  inline void add_center_list(const char* value);
-  inline void add_center_list(const char* value, size_t size);
-  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& center_list() const;
-  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_center_list();
+  // optional .libevrpc.ResponseClientAction response_client_action = 1;
+  inline bool has_response_client_action() const;
+  inline void clear_response_client_action();
+  static const int kResponseClientActionFieldNumber = 1;
+  inline ::libevrpc::ResponseClientAction response_client_action() const;
+  inline void set_response_client_action(::libevrpc::ResponseClientAction value);
 
-  // repeated string server_list = 2;
-  inline int server_list_size() const;
-  inline void clear_server_list();
-  static const int kServerListFieldNumber = 2;
-  inline const ::std::string& server_list(int index) const;
-  inline ::std::string* mutable_server_list(int index);
-  inline void set_server_list(int index, const ::std::string& value);
-  inline void set_server_list(int index, const char* value);
-  inline void set_server_list(int index, const char* value, size_t size);
-  inline ::std::string* add_server_list();
-  inline void add_server_list(const ::std::string& value);
-  inline void add_server_list(const char* value);
-  inline void add_server_list(const char* value, size_t size);
-  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& server_list() const;
-  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_server_list();
+  // repeated string should_communicate_center = 2;
+  inline int should_communicate_center_size() const;
+  inline void clear_should_communicate_center();
+  static const int kShouldCommunicateCenterFieldNumber = 2;
+  inline const ::std::string& should_communicate_center(int index) const;
+  inline ::std::string* mutable_should_communicate_center(int index);
+  inline void set_should_communicate_center(int index, const ::std::string& value);
+  inline void set_should_communicate_center(int index, const char* value);
+  inline void set_should_communicate_center(int index, const char* value, size_t size);
+  inline ::std::string* add_should_communicate_center();
+  inline void add_should_communicate_center(const ::std::string& value);
+  inline void add_should_communicate_center(const char* value);
+  inline void add_should_communicate_center(const char* value, size_t size);
+  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& should_communicate_center() const;
+  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_should_communicate_center();
 
-  // @@protoc_insertion_point(class_scope:libevrpc.CenterClient)
+  // @@protoc_insertion_point(class_scope:libevrpc.CenterResponseClient)
  private:
+  inline void set_has_response_client_action();
+  inline void clear_has_response_client_action();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::google::protobuf::RepeatedPtrField< ::std::string> center_list_;
-  ::google::protobuf::RepeatedPtrField< ::std::string> server_list_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> should_communicate_center_;
+  int response_client_action_;
   friend void  protobuf_AddDesc_center_5fclient_2eproto();
   friend void protobuf_AssignDesc_center_5fclient_2eproto();
   friend void protobuf_ShutdownFile_center_5fclient_2eproto();
 
   void InitAsDefaultInstance();
-  static CenterClient* default_instance_;
+  static CenterResponseClient* default_instance_;
 };
 // ===================================================================
 
 
 // ===================================================================
 
-// CenterClient
+// CenterResponseClient
 
-// repeated string center_list = 1;
-inline int CenterClient::center_list_size() const {
-  return center_list_.size();
+// optional .libevrpc.ResponseClientAction response_client_action = 1;
+inline bool CenterResponseClient::has_response_client_action() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void CenterClient::clear_center_list() {
-  center_list_.Clear();
+inline void CenterResponseClient::set_has_response_client_action() {
+  _has_bits_[0] |= 0x00000001u;
 }
-inline const ::std::string& CenterClient::center_list(int index) const {
-  // @@protoc_insertion_point(field_get:libevrpc.CenterClient.center_list)
-  return center_list_.Get(index);
+inline void CenterResponseClient::clear_has_response_client_action() {
+  _has_bits_[0] &= ~0x00000001u;
 }
-inline ::std::string* CenterClient::mutable_center_list(int index) {
-  // @@protoc_insertion_point(field_mutable:libevrpc.CenterClient.center_list)
-  return center_list_.Mutable(index);
+inline void CenterResponseClient::clear_response_client_action() {
+  response_client_action_ = 1;
+  clear_has_response_client_action();
 }
-inline void CenterClient::set_center_list(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:libevrpc.CenterClient.center_list)
-  center_list_.Mutable(index)->assign(value);
+inline ::libevrpc::ResponseClientAction CenterResponseClient::response_client_action() const {
+  // @@protoc_insertion_point(field_get:libevrpc.CenterResponseClient.response_client_action)
+  return static_cast< ::libevrpc::ResponseClientAction >(response_client_action_);
 }
-inline void CenterClient::set_center_list(int index, const char* value) {
-  center_list_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:libevrpc.CenterClient.center_list)
-}
-inline void CenterClient::set_center_list(int index, const char* value, size_t size) {
-  center_list_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:libevrpc.CenterClient.center_list)
-}
-inline ::std::string* CenterClient::add_center_list() {
-  return center_list_.Add();
-}
-inline void CenterClient::add_center_list(const ::std::string& value) {
-  center_list_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:libevrpc.CenterClient.center_list)
-}
-inline void CenterClient::add_center_list(const char* value) {
-  center_list_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:libevrpc.CenterClient.center_list)
-}
-inline void CenterClient::add_center_list(const char* value, size_t size) {
-  center_list_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:libevrpc.CenterClient.center_list)
-}
-inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
-CenterClient::center_list() const {
-  // @@protoc_insertion_point(field_list:libevrpc.CenterClient.center_list)
-  return center_list_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::std::string>*
-CenterClient::mutable_center_list() {
-  // @@protoc_insertion_point(field_mutable_list:libevrpc.CenterClient.center_list)
-  return &center_list_;
+inline void CenterResponseClient::set_response_client_action(::libevrpc::ResponseClientAction value) {
+  assert(::libevrpc::ResponseClientAction_IsValid(value));
+  set_has_response_client_action();
+  response_client_action_ = value;
+  // @@protoc_insertion_point(field_set:libevrpc.CenterResponseClient.response_client_action)
 }
 
-// repeated string server_list = 2;
-inline int CenterClient::server_list_size() const {
-  return server_list_.size();
+// repeated string should_communicate_center = 2;
+inline int CenterResponseClient::should_communicate_center_size() const {
+  return should_communicate_center_.size();
 }
-inline void CenterClient::clear_server_list() {
-  server_list_.Clear();
+inline void CenterResponseClient::clear_should_communicate_center() {
+  should_communicate_center_.Clear();
 }
-inline const ::std::string& CenterClient::server_list(int index) const {
-  // @@protoc_insertion_point(field_get:libevrpc.CenterClient.server_list)
-  return server_list_.Get(index);
+inline const ::std::string& CenterResponseClient::should_communicate_center(int index) const {
+  // @@protoc_insertion_point(field_get:libevrpc.CenterResponseClient.should_communicate_center)
+  return should_communicate_center_.Get(index);
 }
-inline ::std::string* CenterClient::mutable_server_list(int index) {
-  // @@protoc_insertion_point(field_mutable:libevrpc.CenterClient.server_list)
-  return server_list_.Mutable(index);
+inline ::std::string* CenterResponseClient::mutable_should_communicate_center(int index) {
+  // @@protoc_insertion_point(field_mutable:libevrpc.CenterResponseClient.should_communicate_center)
+  return should_communicate_center_.Mutable(index);
 }
-inline void CenterClient::set_server_list(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:libevrpc.CenterClient.server_list)
-  server_list_.Mutable(index)->assign(value);
+inline void CenterResponseClient::set_should_communicate_center(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:libevrpc.CenterResponseClient.should_communicate_center)
+  should_communicate_center_.Mutable(index)->assign(value);
 }
-inline void CenterClient::set_server_list(int index, const char* value) {
-  server_list_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:libevrpc.CenterClient.server_list)
+inline void CenterResponseClient::set_should_communicate_center(int index, const char* value) {
+  should_communicate_center_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:libevrpc.CenterResponseClient.should_communicate_center)
 }
-inline void CenterClient::set_server_list(int index, const char* value, size_t size) {
-  server_list_.Mutable(index)->assign(
+inline void CenterResponseClient::set_should_communicate_center(int index, const char* value, size_t size) {
+  should_communicate_center_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:libevrpc.CenterClient.server_list)
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.CenterResponseClient.should_communicate_center)
 }
-inline ::std::string* CenterClient::add_server_list() {
-  return server_list_.Add();
+inline ::std::string* CenterResponseClient::add_should_communicate_center() {
+  return should_communicate_center_.Add();
 }
-inline void CenterClient::add_server_list(const ::std::string& value) {
-  server_list_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:libevrpc.CenterClient.server_list)
+inline void CenterResponseClient::add_should_communicate_center(const ::std::string& value) {
+  should_communicate_center_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:libevrpc.CenterResponseClient.should_communicate_center)
 }
-inline void CenterClient::add_server_list(const char* value) {
-  server_list_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:libevrpc.CenterClient.server_list)
+inline void CenterResponseClient::add_should_communicate_center(const char* value) {
+  should_communicate_center_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:libevrpc.CenterResponseClient.should_communicate_center)
 }
-inline void CenterClient::add_server_list(const char* value, size_t size) {
-  server_list_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:libevrpc.CenterClient.server_list)
+inline void CenterResponseClient::add_should_communicate_center(const char* value, size_t size) {
+  should_communicate_center_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:libevrpc.CenterResponseClient.should_communicate_center)
 }
 inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
-CenterClient::server_list() const {
-  // @@protoc_insertion_point(field_list:libevrpc.CenterClient.server_list)
-  return server_list_;
+CenterResponseClient::should_communicate_center() const {
+  // @@protoc_insertion_point(field_list:libevrpc.CenterResponseClient.should_communicate_center)
+  return should_communicate_center_;
 }
 inline ::google::protobuf::RepeatedPtrField< ::std::string>*
-CenterClient::mutable_server_list() {
-  // @@protoc_insertion_point(field_mutable_list:libevrpc.CenterClient.server_list)
-  return &server_list_;
+CenterResponseClient::mutable_should_communicate_center() {
+  // @@protoc_insertion_point(field_mutable_list:libevrpc.CenterResponseClient.should_communicate_center)
+  return &should_communicate_center_;
 }
 
 
@@ -263,6 +246,11 @@ CenterClient::mutable_server_list() {
 namespace google {
 namespace protobuf {
 
+template <> struct is_proto_enum< ::libevrpc::ResponseClientAction> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::libevrpc::ResponseClientAction>() {
+  return ::libevrpc::ResponseClientAction_descriptor();
+}
 
 }  // namespace google
 }  // namespace protobuf

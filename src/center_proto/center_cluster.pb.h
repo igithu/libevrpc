@@ -57,24 +57,24 @@ inline bool ClusteAction_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<ClusteAction>(
     ClusteAction_descriptor(), name, value);
 }
-enum CenterResponseAction {
+enum ResponseClusterAction {
   CLUSTER_RESP = 1,
   CENTER_NOT_READY = 2
 };
-bool CenterResponseAction_IsValid(int value);
-const CenterResponseAction CenterResponseAction_MIN = CLUSTER_RESP;
-const CenterResponseAction CenterResponseAction_MAX = CENTER_NOT_READY;
-const int CenterResponseAction_ARRAYSIZE = CenterResponseAction_MAX + 1;
+bool ResponseClusterAction_IsValid(int value);
+const ResponseClusterAction ResponseClusterAction_MIN = CLUSTER_RESP;
+const ResponseClusterAction ResponseClusterAction_MAX = CENTER_NOT_READY;
+const int ResponseClusterAction_ARRAYSIZE = ResponseClusterAction_MAX + 1;
 
-const ::google::protobuf::EnumDescriptor* CenterResponseAction_descriptor();
-inline const ::std::string& CenterResponseAction_Name(CenterResponseAction value) {
+const ::google::protobuf::EnumDescriptor* ResponseClusterAction_descriptor();
+inline const ::std::string& ResponseClusterAction_Name(ResponseClusterAction value) {
   return ::google::protobuf::internal::NameOfEnum(
-    CenterResponseAction_descriptor(), value);
+    ResponseClusterAction_descriptor(), value);
 }
-inline bool CenterResponseAction_Parse(
-    const ::std::string& name, CenterResponseAction* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<CenterResponseAction>(
-    CenterResponseAction_descriptor(), name, value);
+inline bool ResponseClusterAction_Parse(
+    const ::std::string& name, ResponseClusterAction* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<ResponseClusterAction>(
+    ResponseClusterAction_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -255,12 +255,12 @@ class CenterResponseCluster : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional .libevrpc.CenterResponseAction center_response_action = 1;
+  // optional .libevrpc.ResponseClusterAction center_response_action = 1;
   inline bool has_center_response_action() const;
   inline void clear_center_response_action();
   static const int kCenterResponseActionFieldNumber = 1;
-  inline ::libevrpc::CenterResponseAction center_response_action() const;
-  inline void set_center_response_action(::libevrpc::CenterResponseAction value);
+  inline ::libevrpc::ResponseClusterAction center_response_action() const;
+  inline void set_center_response_action(::libevrpc::ResponseClusterAction value);
 
   // repeated string should_reporter_center = 2;
   inline int should_reporter_center_size() const;
@@ -480,7 +480,7 @@ inline void RpcClusterServer::set_connection_num(::google::protobuf::int32 value
 
 // CenterResponseCluster
 
-// optional .libevrpc.CenterResponseAction center_response_action = 1;
+// optional .libevrpc.ResponseClusterAction center_response_action = 1;
 inline bool CenterResponseCluster::has_center_response_action() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -494,12 +494,12 @@ inline void CenterResponseCluster::clear_center_response_action() {
   center_response_action_ = 1;
   clear_has_center_response_action();
 }
-inline ::libevrpc::CenterResponseAction CenterResponseCluster::center_response_action() const {
+inline ::libevrpc::ResponseClusterAction CenterResponseCluster::center_response_action() const {
   // @@protoc_insertion_point(field_get:libevrpc.CenterResponseCluster.center_response_action)
-  return static_cast< ::libevrpc::CenterResponseAction >(center_response_action_);
+  return static_cast< ::libevrpc::ResponseClusterAction >(center_response_action_);
 }
-inline void CenterResponseCluster::set_center_response_action(::libevrpc::CenterResponseAction value) {
-  assert(::libevrpc::CenterResponseAction_IsValid(value));
+inline void CenterResponseCluster::set_center_response_action(::libevrpc::ResponseClusterAction value) {
+  assert(::libevrpc::ResponseClusterAction_IsValid(value));
   set_has_center_response_action();
   center_response_action_ = value;
   // @@protoc_insertion_point(field_set:libevrpc.CenterResponseCluster.center_response_action)
@@ -573,10 +573,10 @@ template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::libevrpc::ClusteAction>() {
   return ::libevrpc::ClusteAction_descriptor();
 }
-template <> struct is_proto_enum< ::libevrpc::CenterResponseAction> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::libevrpc::ResponseClusterAction> : ::google::protobuf::internal::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::libevrpc::CenterResponseAction>() {
-  return ::libevrpc::CenterResponseAction_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::libevrpc::ResponseClusterAction>() {
+  return ::libevrpc::ResponseClusterAction_descriptor();
 }
 
 }  // namespace google

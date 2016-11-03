@@ -27,7 +27,7 @@ const ::google::protobuf::Descriptor* CenterResponseCluster_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   CenterResponseCluster_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* ClusteAction_descriptor_ = NULL;
-const ::google::protobuf::EnumDescriptor* CenterResponseAction_descriptor_ = NULL;
+const ::google::protobuf::EnumDescriptor* ResponseClusterAction_descriptor_ = NULL;
 
 }  // namespace
 
@@ -74,7 +74,7 @@ void protobuf_AssignDesc_center_5fcluster_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(CenterResponseCluster));
   ClusteAction_descriptor_ = file->enum_type(0);
-  CenterResponseAction_descriptor_ = file->enum_type(1);
+  ResponseClusterAction_descriptor_ = file->enum_type(1);
 }
 
 namespace {
@@ -115,12 +115,12 @@ void protobuf_AddDesc_center_5fcluster_2eproto() {
     "ter_action\030\001 \001(\0162\026.libevrpc.ClusteAction"
     "\022\033\n\023cluster_server_addr\030\002 \001(\t\022\014\n\004load\030\003 "
     "\001(\002\022\020\n\010cpu_used\030\004 \001(\002\022\026\n\016connection_num\030"
-    "\005 \001(\005\"w\n\025CenterResponseCluster\022>\n\026center"
-    "_response_action\030\001 \001(\0162\036.libevrpc.Center"
-    "ResponseAction\022\036\n\026should_reporter_center"
-    "\030\002 \003(\t*.\n\014ClusteAction\022\014\n\010REGISTER\020\001\022\020\n\014"
-    "CLUSTER_PING\020\002*>\n\024CenterResponseAction\022\020"
-    "\n\014CLUSTER_RESP\020\001\022\024\n\020CENTER_NOT_READY\020\002", 438);
+    "\005 \001(\005\"x\n\025CenterResponseCluster\022\?\n\026center"
+    "_response_action\030\001 \001(\0162\037.libevrpc.Respon"
+    "seClusterAction\022\036\n\026should_reporter_cente"
+    "r\030\002 \003(\t*.\n\014ClusteAction\022\014\n\010REGISTER\020\001\022\020\n"
+    "\014CLUSTER_PING\020\002*\?\n\025ResponseClusterAction"
+    "\022\020\n\014CLUSTER_RESP\020\001\022\024\n\020CENTER_NOT_READY\020\002", 440);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "center_cluster.proto", &protobuf_RegisterTypes);
   RpcClusterServer::default_instance_ = new RpcClusterServer();
@@ -150,11 +150,11 @@ bool ClusteAction_IsValid(int value) {
   }
 }
 
-const ::google::protobuf::EnumDescriptor* CenterResponseAction_descriptor() {
+const ::google::protobuf::EnumDescriptor* ResponseClusterAction_descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return CenterResponseAction_descriptor_;
+  return ResponseClusterAction_descriptor_;
 }
-bool CenterResponseAction_IsValid(int value) {
+bool ResponseClusterAction_IsValid(int value) {
   switch(value) {
     case 1:
     case 2:
@@ -658,15 +658,15 @@ bool CenterResponseCluster::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional .libevrpc.CenterResponseAction center_response_action = 1;
+      // optional .libevrpc.ResponseClusterAction center_response_action = 1;
       case 1: {
         if (tag == 8) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          if (::libevrpc::CenterResponseAction_IsValid(value)) {
-            set_center_response_action(static_cast< ::libevrpc::CenterResponseAction >(value));
+          if (::libevrpc::ResponseClusterAction_IsValid(value)) {
+            set_center_response_action(static_cast< ::libevrpc::ResponseClusterAction >(value));
           } else {
             mutable_unknown_fields()->AddVarint(1, value);
           }
@@ -721,7 +721,7 @@ failure:
 void CenterResponseCluster::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:libevrpc.CenterResponseCluster)
-  // optional .libevrpc.CenterResponseAction center_response_action = 1;
+  // optional .libevrpc.ResponseClusterAction center_response_action = 1;
   if (has_center_response_action()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       1, this->center_response_action(), output);
@@ -747,7 +747,7 @@ void CenterResponseCluster::SerializeWithCachedSizes(
 ::google::protobuf::uint8* CenterResponseCluster::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:libevrpc.CenterResponseCluster)
-  // optional .libevrpc.CenterResponseAction center_response_action = 1;
+  // optional .libevrpc.ResponseClusterAction center_response_action = 1;
   if (has_center_response_action()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       1, this->center_response_action(), target);
@@ -775,7 +775,7 @@ int CenterResponseCluster::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional .libevrpc.CenterResponseAction center_response_action = 1;
+    // optional .libevrpc.ResponseClusterAction center_response_action = 1;
     if (has_center_response_action()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->center_response_action());

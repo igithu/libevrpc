@@ -7,7 +7,7 @@ enum ClusteAction {
     CLUSTER_PING = 2;
 }
 
-enum CenterResponseAction {
+enum ResponseClusterAction {
     CLUSTER_RESP = 1;
     CENTER_NOT_READY = 2;
 }
@@ -23,7 +23,7 @@ message RpcClusterServer {
 }
 
 message CenterResponseCluster {
-    optional CenterResponseAction center_response_action = 1;
+    optional ResponseClusterAction center_response_action = 1;
     repeated string should_reporter_center = 2;
 }
 
