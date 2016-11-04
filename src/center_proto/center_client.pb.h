@@ -35,36 +35,38 @@ void  protobuf_AddDesc_center_5fclient_2eproto();
 void protobuf_AssignDesc_center_5fclient_2eproto();
 void protobuf_ShutdownFile_center_5fclient_2eproto();
 
-class CenterResponseClient;
+class ClientWithCenter;
 
-enum ResponseClientAction {
-  CLIENT_RESP = 1
+enum ClientClusterAction {
+  CLIENT_INIT_REQ = 1,
+  UPDATE_SERVER_INFO = 2,
+  CENTER_RESP = 3
 };
-bool ResponseClientAction_IsValid(int value);
-const ResponseClientAction ResponseClientAction_MIN = CLIENT_RESP;
-const ResponseClientAction ResponseClientAction_MAX = CLIENT_RESP;
-const int ResponseClientAction_ARRAYSIZE = ResponseClientAction_MAX + 1;
+bool ClientClusterAction_IsValid(int value);
+const ClientClusterAction ClientClusterAction_MIN = CLIENT_INIT_REQ;
+const ClientClusterAction ClientClusterAction_MAX = CENTER_RESP;
+const int ClientClusterAction_ARRAYSIZE = ClientClusterAction_MAX + 1;
 
-const ::google::protobuf::EnumDescriptor* ResponseClientAction_descriptor();
-inline const ::std::string& ResponseClientAction_Name(ResponseClientAction value) {
+const ::google::protobuf::EnumDescriptor* ClientClusterAction_descriptor();
+inline const ::std::string& ClientClusterAction_Name(ClientClusterAction value) {
   return ::google::protobuf::internal::NameOfEnum(
-    ResponseClientAction_descriptor(), value);
+    ClientClusterAction_descriptor(), value);
 }
-inline bool ResponseClientAction_Parse(
-    const ::std::string& name, ResponseClientAction* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<ResponseClientAction>(
-    ResponseClientAction_descriptor(), name, value);
+inline bool ClientClusterAction_Parse(
+    const ::std::string& name, ClientClusterAction* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<ClientClusterAction>(
+    ClientClusterAction_descriptor(), name, value);
 }
 // ===================================================================
 
-class CenterResponseClient : public ::google::protobuf::Message {
+class ClientWithCenter : public ::google::protobuf::Message {
  public:
-  CenterResponseClient();
-  virtual ~CenterResponseClient();
+  ClientWithCenter();
+  virtual ~ClientWithCenter();
 
-  CenterResponseClient(const CenterResponseClient& from);
+  ClientWithCenter(const ClientWithCenter& from);
 
-  inline CenterResponseClient& operator=(const CenterResponseClient& from) {
+  inline ClientWithCenter& operator=(const ClientWithCenter& from) {
     CopyFrom(from);
     return *this;
   }
@@ -78,17 +80,17 @@ class CenterResponseClient : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const CenterResponseClient& default_instance();
+  static const ClientWithCenter& default_instance();
 
-  void Swap(CenterResponseClient* other);
+  void Swap(ClientWithCenter* other);
 
   // implements Message ----------------------------------------------
 
-  CenterResponseClient* New() const;
+  ClientWithCenter* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const CenterResponseClient& from);
-  void MergeFrom(const CenterResponseClient& from);
+  void CopyFrom(const ClientWithCenter& from);
+  void MergeFrom(const ClientWithCenter& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -110,12 +112,12 @@ class CenterResponseClient : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional .libevrpc.ResponseClientAction response_client_action = 1;
-  inline bool has_response_client_action() const;
-  inline void clear_response_client_action();
-  static const int kResponseClientActionFieldNumber = 1;
-  inline ::libevrpc::ResponseClientAction response_client_action() const;
-  inline void set_response_client_action(::libevrpc::ResponseClientAction value);
+  // optional .libevrpc.ClientClusterAction client_center_action = 1;
+  inline bool has_client_center_action() const;
+  inline void clear_client_center_action();
+  static const int kClientCenterActionFieldNumber = 1;
+  inline ::libevrpc::ClientClusterAction client_center_action() const;
+  inline void set_client_center_action(::libevrpc::ClientClusterAction value);
 
   // repeated string should_communicate_center = 2;
   inline int should_communicate_center_size() const;
@@ -133,108 +135,179 @@ class CenterResponseClient : public ::google::protobuf::Message {
   inline const ::google::protobuf::RepeatedPtrField< ::std::string>& should_communicate_center() const;
   inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_should_communicate_center();
 
-  // @@protoc_insertion_point(class_scope:libevrpc.CenterResponseClient)
+  // repeated string cluster_server_list = 3;
+  inline int cluster_server_list_size() const;
+  inline void clear_cluster_server_list();
+  static const int kClusterServerListFieldNumber = 3;
+  inline const ::std::string& cluster_server_list(int index) const;
+  inline ::std::string* mutable_cluster_server_list(int index);
+  inline void set_cluster_server_list(int index, const ::std::string& value);
+  inline void set_cluster_server_list(int index, const char* value);
+  inline void set_cluster_server_list(int index, const char* value, size_t size);
+  inline ::std::string* add_cluster_server_list();
+  inline void add_cluster_server_list(const ::std::string& value);
+  inline void add_cluster_server_list(const char* value);
+  inline void add_cluster_server_list(const char* value, size_t size);
+  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& cluster_server_list() const;
+  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_cluster_server_list();
+
+  // @@protoc_insertion_point(class_scope:libevrpc.ClientWithCenter)
  private:
-  inline void set_has_response_client_action();
-  inline void clear_has_response_client_action();
+  inline void set_has_client_center_action();
+  inline void clear_has_client_center_action();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::google::protobuf::RepeatedPtrField< ::std::string> should_communicate_center_;
-  int response_client_action_;
+  ::google::protobuf::RepeatedPtrField< ::std::string> cluster_server_list_;
+  int client_center_action_;
   friend void  protobuf_AddDesc_center_5fclient_2eproto();
   friend void protobuf_AssignDesc_center_5fclient_2eproto();
   friend void protobuf_ShutdownFile_center_5fclient_2eproto();
 
   void InitAsDefaultInstance();
-  static CenterResponseClient* default_instance_;
+  static ClientWithCenter* default_instance_;
 };
 // ===================================================================
 
 
 // ===================================================================
 
-// CenterResponseClient
+// ClientWithCenter
 
-// optional .libevrpc.ResponseClientAction response_client_action = 1;
-inline bool CenterResponseClient::has_response_client_action() const {
+// optional .libevrpc.ClientClusterAction client_center_action = 1;
+inline bool ClientWithCenter::has_client_center_action() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void CenterResponseClient::set_has_response_client_action() {
+inline void ClientWithCenter::set_has_client_center_action() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void CenterResponseClient::clear_has_response_client_action() {
+inline void ClientWithCenter::clear_has_client_center_action() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void CenterResponseClient::clear_response_client_action() {
-  response_client_action_ = 1;
-  clear_has_response_client_action();
+inline void ClientWithCenter::clear_client_center_action() {
+  client_center_action_ = 1;
+  clear_has_client_center_action();
 }
-inline ::libevrpc::ResponseClientAction CenterResponseClient::response_client_action() const {
-  // @@protoc_insertion_point(field_get:libevrpc.CenterResponseClient.response_client_action)
-  return static_cast< ::libevrpc::ResponseClientAction >(response_client_action_);
+inline ::libevrpc::ClientClusterAction ClientWithCenter::client_center_action() const {
+  // @@protoc_insertion_point(field_get:libevrpc.ClientWithCenter.client_center_action)
+  return static_cast< ::libevrpc::ClientClusterAction >(client_center_action_);
 }
-inline void CenterResponseClient::set_response_client_action(::libevrpc::ResponseClientAction value) {
-  assert(::libevrpc::ResponseClientAction_IsValid(value));
-  set_has_response_client_action();
-  response_client_action_ = value;
-  // @@protoc_insertion_point(field_set:libevrpc.CenterResponseClient.response_client_action)
+inline void ClientWithCenter::set_client_center_action(::libevrpc::ClientClusterAction value) {
+  assert(::libevrpc::ClientClusterAction_IsValid(value));
+  set_has_client_center_action();
+  client_center_action_ = value;
+  // @@protoc_insertion_point(field_set:libevrpc.ClientWithCenter.client_center_action)
 }
 
 // repeated string should_communicate_center = 2;
-inline int CenterResponseClient::should_communicate_center_size() const {
+inline int ClientWithCenter::should_communicate_center_size() const {
   return should_communicate_center_.size();
 }
-inline void CenterResponseClient::clear_should_communicate_center() {
+inline void ClientWithCenter::clear_should_communicate_center() {
   should_communicate_center_.Clear();
 }
-inline const ::std::string& CenterResponseClient::should_communicate_center(int index) const {
-  // @@protoc_insertion_point(field_get:libevrpc.CenterResponseClient.should_communicate_center)
+inline const ::std::string& ClientWithCenter::should_communicate_center(int index) const {
+  // @@protoc_insertion_point(field_get:libevrpc.ClientWithCenter.should_communicate_center)
   return should_communicate_center_.Get(index);
 }
-inline ::std::string* CenterResponseClient::mutable_should_communicate_center(int index) {
-  // @@protoc_insertion_point(field_mutable:libevrpc.CenterResponseClient.should_communicate_center)
+inline ::std::string* ClientWithCenter::mutable_should_communicate_center(int index) {
+  // @@protoc_insertion_point(field_mutable:libevrpc.ClientWithCenter.should_communicate_center)
   return should_communicate_center_.Mutable(index);
 }
-inline void CenterResponseClient::set_should_communicate_center(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:libevrpc.CenterResponseClient.should_communicate_center)
+inline void ClientWithCenter::set_should_communicate_center(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:libevrpc.ClientWithCenter.should_communicate_center)
   should_communicate_center_.Mutable(index)->assign(value);
 }
-inline void CenterResponseClient::set_should_communicate_center(int index, const char* value) {
+inline void ClientWithCenter::set_should_communicate_center(int index, const char* value) {
   should_communicate_center_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:libevrpc.CenterResponseClient.should_communicate_center)
+  // @@protoc_insertion_point(field_set_char:libevrpc.ClientWithCenter.should_communicate_center)
 }
-inline void CenterResponseClient::set_should_communicate_center(int index, const char* value, size_t size) {
+inline void ClientWithCenter::set_should_communicate_center(int index, const char* value, size_t size) {
   should_communicate_center_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:libevrpc.CenterResponseClient.should_communicate_center)
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.ClientWithCenter.should_communicate_center)
 }
-inline ::std::string* CenterResponseClient::add_should_communicate_center() {
+inline ::std::string* ClientWithCenter::add_should_communicate_center() {
   return should_communicate_center_.Add();
 }
-inline void CenterResponseClient::add_should_communicate_center(const ::std::string& value) {
+inline void ClientWithCenter::add_should_communicate_center(const ::std::string& value) {
   should_communicate_center_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:libevrpc.CenterResponseClient.should_communicate_center)
+  // @@protoc_insertion_point(field_add:libevrpc.ClientWithCenter.should_communicate_center)
 }
-inline void CenterResponseClient::add_should_communicate_center(const char* value) {
+inline void ClientWithCenter::add_should_communicate_center(const char* value) {
   should_communicate_center_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:libevrpc.CenterResponseClient.should_communicate_center)
+  // @@protoc_insertion_point(field_add_char:libevrpc.ClientWithCenter.should_communicate_center)
 }
-inline void CenterResponseClient::add_should_communicate_center(const char* value, size_t size) {
+inline void ClientWithCenter::add_should_communicate_center(const char* value, size_t size) {
   should_communicate_center_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:libevrpc.CenterResponseClient.should_communicate_center)
+  // @@protoc_insertion_point(field_add_pointer:libevrpc.ClientWithCenter.should_communicate_center)
 }
 inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
-CenterResponseClient::should_communicate_center() const {
-  // @@protoc_insertion_point(field_list:libevrpc.CenterResponseClient.should_communicate_center)
+ClientWithCenter::should_communicate_center() const {
+  // @@protoc_insertion_point(field_list:libevrpc.ClientWithCenter.should_communicate_center)
   return should_communicate_center_;
 }
 inline ::google::protobuf::RepeatedPtrField< ::std::string>*
-CenterResponseClient::mutable_should_communicate_center() {
-  // @@protoc_insertion_point(field_mutable_list:libevrpc.CenterResponseClient.should_communicate_center)
+ClientWithCenter::mutable_should_communicate_center() {
+  // @@protoc_insertion_point(field_mutable_list:libevrpc.ClientWithCenter.should_communicate_center)
   return &should_communicate_center_;
+}
+
+// repeated string cluster_server_list = 3;
+inline int ClientWithCenter::cluster_server_list_size() const {
+  return cluster_server_list_.size();
+}
+inline void ClientWithCenter::clear_cluster_server_list() {
+  cluster_server_list_.Clear();
+}
+inline const ::std::string& ClientWithCenter::cluster_server_list(int index) const {
+  // @@protoc_insertion_point(field_get:libevrpc.ClientWithCenter.cluster_server_list)
+  return cluster_server_list_.Get(index);
+}
+inline ::std::string* ClientWithCenter::mutable_cluster_server_list(int index) {
+  // @@protoc_insertion_point(field_mutable:libevrpc.ClientWithCenter.cluster_server_list)
+  return cluster_server_list_.Mutable(index);
+}
+inline void ClientWithCenter::set_cluster_server_list(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:libevrpc.ClientWithCenter.cluster_server_list)
+  cluster_server_list_.Mutable(index)->assign(value);
+}
+inline void ClientWithCenter::set_cluster_server_list(int index, const char* value) {
+  cluster_server_list_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:libevrpc.ClientWithCenter.cluster_server_list)
+}
+inline void ClientWithCenter::set_cluster_server_list(int index, const char* value, size_t size) {
+  cluster_server_list_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.ClientWithCenter.cluster_server_list)
+}
+inline ::std::string* ClientWithCenter::add_cluster_server_list() {
+  return cluster_server_list_.Add();
+}
+inline void ClientWithCenter::add_cluster_server_list(const ::std::string& value) {
+  cluster_server_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:libevrpc.ClientWithCenter.cluster_server_list)
+}
+inline void ClientWithCenter::add_cluster_server_list(const char* value) {
+  cluster_server_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:libevrpc.ClientWithCenter.cluster_server_list)
+}
+inline void ClientWithCenter::add_cluster_server_list(const char* value, size_t size) {
+  cluster_server_list_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:libevrpc.ClientWithCenter.cluster_server_list)
+}
+inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
+ClientWithCenter::cluster_server_list() const {
+  // @@protoc_insertion_point(field_list:libevrpc.ClientWithCenter.cluster_server_list)
+  return cluster_server_list_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::std::string>*
+ClientWithCenter::mutable_cluster_server_list() {
+  // @@protoc_insertion_point(field_mutable_list:libevrpc.ClientWithCenter.cluster_server_list)
+  return &cluster_server_list_;
 }
 
 
@@ -246,10 +319,10 @@ CenterResponseClient::mutable_should_communicate_center() {
 namespace google {
 namespace protobuf {
 
-template <> struct is_proto_enum< ::libevrpc::ResponseClientAction> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::libevrpc::ClientClusterAction> : ::google::protobuf::internal::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::libevrpc::ResponseClientAction>() {
-  return ::libevrpc::ResponseClientAction_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::libevrpc::ClientClusterAction>() {
+  return ::libevrpc::ClientClusterAction_descriptor();
 }
 
 }  // namespace google

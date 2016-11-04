@@ -89,6 +89,20 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
         return false;
     }
 
+    ClientWithCenter cwc_proto;
+    cwc_proto.set_client_center_action(CLIENT_INIT_REQ);
+
+    string cwc_str;
+    if (!cwc_proto.SerializeToString(&cwc_str)) {
+        close(conn_fd);
+        continue;
+    }
+
+    if (!RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
+        // TODO
+    }
+    close(conn_fd);
+
     running_ = true
     return true;
 }

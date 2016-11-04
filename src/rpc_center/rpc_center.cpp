@@ -525,8 +525,16 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             /*
              * 处理来自RPC客户端的请求
              */
-            CenterClient center_client;
-            center_client.ParseFromString(recv_message);
+            ClientWithCenter cwc_proto;
+            if (cwc_proto.ParseFromString(recv_message)) {
+                return false;
+            }
+            switch (cwc_proto.client_center_action()) {
+                case:
+                default:
+                    break;
+            }
+
             break;
        }
        case CENTER2CLUSTER : {

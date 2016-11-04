@@ -3,13 +3,17 @@ package libevrpc;
 import "center_type.proto";
 
 // 中心与RPC客户端信息协议
-enum ResponseClientAction {
-    CLIENT_RESP = 1;
+enum ClientClusterAction {
+    CLIENT_INIT_REQ = 1;
+    UPDATE_SERVER_INFO = 2;
+    CENTER_RESP = 3;
 }
 
-message CenterResponseClient {
-    optional ResponseClientAction response_client_action = 1;
+message ClientWithCenter {
+    optional ClientClusterAction client_center_action = 1;
     repeated string should_communicate_center = 2;
+    repeated string cluster_server_list = 3;
 }
+
 
 

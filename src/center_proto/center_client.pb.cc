@@ -20,10 +20,10 @@ namespace libevrpc {
 
 namespace {
 
-const ::google::protobuf::Descriptor* CenterResponseClient_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* ClientWithCenter_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  CenterResponseClient_reflection_ = NULL;
-const ::google::protobuf::EnumDescriptor* ResponseClientAction_descriptor_ = NULL;
+  ClientWithCenter_reflection_ = NULL;
+const ::google::protobuf::EnumDescriptor* ClientClusterAction_descriptor_ = NULL;
 
 }  // namespace
 
@@ -34,23 +34,24 @@ void protobuf_AssignDesc_center_5fclient_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "center_client.proto");
   GOOGLE_CHECK(file != NULL);
-  CenterResponseClient_descriptor_ = file->message_type(0);
-  static const int CenterResponseClient_offsets_[2] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterResponseClient, response_client_action_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterResponseClient, should_communicate_center_),
+  ClientWithCenter_descriptor_ = file->message_type(0);
+  static const int ClientWithCenter_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ClientWithCenter, client_center_action_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ClientWithCenter, should_communicate_center_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ClientWithCenter, cluster_server_list_),
   };
-  CenterResponseClient_reflection_ =
+  ClientWithCenter_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      CenterResponseClient_descriptor_,
-      CenterResponseClient::default_instance_,
-      CenterResponseClient_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterResponseClient, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CenterResponseClient, _unknown_fields_),
+      ClientWithCenter_descriptor_,
+      ClientWithCenter::default_instance_,
+      ClientWithCenter_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ClientWithCenter, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ClientWithCenter, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(CenterResponseClient));
-  ResponseClientAction_descriptor_ = file->enum_type(0);
+      sizeof(ClientWithCenter));
+  ClientClusterAction_descriptor_ = file->enum_type(0);
 }
 
 namespace {
@@ -64,14 +65,14 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    CenterResponseClient_descriptor_, &CenterResponseClient::default_instance());
+    ClientWithCenter_descriptor_, &ClientWithCenter::default_instance());
 }
 
 }  // namespace
 
 void protobuf_ShutdownFile_center_5fclient_2eproto() {
-  delete CenterResponseClient::default_instance_;
-  delete CenterResponseClient_reflection_;
+  delete ClientWithCenter::default_instance_;
+  delete ClientWithCenter_reflection_;
 }
 
 void protobuf_AddDesc_center_5fclient_2eproto() {
@@ -83,15 +84,17 @@ void protobuf_AddDesc_center_5fclient_2eproto() {
   ::libevrpc::protobuf_AddDesc_center_5ftype_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\023center_client.proto\022\010libevrpc\032\021center_"
-    "type.proto\"y\n\024CenterResponseClient\022>\n\026re"
-    "sponse_client_action\030\001 \001(\0162\036.libevrpc.Re"
-    "sponseClientAction\022!\n\031should_communicate"
-    "_center\030\002 \003(\t*\'\n\024ResponseClientAction\022\017\n"
-    "\013CLIENT_RESP\020\001", 214);
+    "type.proto\"\217\001\n\020ClientWithCenter\022;\n\024clien"
+    "t_center_action\030\001 \001(\0162\035.libevrpc.ClientC"
+    "lusterAction\022!\n\031should_communicate_cente"
+    "r\030\002 \003(\t\022\033\n\023cluster_server_list\030\003 \003(\t*S\n\023"
+    "ClientClusterAction\022\023\n\017CLIENT_INIT_REQ\020\001"
+    "\022\026\n\022UPDATE_SERVER_INFO\020\002\022\017\n\013CENTER_RESP\020"
+    "\003", 281);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "center_client.proto", &protobuf_RegisterTypes);
-  CenterResponseClient::default_instance_ = new CenterResponseClient();
-  CenterResponseClient::default_instance_->InitAsDefaultInstance();
+  ClientWithCenter::default_instance_ = new ClientWithCenter();
+  ClientWithCenter::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_center_5fclient_2eproto);
 }
 
@@ -101,13 +104,15 @@ struct StaticDescriptorInitializer_center_5fclient_2eproto {
     protobuf_AddDesc_center_5fclient_2eproto();
   }
 } static_descriptor_initializer_center_5fclient_2eproto_;
-const ::google::protobuf::EnumDescriptor* ResponseClientAction_descriptor() {
+const ::google::protobuf::EnumDescriptor* ClientClusterAction_descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return ResponseClientAction_descriptor_;
+  return ClientClusterAction_descriptor_;
 }
-bool ResponseClientAction_IsValid(int value) {
+bool ClientClusterAction_IsValid(int value) {
   switch(value) {
     case 1:
+    case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -118,90 +123,92 @@ bool ResponseClientAction_IsValid(int value) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int CenterResponseClient::kResponseClientActionFieldNumber;
-const int CenterResponseClient::kShouldCommunicateCenterFieldNumber;
+const int ClientWithCenter::kClientCenterActionFieldNumber;
+const int ClientWithCenter::kShouldCommunicateCenterFieldNumber;
+const int ClientWithCenter::kClusterServerListFieldNumber;
 #endif  // !_MSC_VER
 
-CenterResponseClient::CenterResponseClient()
+ClientWithCenter::ClientWithCenter()
   : ::google::protobuf::Message() {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:libevrpc.CenterResponseClient)
+  // @@protoc_insertion_point(constructor:libevrpc.ClientWithCenter)
 }
 
-void CenterResponseClient::InitAsDefaultInstance() {
+void ClientWithCenter::InitAsDefaultInstance() {
 }
 
-CenterResponseClient::CenterResponseClient(const CenterResponseClient& from)
+ClientWithCenter::ClientWithCenter(const ClientWithCenter& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
-  // @@protoc_insertion_point(copy_constructor:libevrpc.CenterResponseClient)
+  // @@protoc_insertion_point(copy_constructor:libevrpc.ClientWithCenter)
 }
 
-void CenterResponseClient::SharedCtor() {
+void ClientWithCenter::SharedCtor() {
   ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
-  response_client_action_ = 1;
+  client_center_action_ = 1;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-CenterResponseClient::~CenterResponseClient() {
-  // @@protoc_insertion_point(destructor:libevrpc.CenterResponseClient)
+ClientWithCenter::~ClientWithCenter() {
+  // @@protoc_insertion_point(destructor:libevrpc.ClientWithCenter)
   SharedDtor();
 }
 
-void CenterResponseClient::SharedDtor() {
+void ClientWithCenter::SharedDtor() {
   if (this != default_instance_) {
   }
 }
 
-void CenterResponseClient::SetCachedSize(int size) const {
+void ClientWithCenter::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* CenterResponseClient::descriptor() {
+const ::google::protobuf::Descriptor* ClientWithCenter::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return CenterResponseClient_descriptor_;
+  return ClientWithCenter_descriptor_;
 }
 
-const CenterResponseClient& CenterResponseClient::default_instance() {
+const ClientWithCenter& ClientWithCenter::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_center_5fclient_2eproto();
   return *default_instance_;
 }
 
-CenterResponseClient* CenterResponseClient::default_instance_ = NULL;
+ClientWithCenter* ClientWithCenter::default_instance_ = NULL;
 
-CenterResponseClient* CenterResponseClient::New() const {
-  return new CenterResponseClient;
+ClientWithCenter* ClientWithCenter::New() const {
+  return new ClientWithCenter;
 }
 
-void CenterResponseClient::Clear() {
-  response_client_action_ = 1;
+void ClientWithCenter::Clear() {
+  client_center_action_ = 1;
   should_communicate_center_.Clear();
+  cluster_server_list_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
-bool CenterResponseClient::MergePartialFromCodedStream(
+bool ClientWithCenter::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:libevrpc.CenterResponseClient)
+  // @@protoc_insertion_point(parse_start:libevrpc.ClientWithCenter)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional .libevrpc.ResponseClientAction response_client_action = 1;
+      // optional .libevrpc.ClientClusterAction client_center_action = 1;
       case 1: {
         if (tag == 8) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          if (::libevrpc::ResponseClientAction_IsValid(value)) {
-            set_response_client_action(static_cast< ::libevrpc::ResponseClientAction >(value));
+          if (::libevrpc::ClientClusterAction_IsValid(value)) {
+            set_client_center_action(static_cast< ::libevrpc::ClientClusterAction >(value));
           } else {
             mutable_unknown_fields()->AddVarint(1, value);
           }
@@ -227,6 +234,25 @@ bool CenterResponseClient::MergePartialFromCodedStream(
           goto handle_unusual;
         }
         if (input->ExpectTag(18)) goto parse_should_communicate_center;
+        if (input->ExpectTag(26)) goto parse_cluster_server_list;
+        break;
+      }
+
+      // repeated string cluster_server_list = 3;
+      case 3: {
+        if (tag == 26) {
+         parse_cluster_server_list:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_cluster_server_list()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->cluster_server_list(this->cluster_server_list_size() - 1).data(),
+            this->cluster_server_list(this->cluster_server_list_size() - 1).length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "cluster_server_list");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(26)) goto parse_cluster_server_list;
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -245,21 +271,21 @@ bool CenterResponseClient::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:libevrpc.CenterResponseClient)
+  // @@protoc_insertion_point(parse_success:libevrpc.ClientWithCenter)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:libevrpc.CenterResponseClient)
+  // @@protoc_insertion_point(parse_failure:libevrpc.ClientWithCenter)
   return false;
 #undef DO_
 }
 
-void CenterResponseClient::SerializeWithCachedSizes(
+void ClientWithCenter::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:libevrpc.CenterResponseClient)
-  // optional .libevrpc.ResponseClientAction response_client_action = 1;
-  if (has_response_client_action()) {
+  // @@protoc_insertion_point(serialize_start:libevrpc.ClientWithCenter)
+  // optional .libevrpc.ClientClusterAction client_center_action = 1;
+  if (has_client_center_action()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      1, this->response_client_action(), output);
+      1, this->client_center_action(), output);
   }
 
   // repeated string should_communicate_center = 2;
@@ -272,20 +298,30 @@ void CenterResponseClient::SerializeWithCachedSizes(
       2, this->should_communicate_center(i), output);
   }
 
+  // repeated string cluster_server_list = 3;
+  for (int i = 0; i < this->cluster_server_list_size(); i++) {
+  ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+    this->cluster_server_list(i).data(), this->cluster_server_list(i).length(),
+    ::google::protobuf::internal::WireFormat::SERIALIZE,
+    "cluster_server_list");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      3, this->cluster_server_list(i), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:libevrpc.CenterResponseClient)
+  // @@protoc_insertion_point(serialize_end:libevrpc.ClientWithCenter)
 }
 
-::google::protobuf::uint8* CenterResponseClient::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* ClientWithCenter::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:libevrpc.CenterResponseClient)
-  // optional .libevrpc.ResponseClientAction response_client_action = 1;
-  if (has_response_client_action()) {
+  // @@protoc_insertion_point(serialize_to_array_start:libevrpc.ClientWithCenter)
+  // optional .libevrpc.ClientClusterAction client_center_action = 1;
+  if (has_client_center_action()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      1, this->response_client_action(), target);
+      1, this->client_center_action(), target);
   }
 
   // repeated string should_communicate_center = 2;
@@ -298,22 +334,32 @@ void CenterResponseClient::SerializeWithCachedSizes(
       WriteStringToArray(2, this->should_communicate_center(i), target);
   }
 
+  // repeated string cluster_server_list = 3;
+  for (int i = 0; i < this->cluster_server_list_size(); i++) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->cluster_server_list(i).data(), this->cluster_server_list(i).length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "cluster_server_list");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(3, this->cluster_server_list(i), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:libevrpc.CenterResponseClient)
+  // @@protoc_insertion_point(serialize_to_array_end:libevrpc.ClientWithCenter)
   return target;
 }
 
-int CenterResponseClient::ByteSize() const {
+int ClientWithCenter::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional .libevrpc.ResponseClientAction response_client_action = 1;
-    if (has_response_client_action()) {
+    // optional .libevrpc.ClientClusterAction client_center_action = 1;
+    if (has_client_center_action()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::EnumSize(this->response_client_action());
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->client_center_action());
     }
 
   }
@@ -322,6 +368,13 @@ int CenterResponseClient::ByteSize() const {
   for (int i = 0; i < this->should_communicate_center_size(); i++) {
     total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
       this->should_communicate_center(i));
+  }
+
+  // repeated string cluster_server_list = 3;
+  total_size += 1 * this->cluster_server_list_size();
+  for (int i = 0; i < this->cluster_server_list_size(); i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->cluster_server_list(i));
   }
 
   if (!unknown_fields().empty()) {
@@ -335,10 +388,10 @@ int CenterResponseClient::ByteSize() const {
   return total_size;
 }
 
-void CenterResponseClient::MergeFrom(const ::google::protobuf::Message& from) {
+void ClientWithCenter::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const CenterResponseClient* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const CenterResponseClient*>(
+  const ClientWithCenter* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const ClientWithCenter*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -347,49 +400,51 @@ void CenterResponseClient::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void CenterResponseClient::MergeFrom(const CenterResponseClient& from) {
+void ClientWithCenter::MergeFrom(const ClientWithCenter& from) {
   GOOGLE_CHECK_NE(&from, this);
   should_communicate_center_.MergeFrom(from.should_communicate_center_);
+  cluster_server_list_.MergeFrom(from.cluster_server_list_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_response_client_action()) {
-      set_response_client_action(from.response_client_action());
+    if (from.has_client_center_action()) {
+      set_client_center_action(from.client_center_action());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void CenterResponseClient::CopyFrom(const ::google::protobuf::Message& from) {
+void ClientWithCenter::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void CenterResponseClient::CopyFrom(const CenterResponseClient& from) {
+void ClientWithCenter::CopyFrom(const ClientWithCenter& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool CenterResponseClient::IsInitialized() const {
+bool ClientWithCenter::IsInitialized() const {
 
   return true;
 }
 
-void CenterResponseClient::Swap(CenterResponseClient* other) {
+void ClientWithCenter::Swap(ClientWithCenter* other) {
   if (other != this) {
-    std::swap(response_client_action_, other->response_client_action_);
+    std::swap(client_center_action_, other->client_center_action_);
     should_communicate_center_.Swap(&other->should_communicate_center_);
+    cluster_server_list_.Swap(&other->cluster_server_list_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
   }
 }
 
-::google::protobuf::Metadata CenterResponseClient::GetMetadata() const {
+::google::protobuf::Metadata ClientWithCenter::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = CenterResponseClient_descriptor_;
-  metadata.reflection = CenterResponseClient_reflection_;
+  metadata.descriptor = ClientWithCenter_descriptor_;
+  metadata.reflection = ClientWithCenter_reflection_;
   return metadata;
 }
 
