@@ -111,10 +111,6 @@ bool ConsistentHashLoadBalancer::UpdateLBResult(const RepeatedPtrField<LoadBalan
     return true;
 }
 
-bool ConsistentHashLoadBalancer::BuildConsistentHashMap() {
-    return true;
-}
-
 
 }  // end of namespace libevrpc
 

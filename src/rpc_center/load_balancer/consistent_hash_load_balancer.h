@@ -59,9 +59,6 @@ class ConsistentHashLoadBalancer : public LoadBalancer {
                 const ::google::protobuf::RepeatedPtrField<LoadBalancerMetaData>& lb_result_list);
 
     private:
-        bool BuildConsistentHashMap();
-
-    private:
         std::string config_file_;
         int32_t virtual_node_num_;
 
