@@ -44,6 +44,7 @@ class CenterClientHeartbeat : public Thread {
         std::string config_file_;
         ADDRS_LIST_TYPE* center_addrs_ptr_;
         ADDRS_LIST_TYPE* updatecenter_addrs_ptr_;
+        ADDRS_LIST_TYPE* cluster_server_addrs_list_ptr_;
 
         bool running_;
         char* center_port_;

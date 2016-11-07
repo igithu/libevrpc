@@ -39,6 +39,7 @@ CenterClientHeartbeat::CenterClientHeartbeat(const string& config_file):
     config_file_(config_file),
     center_addrs_ptr_(new ADDRS_LIST_TYPE()),
     updatecenter_addrs_ptr_(new ADDRS_LIST_TYPE()),
+    cluster_server_addrs_list_ptr_(new ADDRS_LIST_TYPE()),
     running_(false),
     center_port_(NULL){
 }
@@ -55,9 +56,25 @@ CenterClientHeartbeat::~CenterClientHeartbeat() {
     if (NULL != center_port_) {
         free(center_port_);
     }
+
+    if (NULL != cluster_server_addrs_list_ptr_) {
+        delete cluster_server_addrs_list_ptr_;
+    }
 }
 
 void CenterClientHeartbeat::Run() {
+
+    int32_t rca_size = updatecenter_addrs_ptr_->size();
+
+    if (!InitCenterClientHB()) {
+        fprintf(stderr, "Center Init HeartBeat failed!\n");
+        return;
+    }
+
+    while (running_) {
+
+    }
+
 }
 
 bool CenterClientHeartbeat::InitCenterClientHB() {
