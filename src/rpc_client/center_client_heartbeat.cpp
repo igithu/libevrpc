@@ -63,16 +63,14 @@ CenterClientHeartbeat::~CenterClientHeartbeat() {
 }
 
 void CenterClientHeartbeat::Run() {
+    int32_t rc_size = updatecenter_addrs_ptr_->size();
 
-    int32_t rca_size = updatecenter_addrs_ptr_->size();
-
-    if (!InitCenterClientHB()) {
+    if (0 == rc_size || !InitCenterClientHB()) {
         fprintf(stderr, "Center Init HeartBeat failed!\n");
         return;
     }
 
     while (running_) {
-
     }
 
 }
@@ -117,6 +115,32 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
 
     if (!RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
         // TODO
+    }
+
+    string center_response_str;
+    if (RpcRecv(conn_fd, center_response_str, false)) {
+        // TODO
+        ClientWithCenter cwc_proto;
+        if (cwc_proto.ParseFromString(center_response_str) &&
+            cwc_proto.client_center_action() == CENTER_RESP_OK) {
+            /*
+             * 获取与当前Client对应Center服务器列表
+             */
+            RepeatedPtrField<string>* center_list = cwc_proto.should_communicate_center();
+            for (RepeatedPtrField<string>::iterator iter = center_list->begin();
+                 iter != center_list->end();
+                 ++iter) {
+                updatecenter_addrs_ptr_->push_back(*iter);
+            }
+            /*
+             * 第一次获取与当前Client对应的Cluster服务器列表
+             */
+            RepeatedPtrField<string>* rpc_server_list = cwc_proto.cluster_server_list();
+            for (RepeatedPtrField<string>::iterator iter = rpc_server_list->begin();
+                 iter != rpc_server_list->end();
+                 ++iter) {
+                cluster_server_addrs_list_ptr_->push_back(*iter);
+            }
     }
     close(conn_fd);
 

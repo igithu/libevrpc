@@ -40,11 +40,12 @@ class ClientWithCenter;
 enum ClientClusterAction {
   CLIENT_INIT_REQ = 1,
   UPDATE_SERVER_INFO = 2,
-  CENTER_RESP = 3
+  CENTER_RESP_OK = 3,
+  CENTER_RESP_ERR = 4
 };
 bool ClientClusterAction_IsValid(int value);
 const ClientClusterAction ClientClusterAction_MIN = CLIENT_INIT_REQ;
-const ClientClusterAction ClientClusterAction_MAX = CENTER_RESP;
+const ClientClusterAction ClientClusterAction_MAX = CENTER_RESP_ERR;
 const int ClientClusterAction_ARRAYSIZE = ClientClusterAction_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* ClientClusterAction_descriptor();

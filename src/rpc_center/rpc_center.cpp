@@ -530,7 +530,12 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                 return false;
             }
             switch (cwc_proto.client_center_action()) {
-                case:
+                case CLIENT_INIT_REQ: {
+                    break;
+                }
+                case UPDATE_SERVER_INFO: {
+                    break;
+                }
                 default:
                     break;
             }

@@ -87,10 +87,10 @@ void protobuf_AddDesc_center_5fclient_2eproto() {
     "type.proto\"\217\001\n\020ClientWithCenter\022;\n\024clien"
     "t_center_action\030\001 \001(\0162\035.libevrpc.ClientC"
     "lusterAction\022!\n\031should_communicate_cente"
-    "r\030\002 \003(\t\022\033\n\023cluster_server_list\030\003 \003(\t*S\n\023"
+    "r\030\002 \003(\t\022\033\n\023cluster_server_list\030\003 \003(\t*k\n\023"
     "ClientClusterAction\022\023\n\017CLIENT_INIT_REQ\020\001"
-    "\022\026\n\022UPDATE_SERVER_INFO\020\002\022\017\n\013CENTER_RESP\020"
-    "\003", 281);
+    "\022\026\n\022UPDATE_SERVER_INFO\020\002\022\022\n\016CENTER_RESP_"
+    "OK\020\003\022\023\n\017CENTER_RESP_ERR\020\004", 305);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "center_client.proto", &protobuf_RegisterTypes);
   ClientWithCenter::default_instance_ = new ClientWithCenter();
@@ -113,6 +113,7 @@ bool ClientClusterAction_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
       return true;
     default:
       return false;

@@ -134,12 +134,15 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 void CenterClusterHeartbeat::Run() {
     int32_t rca_size = reporter_center_addrs_ptr_->size();
 
-    if (!InitCenterClusterHB() || 0 == rca_size) {
+    if (0 == rca_size || !InitCenterClusterHB()) {
         fprintf(stderr, "Center Init HeartBeat failed!\n");
         return;
     }
 
     int32_t random_index = random(rca_size);
+
+    int32_t should_reinit = ConfigParser::GetInstance(config_file_).IniGetInt("rpc_center:should_reinit", 10);
+    int32_t reinit_cnt = 0;
     while (running_) {
         /**
          * 获取本地机器信息 CPU LOAD1等
@@ -155,6 +158,11 @@ void CenterClusterHeartbeat::Run() {
 
         int32_t conn_fd = TcpConnect(reporter_center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
         if (conn_fd < 0) {
+            ++reinit_cnt;
+            if (reinit_cnt > should_reinit) {
+                reinit_cnt = 0;
+                InitCenterClusterHB();
+            }
             random_index = random(rca_size);
             sleep(sleep_time);
             continue;

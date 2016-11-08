@@ -6,7 +6,8 @@ import "center_type.proto";
 enum ClientClusterAction {
     CLIENT_INIT_REQ = 1;
     UPDATE_SERVER_INFO = 2;
-    CENTER_RESP = 3;
+    CENTER_RESP_OK = 3;
+    CENTER_RESP_ERR = 4;
 }
 
 message ClientWithCenter {
