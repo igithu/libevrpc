@@ -529,8 +529,24 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             if (cwc_proto.ParseFromString(recv_message)) {
                 return false;
             }
+            string client_addr = cwc_proto.from_addr();
+            ClientWithCenter cwc_response_proto;
             switch (cwc_proto.client_center_action()) {
                 case CLIENT_INIT_REQ: {
+                    uint32_t hash_id = MurMurHash2(client_addr.c_str(), client_addr.size());
+                    {
+                        ReadLockGuard rguard(center_hash_map_rwlock_);
+                        CENTER_HASH_MAP::iterator iter = center_hash_map_ptr_->lower_bound(hash_id);
+                        for (int32_t i = 0; i < 3; ++i) {
+                            if (center_hash_map_ptr_->end() != iter) {
+                                ++iter;
+                            } else {
+                                iter = center_hash_map_ptr_->begin();
+                            }
+                            cwc_response_proto.add_should_communicate_center(iter->second);
+                        }
+                    }
+
                     break;
                 }
                 case UPDATE_SERVER_INFO: {
@@ -538,6 +554,12 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                 }
                 default:
                     break;
+            }
+
+            string response_client_str;
+            if (!cwc_response_proto.SerializeToString(&response_client_str) ||
+                !RpcSend(conn_fd, CENTER2CLIENT, response_client_str)) {
+                return false;
             }
 
             break;
@@ -586,11 +608,11 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                         CENTER_HASH_MAP::iterator iter = center_hash_map_ptr_->lower_bound(hash_id);
                         for (int32_t i = 0; i < 3; ++i) {
                             if (center_hash_map_ptr_->end() != iter) {
-                                crc.add_should_reporter_center(iter->second);
                                 ++iter;
                             } else {
                                 iter = center_hash_map_ptr_->begin();
                             }
+                            crc.add_should_reporter_center(iter->second);
                         }
                     }
                     string send_str;

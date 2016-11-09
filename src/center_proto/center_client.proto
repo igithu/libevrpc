@@ -11,9 +11,10 @@ enum ClientClusterAction {
 }
 
 message ClientWithCenter {
-    optional ClientClusterAction client_center_action = 1;
-    repeated string should_communicate_center = 2;
-    repeated string cluster_server_list = 3;
+    optional string from_addr = 1;
+    optional ClientClusterAction client_center_action = 2;
+    repeated string should_communicate_center = 3;
+    repeated string cluster_server_list = 4;
 }
 
 

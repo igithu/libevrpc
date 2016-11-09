@@ -113,17 +113,29 @@ class ClientWithCenter : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional .libevrpc.ClientClusterAction client_center_action = 1;
+  // optional string from_addr = 1;
+  inline bool has_from_addr() const;
+  inline void clear_from_addr();
+  static const int kFromAddrFieldNumber = 1;
+  inline const ::std::string& from_addr() const;
+  inline void set_from_addr(const ::std::string& value);
+  inline void set_from_addr(const char* value);
+  inline void set_from_addr(const char* value, size_t size);
+  inline ::std::string* mutable_from_addr();
+  inline ::std::string* release_from_addr();
+  inline void set_allocated_from_addr(::std::string* from_addr);
+
+  // optional .libevrpc.ClientClusterAction client_center_action = 2;
   inline bool has_client_center_action() const;
   inline void clear_client_center_action();
-  static const int kClientCenterActionFieldNumber = 1;
+  static const int kClientCenterActionFieldNumber = 2;
   inline ::libevrpc::ClientClusterAction client_center_action() const;
   inline void set_client_center_action(::libevrpc::ClientClusterAction value);
 
-  // repeated string should_communicate_center = 2;
+  // repeated string should_communicate_center = 3;
   inline int should_communicate_center_size() const;
   inline void clear_should_communicate_center();
-  static const int kShouldCommunicateCenterFieldNumber = 2;
+  static const int kShouldCommunicateCenterFieldNumber = 3;
   inline const ::std::string& should_communicate_center(int index) const;
   inline ::std::string* mutable_should_communicate_center(int index);
   inline void set_should_communicate_center(int index, const ::std::string& value);
@@ -136,10 +148,10 @@ class ClientWithCenter : public ::google::protobuf::Message {
   inline const ::google::protobuf::RepeatedPtrField< ::std::string>& should_communicate_center() const;
   inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_should_communicate_center();
 
-  // repeated string cluster_server_list = 3;
+  // repeated string cluster_server_list = 4;
   inline int cluster_server_list_size() const;
   inline void clear_cluster_server_list();
-  static const int kClusterServerListFieldNumber = 3;
+  static const int kClusterServerListFieldNumber = 4;
   inline const ::std::string& cluster_server_list(int index) const;
   inline ::std::string* mutable_cluster_server_list(int index);
   inline void set_cluster_server_list(int index, const ::std::string& value);
@@ -154,6 +166,8 @@ class ClientWithCenter : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:libevrpc.ClientWithCenter)
  private:
+  inline void set_has_from_addr();
+  inline void clear_has_from_addr();
   inline void set_has_client_center_action();
   inline void clear_has_client_center_action();
 
@@ -161,6 +175,7 @@ class ClientWithCenter : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
+  ::std::string* from_addr_;
   ::google::protobuf::RepeatedPtrField< ::std::string> should_communicate_center_;
   ::google::protobuf::RepeatedPtrField< ::std::string> cluster_server_list_;
   int client_center_action_;
@@ -178,15 +193,91 @@ class ClientWithCenter : public ::google::protobuf::Message {
 
 // ClientWithCenter
 
-// optional .libevrpc.ClientClusterAction client_center_action = 1;
-inline bool ClientWithCenter::has_client_center_action() const {
+// optional string from_addr = 1;
+inline bool ClientWithCenter::has_from_addr() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void ClientWithCenter::set_has_client_center_action() {
+inline void ClientWithCenter::set_has_from_addr() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void ClientWithCenter::clear_has_client_center_action() {
+inline void ClientWithCenter::clear_has_from_addr() {
   _has_bits_[0] &= ~0x00000001u;
+}
+inline void ClientWithCenter::clear_from_addr() {
+  if (from_addr_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    from_addr_->clear();
+  }
+  clear_has_from_addr();
+}
+inline const ::std::string& ClientWithCenter::from_addr() const {
+  // @@protoc_insertion_point(field_get:libevrpc.ClientWithCenter.from_addr)
+  return *from_addr_;
+}
+inline void ClientWithCenter::set_from_addr(const ::std::string& value) {
+  set_has_from_addr();
+  if (from_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    from_addr_ = new ::std::string;
+  }
+  from_addr_->assign(value);
+  // @@protoc_insertion_point(field_set:libevrpc.ClientWithCenter.from_addr)
+}
+inline void ClientWithCenter::set_from_addr(const char* value) {
+  set_has_from_addr();
+  if (from_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    from_addr_ = new ::std::string;
+  }
+  from_addr_->assign(value);
+  // @@protoc_insertion_point(field_set_char:libevrpc.ClientWithCenter.from_addr)
+}
+inline void ClientWithCenter::set_from_addr(const char* value, size_t size) {
+  set_has_from_addr();
+  if (from_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    from_addr_ = new ::std::string;
+  }
+  from_addr_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:libevrpc.ClientWithCenter.from_addr)
+}
+inline ::std::string* ClientWithCenter::mutable_from_addr() {
+  set_has_from_addr();
+  if (from_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    from_addr_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:libevrpc.ClientWithCenter.from_addr)
+  return from_addr_;
+}
+inline ::std::string* ClientWithCenter::release_from_addr() {
+  clear_has_from_addr();
+  if (from_addr_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = from_addr_;
+    from_addr_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void ClientWithCenter::set_allocated_from_addr(::std::string* from_addr) {
+  if (from_addr_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete from_addr_;
+  }
+  if (from_addr) {
+    set_has_from_addr();
+    from_addr_ = from_addr;
+  } else {
+    clear_has_from_addr();
+    from_addr_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:libevrpc.ClientWithCenter.from_addr)
+}
+
+// optional .libevrpc.ClientClusterAction client_center_action = 2;
+inline bool ClientWithCenter::has_client_center_action() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void ClientWithCenter::set_has_client_center_action() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void ClientWithCenter::clear_has_client_center_action() {
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void ClientWithCenter::clear_client_center_action() {
   client_center_action_ = 1;
@@ -203,7 +294,7 @@ inline void ClientWithCenter::set_client_center_action(::libevrpc::ClientCluster
   // @@protoc_insertion_point(field_set:libevrpc.ClientWithCenter.client_center_action)
 }
 
-// repeated string should_communicate_center = 2;
+// repeated string should_communicate_center = 3;
 inline int ClientWithCenter::should_communicate_center_size() const {
   return should_communicate_center_.size();
 }
@@ -257,7 +348,7 @@ ClientWithCenter::mutable_should_communicate_center() {
   return &should_communicate_center_;
 }
 
-// repeated string cluster_server_list = 3;
+// repeated string cluster_server_list = 4;
 inline int ClientWithCenter::cluster_server_list_size() const {
   return cluster_server_list_.size();
 }

@@ -103,19 +103,23 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 
     string rcs_str;
     if (!rcs.SerializeToString(&rcs_str)) {
+        close(conn_fd);
         return false;
     }
     if (!RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, false)) {
+        close(conn_fd);
         return false;
     }
 
     string crc_str;
-    if (RpcRecv(conn_fd, crc_str, true) < 0) {
+    if (!RpcRecv(conn_fd, crc_str, true) < 0) {
+        close(conn_fd);
         return false;
     }
 
     CenterResponseCluster crc_proto;
     if (!crc_proto.ParseFromString(crc_str)) {
+        close(conn_fd);
         return false;
     }
 

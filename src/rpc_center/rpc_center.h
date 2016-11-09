@@ -126,7 +126,6 @@ class RpcCenter {
          * 开始FastLeaderElection,同时启动Election线程
          */
         bool StartFastLeaderElection();
-
         /**
          * 标示判决FastLeaderElection是否在运行
          */

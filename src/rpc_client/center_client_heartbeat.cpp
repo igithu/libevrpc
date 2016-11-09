@@ -110,7 +110,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
     string cwc_str;
     if (!cwc_proto.SerializeToString(&cwc_str)) {
         close(conn_fd);
-        continue;
+        return false;
     }
 
     if (!RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
@@ -119,7 +119,6 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
 
     string center_response_str;
     if (RpcRecv(conn_fd, center_response_str, false)) {
-        // TODO
         ClientWithCenter cwc_proto;
         if (cwc_proto.ParseFromString(center_response_str) &&
             cwc_proto.client_center_action() == CENTER_RESP_OK) {
@@ -141,6 +140,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
                  ++iter) {
                 cluster_server_addrs_list_ptr_->push_back(*iter);
             }
+        }
     }
     close(conn_fd);
 
