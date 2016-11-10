@@ -22,6 +22,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <vector>
+
 #include <google/protobuf/repeated_field.h>
 
 #include "center_proto/center_type.pb.h"
@@ -33,6 +35,7 @@
 namespace libevrpc {
 
 using std::string;
+using std::vector;
 using ::google::protobuf::RepeatedPtrField;
 
 extern string g_config_file = "";
@@ -547,9 +550,27 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                         }
                     }
 
+                    vector<string> server_list;
+                    if (load_balancer_ptr_->GetRpcServer(client_addr, server_list)) {
+                        for (vector<string>::iterator iter = server_list.begin();
+                             iter != server_list.end();
+                             ++iter) {
+                            cwc_response_proto.add_cluster_server_list(*iter);
+                        }
+                    }
+
                     break;
                 }
                 case UPDATE_SERVER_INFO: {
+                    vector<string> server_list;
+                    if (load_balancer_ptr_->GetRpcServer(client_addr, server_list)) {
+                        for (vector<string>::iterator iter = server_list.begin();
+                             iter != server_list.end();
+                             ++iter) {
+                            cwc_response_proto.add_cluster_server_list(*iter);
+                        }
+                    }
+
                     break;
                 }
                 default:
