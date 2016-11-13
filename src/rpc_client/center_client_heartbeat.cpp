@@ -70,6 +70,7 @@ void CenterClientHeartbeat::Run() {
         return;
     }
 
+    const char* center_port = ConfigParser::GetInstance(config_file_).IniGetString("rpc_client:port", "8899");
     while (running_) {
     }
 
@@ -85,7 +86,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
          */
         return false;
     }
-    const char* center_port = ConfigParser::GetInstance(config_file_).IniGetString("rpc_center:port", "8899");
+    const char* center_port = ConfigParser::GetInstance(config_file_).IniGetString("rpc_client:port", "8899");
     strcpy(center_port_ = (char*)malloc(strlen(center_port) + 1), center_port);
 
     std::ifstream in(cfile);
@@ -114,7 +115,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
     }
 
     if (!RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
-        // TODO
+        return false;
     }
 
     string center_response_str;
