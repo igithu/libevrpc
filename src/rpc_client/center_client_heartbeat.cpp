@@ -70,8 +70,28 @@ void CenterClientHeartbeat::Run() {
         return;
     }
 
-    const char* center_port = ConfigParser::GetInstance(config_file_).IniGetString("rpc_client:port", "8899");
     while (running_) {
+        int32_t random_index = random(center_addrs_ptr_->size());
+        int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
+        if (conn_fd <= 0) {
+            sleep(10);
+            continue;
+        }
+        ClientWithCenter cwc_proto;
+        cwc_proto.set_client_center_action(UPDATE_SERVER_INFO);
+
+        string cwc_str;
+        if (!cwc_proto.SerializeToString(&cwc_str)) {
+            close(conn_fd);
+            sleep(10);
+            continue;
+        }
+
+        if (!RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
+            sleep(10);
+            continue;
+        }
+
     }
 
 }
