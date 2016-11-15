@@ -81,15 +81,18 @@ void CenterClientHeartbeat::Run() {
         cwc_proto.set_client_center_action(UPDATE_SERVER_INFO);
 
         string cwc_str;
-        if (!cwc_proto.SerializeToString(&cwc_str) || !RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
+        if (!cwc_proto.SerializeToString(&cwc_str) ||
+            !RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
             close(conn_fd);
             sleep(10);
             continue;
         }
 
         string center_response_str;
-        if (RpcRecv(conn_fd, center_response_str, false)) {
-            // TODO
+        ClientWithCenter cwc_response_proto;
+        if (RpcRecv(conn_fd, center_response_str, false) ||
+            cwc_response_proto.ParseFromString(&center_response_str)) {
+            //
         }
     }
 
@@ -166,6 +169,12 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
 
     running_ = true
     return true;
+}
+
+void CenterClientHeartbeat::UpdateCenterAddrs() {
+}
+
+void CenterClientHeartbeat::UpdateServerAddrs() {
 }
 
 

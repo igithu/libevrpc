@@ -24,6 +24,7 @@
 #include <string>
 
 #include "util/thread.h"
+#include "util/pthread_rwlock.h"
 
 namespace libevrpc {
 
@@ -40,6 +41,9 @@ class CenterClientHeartbeat : public Thread {
     private:
         bool InitCenterClientHB();
 
+        void UpdateCenterAddrs();
+        void UpdateServerAddrs();
+
     private:
         std::string config_file_;
         ADDRS_LIST_TYPE* center_addrs_ptr_;
@@ -48,6 +52,9 @@ class CenterClientHeartbeat : public Thread {
 
         bool running_;
         char* center_port_;
+
+        RWLock centers_rwlock_;
+        RWLock servers_rwlock_;
 };
 
 }  // end of namespace libevrpc
