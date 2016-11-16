@@ -23,6 +23,8 @@
 #include <vector>
 #include <string>
 
+#include <google/protobuf/repeated_field.h>
+
 #include "util/thread.h"
 #include "util/pthread_rwlock.h"
 
@@ -41,8 +43,8 @@ class CenterClientHeartbeat : public Thread {
     private:
         bool InitCenterClientHB();
 
-        void UpdateCenterAddrs();
-        void UpdateServerAddrs();
+        void UpdateCenterAddrs(const ::google::protobuf::RepeatedPtrField<std::string>* center_list);
+        void UpdateServerAddrs(const ::google::protobuf::RepeatedPtrField<std::string>* server_list);
 
     private:
         std::string config_file_;

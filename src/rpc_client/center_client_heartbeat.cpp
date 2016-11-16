@@ -92,7 +92,10 @@ void CenterClientHeartbeat::Run() {
         ClientWithCenter cwc_response_proto;
         if (RpcRecv(conn_fd, center_response_str, false) ||
             cwc_response_proto.ParseFromString(&center_response_str)) {
-            //
+            RepeatedPtrField<string>* center_list = cwc_response_proto.should_communicate_center();
+            UpdateCenterAddrs(center_list);
+            RepeatedPtrField<string>* server_list = cwc_response_proto.cluster_server_list();
+            UpdateServerAddrs(server_list);
         }
     }
 
@@ -171,10 +174,22 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
     return true;
 }
 
-void CenterClientHeartbeat::UpdateCenterAddrs() {
+void CenterClientHeartbeat::UpdateCenterAddrs(const RepeatedPtrField<string>* center_list) {
+    WriteLockGuard wguard(centers_rwlock_);
+    for (RepeatedPtrField<string>::const_iterator iter = center_list->begin();
+         iter != center_list->end();
+         ++iter) {
+        updatecenter_addrs_ptr_->push_back(*iter);
+    }
 }
 
-void CenterClientHeartbeat::UpdateServerAddrs() {
+void CenterClientHeartbeat::UpdateServerAddrs(const RepeatedPtrField<string>* server_list) {
+    WriteLockGuard wguard(servers_rwlock_);
+    for (RepeatedPtrField<string>::const_iterator iter = server_list->begin();
+         iter != server_list->end();
+         ++iter) {
+        cluster_server_addrs_list_ptr_->push_back(*iter);
+    }
 }
 
 
