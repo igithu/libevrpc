@@ -41,7 +41,7 @@ CenterClientHeartbeat::CenterClientHeartbeat(const string& config_file):
     updatecenter_addrs_ptr_(new ADDRS_LIST_TYPE()),
     cluster_server_addrs_list_ptr_(new ADDRS_LIST_TYPE()),
     running_(false),
-    center_port_(NULL){
+    center_port_(NULL) {
 }
 
 CenterClientHeartbeat::~CenterClientHeartbeat() {
