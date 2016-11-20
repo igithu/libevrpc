@@ -101,6 +101,11 @@ void CenterClientHeartbeat::Run() {
 
 }
 
+void CenterClientHeartbeat::GetRpcServerList(ADDRS_LIST_TYPE& server_list) {
+    ReadLockGuard wguard(servers_rwlock_);
+    server_list.assign(cluster_server_addrs_list_ptr_->begin(), cluster_server_addrs_list_ptr_->end());
+}
+
 bool CenterClientHeartbeat::InitCenterClientHB() {
     const string cfile = "/tmp/centers.data";
     int ftyp = access(cfile.c_str(), 0);
