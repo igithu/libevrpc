@@ -140,6 +140,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
     }
 
     if (!RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
+        close(conn_fd);
         return false;
     }
 
