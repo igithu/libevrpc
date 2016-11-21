@@ -211,6 +211,18 @@ void RpcCenter::WaitCenter() {
     if (NULL != center_server_thread_) {
         center_server_thread_->Wait();
     }
+
+    if (NULL != election_thread_) {
+        election_thread_->Wait();
+    }
+
+    if (NULL != reporter_thread_) {
+        reporter_thread_->Wait();
+    }
+
+    if (NULL != leader_thread_) {
+        leader_thread_->Wait();
+    }
 }
 
 void RpcCenter::UpdateCenterStatus(CenterStatus cs) {
@@ -358,7 +370,6 @@ CenterStatus RpcCenter::GetCenterStatus() {
     ReadLockGuard rguard(status_rwlock_);
     return center_status_;
 }
-
 
 bool RpcCenter::FastLeaderElection() {
     InquiryCenters();

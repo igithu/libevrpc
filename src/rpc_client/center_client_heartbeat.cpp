@@ -123,7 +123,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
     string line;
 
     const char* local_addr = GetLocalAddress();
-    while (getline (in, line)) {
+    while (getline(in, line)) {
         if (strcmp(line.c_str(), local_addr) == 0) {
             continue;
         }
