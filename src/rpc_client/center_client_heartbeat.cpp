@@ -74,7 +74,7 @@ void CenterClientHeartbeat::Run() {
         int32_t random_index = random(center_addrs_ptr_->size());
         int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
         if (conn_fd <= 0) {
-            sleep(10);
+            sleep(20);
             continue;
         }
         ClientWithCenter cwc_proto;
@@ -97,6 +97,7 @@ void CenterClientHeartbeat::Run() {
             RepeatedPtrField<string>* server_list = cwc_response_proto.cluster_server_list();
             UpdateServerAddrs(server_list);
         }
+        sleep(20);
     }
 
 }

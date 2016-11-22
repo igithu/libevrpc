@@ -581,7 +581,6 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                             cwc_response_proto.add_cluster_server_list(*iter);
                         }
                     }
-
                     break;
                 }
                 default:
