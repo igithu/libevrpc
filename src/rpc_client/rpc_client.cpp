@@ -38,6 +38,7 @@ RpcClient::~RpcClient() {
         rpc_heartbeat_ptr_->Wait();
         delete rpc_heartbeat_ptr_;
     }
+
     if (NULL != rpc_channel_ptr_) {
         delete rpc_channel_ptr_;
     }

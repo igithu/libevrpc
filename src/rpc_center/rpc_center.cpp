@@ -743,7 +743,6 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             break;
         }
         case LEADER_PING_RESPONSE: {
-            // const RepeatedPtrField<LoadBalancerMetaData>* lb_result_list_ptr = centers_proto.mutable_lb_result();
             const RepeatedPtrField<LoadBalancerMetaData>& lb_result_list = centers_proto.lb_result();
             load_balancer_ptr_->UpdateLBResult(lb_result_list);
             break;
@@ -815,7 +814,6 @@ bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
         return false;
     }
     return CenterProcessor(conn_fd);
-    // return true;
 }
 
 void RpcCenter::SetFastLeaderRunning(bool is_running) {
