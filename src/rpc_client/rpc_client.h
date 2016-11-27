@@ -25,6 +25,7 @@
 #include <string>
 
 #include "rpc_heartbeat_client.h"
+#include "center_client_heartbeat.h"
 #include "config_parser/config_parser.h"
 
 namespace libevrpc {
@@ -75,7 +76,11 @@ class RpcClient {
         /*
          * heartbeat in client
          */
-        RpcHeartbeatClient* rpc_heartbeat_ptr_;;
+        RpcHeartbeatClient* rpc_heartbeat_ptr_;
+        /*
+         * update info from center
+         */
+        CenterClientHeartbeat* center_client_heartbeat_ptr_;
         /*
          * when init, read config from config file
          */
