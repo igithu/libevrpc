@@ -40,6 +40,12 @@ RpcClient::~RpcClient() {
         delete rpc_heartbeat_ptr_;
     }
 
+    if (NULL != center_client_heartbeat_ptr_) {
+        center_client_heartbeat_ptr_->Stop();
+        center_client_heartbeat_ptr_->Wait();
+        delete center_client_heartbeat_ptr_;
+    }
+
     if (NULL != rpc_channel_ptr_) {
         delete rpc_channel_ptr_;
     }
@@ -68,6 +74,12 @@ bool RpcClient::InitClient() {
         rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port, rpc_connection_timeout);
         rpc_heartbeat_ptr_->Start();
     }
+
+    if (distributed_mode) {
+        center_client_heartbeat_ptr_ = new CenterClientHeartbeat();
+        center_client_heartbeat_ptr_->Start();
+    }
+
     rpc_controller_ptr_ = new ClientRpcController();
     SetRpcConnectionInfo(1000, 1);
     return true;
