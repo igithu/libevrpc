@@ -60,7 +60,7 @@ class RpcClient {
         std::string GetErrorInfo() const;
 
     protected:
-        bool InitClient();
+        bool InitClient(const std::string& config_file);
 
         Channel* GetRpcChannel();
 

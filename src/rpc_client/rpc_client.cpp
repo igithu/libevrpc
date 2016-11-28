@@ -30,7 +30,7 @@ RpcClient::RpcClient(const string& config_file) :
     center_client_heartbeat_ptr_(NULL),
     config_parser_instance_(ConfigParser::GetInstance(config_file)){
 
-    InitClient();
+    InitClient(config_file);
 }
 
 RpcClient::~RpcClient() {
@@ -55,7 +55,7 @@ RpcClient::~RpcClient() {
     }
 }
 
-bool RpcClient::InitClient() {
+bool RpcClient::InitClient(const string& config_file) {
     const char* rpc_server_addr = config_parser_instance_.IniGetString("rpc_server:addr", "127.0.0.1");
     const char* rpc_server_port = config_parser_instance_.IniGetString("rpc_server:port", "9998");
     const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", "9999");
@@ -76,7 +76,7 @@ bool RpcClient::InitClient() {
     }
 
     if (distributed_mode) {
-        center_client_heartbeat_ptr_ = new CenterClientHeartbeat();
+        center_client_heartbeat_ptr_ = new CenterClientHeartbeat(config_file);
         center_client_heartbeat_ptr_->Start();
     }
 
