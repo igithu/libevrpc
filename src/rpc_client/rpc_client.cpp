@@ -59,7 +59,7 @@ bool RpcClient::InitClient(const string& config_file) {
     const char* rpc_server_addr = config_parser_instance_.IniGetString("rpc_server:addr", "127.0.0.1");
     const char* rpc_server_port = config_parser_instance_.IniGetString("rpc_server:port", "9998");
     const char* hb_server_port = config_parser_instance_.IniGetString("heartbeat:port", "9999");
-    bool distributed_mode = config_parser_instance_.IniGetBool("rpc_server:distributed_mode",false);
+    bool distributed_mode = config_parser_instance_.IniGetBool("rpc_server:distributed_mode", false);
     bool hb_open = config_parser_instance_.IniGetBool("heartbeat:open", true);
     int32_t rpc_connection_timeout = config_parser_instance_.IniGetInt("connection:timeout", 10);
 

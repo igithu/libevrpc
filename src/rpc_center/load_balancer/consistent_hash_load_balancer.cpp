@@ -39,9 +39,6 @@ ConsistentHashLoadBalancer::~ConsistentHashLoadBalancer() {
     if (NULL != vn_map_ptr_) {
         delete vn_map_ptr_;
     }
-    // if (NULL != py_server_list_ptr_) {
-    //     delete py_server_list_ptr_;
-    // }
 }
 
 bool ConsistentHashLoadBalancer::InitBalancer() {

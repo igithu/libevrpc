@@ -128,7 +128,6 @@ bool RpcCenter::InitRpcCenter() {
     center_port_ = (char*)malloc(strlen(local_port));
     strcpy(center_port_, local_port);
 
-
     std::ifstream in(cfile);
     string line;
     while (getline (in, line)) {
