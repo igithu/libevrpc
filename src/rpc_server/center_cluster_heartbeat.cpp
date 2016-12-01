@@ -185,7 +185,7 @@ void CenterClusterHeartbeat::Run() {
             continue;
         }
         if (!RpcSend(conn_fd, CENTER2CLUSTER, rcs_str)) {
-            // TODO
+            fprintf(stderr, "Send info to Center failed!\n");
         }
         close(conn_fd);
     }

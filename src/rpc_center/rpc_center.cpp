@@ -61,7 +61,6 @@ RpcCenter::RpcCenter(const string& config_file) :
     leader_infos_ptr_->lc_start_time = start_time_;
     leader_infos_ptr_->leader_center = GetLocalAddress();
     g_config_file = config_file;
-
 }
 
 RpcCenter::~RpcCenter() {

@@ -45,9 +45,11 @@ CenterServerThread::~CenterServerThread() {
     if (NULL != local_center_) {
         free(local_center_);
     }
+
     if (NULL != center_port_) {
         free(center_port_);
     }
+
     if (NULL != epoller_) {
         ev_loop_destroy(epoller_);
     }
@@ -180,7 +182,6 @@ CEIO_ITEM* CenterServerThread::PopCEIO(CenterEioQueue& eq) {
     }
     return ei;
 }
-
 
 }  // end of namespace libevrpc
 
