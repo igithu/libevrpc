@@ -140,7 +140,6 @@ class RpcServer {
             Message* response_ptr;
             RpcController* rpc_controller_ptr;
         };
-
 };
 
 }  // end of namespace libevrpc

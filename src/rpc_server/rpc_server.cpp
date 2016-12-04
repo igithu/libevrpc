@@ -26,7 +26,6 @@
 #include "server_rpc_controller.h"
 #include "util/rpc_util.h"
 #include "util/rpc_communication.h"
-// #include "connection_timer_manager.h"
 
 namespace libevrpc {
 
@@ -160,7 +159,6 @@ bool RpcServer::Start() {
     dispatcher_thread_ptr_->Start();
     worker_threads_ptr_->Start(thread_num);
     active_wtd_num_ = thread_num;
-
 
     /*
      * if start readerpool or writerpool

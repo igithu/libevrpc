@@ -86,8 +86,6 @@ class RpcClient {
          */
         ConfigParser& config_parser_instance_;
 
-
-
 };
 
 }  // end of namespace libevrpc

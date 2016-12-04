@@ -590,7 +590,6 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                 !RpcSend(conn_fd, CENTER2CLIENT, response_client_str)) {
                 return false;
             }
-
             break;
        }
        case CENTER2CLUSTER : {
@@ -737,7 +736,6 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
             if (!RpcSend(fd, CENTER2CENTER, cp_response_str)) {
                 fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
             }
-
             break;
         }
         case LEADER_PING_RESPONSE: {
