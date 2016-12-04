@@ -23,7 +23,6 @@
 
 namespace libevrpc {
 
-
 LeaderThread::LeaderThread():
     follower_q_(new FollowerQueue()),
     running_(false) {

@@ -99,7 +99,6 @@ void CenterClientHeartbeat::Run() {
         }
         sleep(20);
     }
-
 }
 
 void CenterClientHeartbeat::GetRpcServerList(ADDRS_LIST_TYPE& server_list) {

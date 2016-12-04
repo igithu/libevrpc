@@ -70,6 +70,7 @@ bool RpcClient::InitClient(const string& config_file) {
         PrintErrorInfo("Attention! rpc client cann't read config file!");
         PrintErrorInfo("Init with local server address and default port:8899!");
     }
+
     if (hb_open) {
         rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port, rpc_connection_timeout);
         rpc_heartbeat_ptr_->Start();
