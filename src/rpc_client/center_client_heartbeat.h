@@ -41,6 +41,7 @@ class CenterClientHeartbeat : public Thread {
         virtual void Run();
 
         void GetRpcServerList(ADDRS_LIST_TYPE& server_list);
+        std::string RandomGetRpcServerAddr();
 
     private:
         bool InitCenterClientHB();

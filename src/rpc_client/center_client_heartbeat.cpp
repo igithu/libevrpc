@@ -106,6 +106,12 @@ void CenterClientHeartbeat::GetRpcServerList(ADDRS_LIST_TYPE& server_list) {
     server_list.assign(cluster_server_addrs_list_ptr_->begin(), cluster_server_addrs_list_ptr_->end());
 }
 
+std::string CenterClientHeartbeat::RandomGetRpcServerAddr() {
+    ReadLockGuard wguard(servers_rwlock_);
+    int32_t random = random(cluster_server_addrs_list_ptr_->size());
+    return cluster_server_addrs_list_ptr_->at(random);
+}
+
 bool CenterClientHeartbeat::InitCenterClientHB() {
     const string cfile = "/tmp/centers.data";
     int ftyp = access(cfile.c_str(), 0);
