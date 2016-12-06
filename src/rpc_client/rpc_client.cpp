@@ -63,10 +63,15 @@ bool RpcClient::InitClient(const string& config_file) {
     bool hb_open = config_parser_instance_.IniGetBool("heartbeat:open", true);
     int32_t rpc_connection_timeout = config_parser_instance_.IniGetInt("connection:timeout", 10);
 
+    if (distributed_mode) {
+        center_client_heartbeat_ptr_ = new CenterClientHeartbeat(config_file);
+        center_client_heartbeat_ptr_->Start();
+    }
+
     if (NULL != rpc_server_addr && NULL != rpc_server_port) {
         rpc_channel_ptr_ = new Channel(rpc_server_addr, rpc_server_port);
     } else {
-        rpc_channel_ptr_ = new Channel("127.0.0.1", "999b");
+        rpc_channel_ptr_ = new Channel("127.0.0.1", "9999");
         PrintErrorInfo("Attention! rpc client cann't read config file!");
         PrintErrorInfo("Init with local server address and default port:8899!");
     }
@@ -74,11 +79,6 @@ bool RpcClient::InitClient(const string& config_file) {
     if (hb_open) {
         rpc_heartbeat_ptr_ = new RpcHeartbeatClient(rpc_server_addr, hb_server_port, rpc_connection_timeout);
         rpc_heartbeat_ptr_->Start();
-    }
-
-    if (distributed_mode) {
-        center_client_heartbeat_ptr_ = new CenterClientHeartbeat(config_file);
-        center_client_heartbeat_ptr_->Start();
     }
 
     rpc_controller_ptr_ = new ClientRpcController();

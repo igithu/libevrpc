@@ -27,6 +27,16 @@ namespace libevrpc {
 using std::string;
 using std::vector;
 
+Channel::Channel() :
+    addr_(NULL),
+    port_(NULL),
+    is_channel_async_call_(false),
+    call_limit_(100),
+    tcp_conn_timeout_(1000),
+    try_time_(1) {
+}
+
+
 Channel::Channel(const char* addr, const char* port) :
     is_channel_async_call_(false), call_limit_(100), tcp_conn_timeout_(1000), try_time_(1) {
     strcpy(addr_ = (char*)malloc(strlen(addr) + 1), addr);
@@ -34,8 +44,13 @@ Channel::Channel(const char* addr, const char* port) :
 }
 
 Channel::~Channel() {
-    free(addr_);
-    free(port_);
+    if (NULL != addr_) {
+        free(addr_);
+    }
+
+    if (NULL != port_) {
+        free(port_);
+    }
 
     if (!thread_ids_vec_.empty()) {
         for (int i = 0; i < thread_ids_vec_.size(); ++i) {

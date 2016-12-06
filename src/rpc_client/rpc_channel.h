@@ -74,6 +74,7 @@ struct RpcCallParams {
 
 class Channel : public RpcChannel {
     public:
+        Channel();
         Channel(const char* addr, const char* port);
 
         virtual ~Channel();
