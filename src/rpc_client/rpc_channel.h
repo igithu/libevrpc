@@ -31,6 +31,7 @@
 #include <google/protobuf/service.h>
 #include <google/protobuf/message.h>
 
+#include "center_client_heartbeat.h"
 #include "util/pthread_rwlock.h"
 
 namespace libevrpc {
@@ -74,8 +75,11 @@ struct RpcCallParams {
 
 class Channel : public RpcChannel {
     public:
-        Channel();
         Channel(const char* addr, const char* port);
+        /**
+         * FOR server distribution mode
+         */
+        Channel(CenterClientHeartbeat* center_client_heartbeat_ptr);
 
         virtual ~Channel();
 
@@ -111,6 +115,7 @@ class Channel : public RpcChannel {
          * only for time out
          */
         int32_t try_time_;
+        CenterClientHeartbeat* center_client_heartbeat_ptr_;
         std::string error_info_;
 
         std::vector<pthread_t> thread_ids_vec_;

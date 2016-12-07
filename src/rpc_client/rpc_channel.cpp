@@ -27,18 +27,25 @@ namespace libevrpc {
 using std::string;
 using std::vector;
 
-Channel::Channel() :
+Channel::Channel(CenterClientHeartbeat* center_client_heartbeat_ptr) :
     addr_(NULL),
     port_(NULL),
     is_channel_async_call_(false),
     call_limit_(100),
     tcp_conn_timeout_(1000),
-    try_time_(1) {
+    try_time_(1),
+    center_client_heartbeat_ptr_(center_client_heartbeat_ptr) {
 }
 
 
 Channel::Channel(const char* addr, const char* port) :
-    is_channel_async_call_(false), call_limit_(100), tcp_conn_timeout_(1000), try_time_(1) {
+    is_channel_async_call_(false),
+    call_limit_(100),
+    tcp_conn_timeout_(1000),
+    try_time_(1) {
+    /**
+     * copy the server addr and port when in single server
+     */
     strcpy(addr_ = (char*)malloc(strlen(addr) + 1), addr);
     strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
 }
