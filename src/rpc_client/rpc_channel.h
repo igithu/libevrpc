@@ -79,7 +79,7 @@ class Channel : public RpcChannel {
         /**
          * FOR server distribution mode
          */
-        Channel(CenterClientHeartbeat* center_client_heartbeat_ptr);
+        Channel(CenterClientHeartbeat* center_client_heartbeat_ptr, const char* port);
 
         virtual ~Channel();
 

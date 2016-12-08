@@ -27,7 +27,7 @@ namespace libevrpc {
 using std::string;
 using std::vector;
 
-Channel::Channel(CenterClientHeartbeat* center_client_heartbeat_ptr) :
+Channel::Channel(CenterClientHeartbeat* center_client_heartbeat_ptr, const char* port) :
     addr_(NULL),
     port_(NULL),
     is_channel_async_call_(false),
@@ -35,6 +35,8 @@ Channel::Channel(CenterClientHeartbeat* center_client_heartbeat_ptr) :
     tcp_conn_timeout_(1000),
     try_time_(1),
     center_client_heartbeat_ptr_(center_client_heartbeat_ptr) {
+
+    strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
 }
 
 
@@ -71,6 +73,11 @@ void Channel::CallMethod(const MethodDescriptor* method,
                          const Message* request,
                          Message* response,
                          Closure* done) {
+
+    if (NULL == center_client_heartbeat_ptr_ &&
+        (NULL == addr_ || NULL == port_)) {
+        return;
+    }
 
     int32_t try_times = try_time_;
     do {
