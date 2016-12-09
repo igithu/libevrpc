@@ -75,11 +75,14 @@ void Channel::CallMethod(const MethodDescriptor* method,
                          Closure* done) {
 
     if (NULL == center_client_heartbeat_ptr_ &&
-        (NULL == addr_ || NULL == port_)) {
+       (NULL == addr_ || NULL == port_)) {
         return;
     }
 
     int32_t try_times = try_time_;
+    if (NULL != center_client_heartbeat_ptr_) {
+        addr_ = center_client_heartbeat_ptr_->RandomGetRpcServerAddr();
+    }
     do {
         connect_fd_ = TcpConnect(addr_, port_, tcp_conn_timeout_);
         if (TCP_CONN_TIMEOUT != connect_fd_) {
