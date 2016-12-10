@@ -80,17 +80,24 @@ void Channel::CallMethod(const MethodDescriptor* method,
     }
 
     int32_t try_times = try_time_;
+    char* local_addr = NULL;
     if (NULL != center_client_heartbeat_ptr_) {
-        addr_ = center_client_heartbeat_ptr_->RandomGetRpcServerAddr();
+        local_addr = center_client_heartbeat_ptr_->RandomGetRpcServerAddr();
+    } else {
+        strcpy(local_addr = (char*)malloc(strlen(addr_) + 1), addr_);
     }
     do {
-        connect_fd_ = TcpConnect(addr_, port_, tcp_conn_timeout_);
+        connect_fd_ = TcpConnect(local_addr, port_, tcp_conn_timeout_);
         if (TCP_CONN_TIMEOUT != connect_fd_) {
             break;
         }
         --try_times;
         PrintErrorInfo("TcpConnect timeout! try again!");
     } while (try_times <= 0);
+
+    if (NULL != local_addr) {
+        free(local_addr);
+    }
 
     if (connect_fd_ < 0) {
         if (NULL != controller) {
