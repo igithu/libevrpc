@@ -111,8 +111,6 @@ ElectionItem* ElectionThread::PopElectionMessage() {
 }
 
 
-
-
 }  // end of namespace libevrpc
 
 

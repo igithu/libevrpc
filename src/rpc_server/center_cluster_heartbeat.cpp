@@ -88,7 +88,6 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
     }
 
     int32_t random_index = random(center_addrs_ptr_->size());
-
     int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
     if (conn_fd <= 0) {
         return false;
@@ -131,7 +130,6 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
     }
 
     running_ = true;
-
     return true;
 }
 
