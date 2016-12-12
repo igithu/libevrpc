@@ -82,7 +82,7 @@ void Channel::CallMethod(const MethodDescriptor* method,
     int32_t try_times = try_time_;
     char* local_addr = NULL;
     if (NULL != center_client_heartbeat_ptr_) {
-        local_addr = center_client_heartbeat_ptr_->RandomGetRpcServerAddr();
+        local_addr = const_cast<char*>(center_client_heartbeat_ptr_->RandomGetRpcServerAddr().c_str());
     } else {
         strcpy(local_addr = (char*)malloc(strlen(addr_) + 1), addr_);
     }
