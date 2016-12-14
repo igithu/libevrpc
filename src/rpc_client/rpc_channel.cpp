@@ -68,6 +68,9 @@ Channel::~Channel() {
     }
 }
 
+/**
+ * 非线程安全!
+ */
 void Channel::CallMethod(const MethodDescriptor* method,
                          RpcController* controller,
                          const Message* request,
