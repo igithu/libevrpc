@@ -72,8 +72,8 @@ bool RpcClient::InitClient(const string& config_file) {
         rpc_channel_ptr_ = new Channel(rpc_server_addr, rpc_server_port);
     } else {
         rpc_channel_ptr_ = new Channel("127.0.0.1", "9999");
-        PrintErrorInfo("Attention! rpc client cann't read config file!");
-        PrintErrorInfo("Init with local server address and default port:8899!");
+        PrintErrorInfo("Attention! rpc client cann't read config file! \n
+                Init with local server address and default port:8899! \n");
     }
 
     if (hb_open) {
