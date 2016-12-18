@@ -519,10 +519,8 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                         response_proto.set_from_center_addr(GetLocalAddress());
                         response_proto.set_center_action(REFUSED);
                         string response_str;
-                        if (!response_proto.SerializeToString(&response_str)) {
-                            return false;
-                        }
-                        if (!RpcSend(conn_fd, CENTER2CENTER, response_str)) {
+                        if (!response_proto.SerializeToString(&response_str) ||
+                            !RpcSend(conn_fd, CENTER2CENTER, response_str)) {
                             return false;
                         }
                     } else {

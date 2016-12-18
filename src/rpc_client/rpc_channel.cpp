@@ -122,7 +122,6 @@ void Channel::CallMethod(const MethodDescriptor* method,
         }
         if (!response->ParseFromString(rpc_params_ptr->response_str) && NULL != controller) {
             controller->SetFailed("SerializeToString response error in RpcChannel!");
-            // TODO
         }
         delete rpc_params_ptr;
     }
