@@ -66,9 +66,8 @@ bool RpcClient::InitClient(const string& config_file) {
     if (distributed_mode) {
         center_client_heartbeat_ptr_ = new CenterClientHeartbeat(config_file);
         center_client_heartbeat_ptr_->Start();
-    }
-
-    if (NULL != rpc_server_addr && NULL != rpc_server_port) {
+        rpc_channel_ptr_ = new Channel(center_client_heartbeat_ptr_, rpc_server_port);
+    } else if (NULL != rpc_server_addr && NULL != rpc_server_port) {
         rpc_channel_ptr_ = new Channel(rpc_server_addr, rpc_server_port);
     } else {
         rpc_channel_ptr_ = new Channel("127.0.0.1", "9999");
