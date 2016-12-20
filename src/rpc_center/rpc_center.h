@@ -181,7 +181,6 @@ class RpcCenter {
          */
         bool fastleader_election_running_;
 
-
         /*
          * 各种RWLock
          */

@@ -162,7 +162,10 @@ bool RpcCenter::InitRpcCenter() {
      */
     int32_t load_balancer_policy = config_parser_instance_.IniGetInt("rpc_center:load_balancer_policy", 1);
     switch (load_balancer_policy) {
-        case 1 : load_balancer_ptr_ = new ConsistentHashLoadBalancer(g_config_file); break;
+        case 1 : {
+           load_balancer_ptr_ = new ConsistentHashLoadBalancer(g_config_file);
+           break;
+        }
         default: load_balancer_ptr_ = new ConsistentHashLoadBalancer(g_config_file);
     }
     load_balancer_ptr_->SetConfigFile(g_config_file);
