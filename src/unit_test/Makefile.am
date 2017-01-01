@@ -35,11 +35,13 @@ RPC_SRC = ${config_parser}/config_parser.h \
 		  ${util_dir}/rpc_communication.h \
 		  ${util_dir}/rpc_communication.cpp
 
+RPC_SERVER =
+
 # LTP = ${ut_dir}/test_libev_tp.cpp ${util_dir}/pthread_mutex.h ${server_rootdir}/libev_thread_pool.h ${server_rootdir}/libev_thread_pool.cpp
 
 #bin_PROGRAMS = ltp_client ltp_server
-
-bin_PROGRAMS = ltp_test
+#bin_PROGRAMS = ltp_test
+bin_PROGRAMS = cc_client_test cs_client_test
 
 LTP_CLIENT = ${ut_dir}/test_hb_client.cc ${RPC_SRC} \
 			 ${client_rootdir}/rpc_heartbeat_client.h \
@@ -71,6 +73,11 @@ LTP_TEST = ${ut_dir}/test_libev_tp.cc ${RPC_SRC} \
 			 ${server_rootdir}/rpc_heartbeat_server.h \
 			 ${server_rootdir}/rpc_heartbeat_server.cpp
 ltp_test_SOURCES = ${LTP_TEST}
+
+CC_CLIENT_TEST = ${ut_dir}/center_test/client_test.cc ${RPC_SRC} \
+				 ${client_rootdir}/center_client_heartbeat.h \
+				 ${client_rootdir}/center_client_heartbeat.h
+cc_client_SOURCES = ${CC_CLIENT_TEST}
 
 
 
