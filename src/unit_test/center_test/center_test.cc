@@ -16,6 +16,8 @@
 
 #include "rpc_center.h"
 
+using namespace libevrpc;
+
 int main() {
     RpcCenter& rc = RpcCenter::GetInstance("conf/rpc_center.ini");
     rc.StartCenter();

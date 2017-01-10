@@ -15,7 +15,9 @@
  **/
 
 
-#include "../rpc_client/client_rpc_controller.h"
+#include "../rpc_client/center_client_heartbeat.h"
+
+using namespace libevrpc;
 
 int main {
     CenterClientHeartbeat* center_client_heartbeat_ptr = new CenterClientHeartbeat("../test_conf/test.ini");

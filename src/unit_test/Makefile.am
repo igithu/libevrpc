@@ -41,7 +41,7 @@ RPC_SERVER =
 
 #bin_PROGRAMS = ltp_client ltp_server
 #bin_PROGRAMS = ltp_test
-bin_PROGRAMS = cc_client_test cs_client_test
+bin_PROGRAMS = cc_client cc_center
 
 LTP_CLIENT = ${ut_dir}/test_hb_client.cc ${RPC_SRC} \
 			 ${client_rootdir}/rpc_heartbeat_client.h \
@@ -78,6 +78,12 @@ CC_CLIENT_TEST = ${ut_dir}/center_test/client_test.cc ${RPC_SRC} \
 				 ${client_rootdir}/center_client_heartbeat.h \
 				 ${client_rootdir}/center_client_heartbeat.h
 cc_client_SOURCES = ${CC_CLIENT_TEST}
+
+
+CC_CENTER_TEST = ${ut_dir}/center_test/center_test.cc ${RPC_SRC} \
+				 ${client_rootdir}/center_client_heartbeat.h \
+				 ${client_rootdir}/center_client_heartbeat.h
+cc_center_SOURCES = ${CC_CENTER_TEST}
 
 
 
