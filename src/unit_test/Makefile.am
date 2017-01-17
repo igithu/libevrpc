@@ -76,13 +76,13 @@ ltp_test_SOURCES = ${LTP_TEST}
 
 CC_CLIENT_TEST = ${ut_dir}/center_test/client_test.cc ${RPC_SRC} \
 				 ${client_rootdir}/center_client_heartbeat.h \
-				 ${client_rootdir}/center_client_heartbeat.h
+				 ${client_rootdir}/center_client_heartbeat.cpp
 cc_client_SOURCES = ${CC_CLIENT_TEST}
 
 
 CC_CENTER_TEST = ${ut_dir}/center_test/center_test.cc ${RPC_SRC} \
 				 ${client_rootdir}/center_client_heartbeat.h \
-				 ${client_rootdir}/center_client_heartbeat.h
+				 ${client_rootdir}/center_client_heartbeat.cpp
 cc_center_SOURCES = ${CC_CENTER_TEST}
 
 
