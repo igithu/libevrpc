@@ -19,16 +19,18 @@
 
 using namespace libevrpc;
 
-int main {
-    CenterClientHeartbeat* center_client_heartbeat_ptr = new CenterClientHeartbeat("../test_conf/test.ini");
-    center_client_heartbeat_ptr->Start();
+
+int main() {
+
+    libevrpc::CenterClientHeartbeat center_client_heartbeat("../test_conf/test.ini");
+    center_client_heartbeat.Start();
 
     sleep(30);
 
-    center_client_heartbeat_ptr->Stop();
-    center_client_heartbeat_ptr->Wait();
+    center_client_heartbeat.Stop();
+    center_client_heartbeat.Wait();
 
-    delete center_client_heartbeat_ptr
+//    delete center_client_heartbeat_ptr
     return 0;
 }
 

@@ -28,12 +28,17 @@
 #include <google/protobuf/repeated_field.h>
 
 #include "center_proto/center_cluster.pb.h"
+#include "center_proto/center_client.pb.h"
 #include "config_parser/config_parser.h"
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
 
+#define random(x) (rand()%x)
 
 namespace libevrpc {
+
+using std::string;
+using namespace google::protobuf;
 
 CenterClientHeartbeat::CenterClientHeartbeat(const string& config_file):
     config_file_(config_file),
@@ -91,11 +96,11 @@ void CenterClientHeartbeat::Run() {
         string center_response_str;
         ClientWithCenter cwc_response_proto;
         if (RpcRecv(conn_fd, center_response_str, false) ||
-            cwc_response_proto.ParseFromString(&center_response_str)) {
-            RepeatedPtrField<string>* center_list = cwc_response_proto.should_communicate_center();
-            UpdateCenterAddrs(center_list);
-            RepeatedPtrField<string>* server_list = cwc_response_proto.cluster_server_list();
-            UpdateServerAddrs(server_list);
+            cwc_response_proto.ParseFromString(center_response_str)) {
+            const RepeatedPtrField<string>& center_list = cwc_response_proto.should_communicate_center();
+            UpdateCenterAddrs(&center_list);
+            const RepeatedPtrField<string>& server_list = cwc_response_proto.cluster_server_list();
+            UpdateServerAddrs(&server_list);
         }
         sleep(20);
     }
@@ -163,18 +168,18 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
             /*
              * 获取与当前Client对应Center服务器列表
              */
-            RepeatedPtrField<string>* center_list = cwc_proto.should_communicate_center();
-            for (RepeatedPtrField<string>::iterator iter = center_list->begin();
-                 iter != center_list->end();
+            const RepeatedPtrField<string>& center_list = cwc_proto.should_communicate_center();
+            for (RepeatedPtrField<string>::const_iterator iter = center_list.begin();
+                 iter != center_list.end();
                  ++iter) {
                 updatecenter_addrs_ptr_->push_back(*iter);
             }
             /*
              * 第一次获取与当前Client对应的Cluster服务器列表
              */
-            RepeatedPtrField<string>* rpc_server_list = cwc_proto.cluster_server_list();
-            for (RepeatedPtrField<string>::iterator iter = rpc_server_list->begin();
-                 iter != rpc_server_list->end();
+            const RepeatedPtrField<string>& rpc_server_list = cwc_proto.cluster_server_list();
+            for (RepeatedPtrField<string>::const_iterator iter = rpc_server_list.begin();
+                 iter != rpc_server_list.end();
                  ++iter) {
                 cluster_server_addrs_list_ptr_->push_back(*iter);
             }
@@ -182,7 +187,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
     }
     close(conn_fd);
 
-    running_ = true
+    running_ = true;
     return true;
 }
 

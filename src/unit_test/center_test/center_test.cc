@@ -14,7 +14,7 @@
  *
  **/
 
-#include "rpc_center.h"
+#include "../rpc_center/rpc_center.h"
 
 using namespace libevrpc;
 
