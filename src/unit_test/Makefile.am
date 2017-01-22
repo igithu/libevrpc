@@ -2,6 +2,7 @@ AUTOMAKE_OPTIONS=foreign subdir-objects
 
 proj_dir = ${top_srcdir}/..
 top_dir = ${proj_dir}/../..
+center_rootdir = ${proj_dir}/rpc_center
 server_rootdir = ${proj_dir}/rpc_server
 client_rootdir = ${proj_dir}/rpc_client
 config_parser = ${proj_dir}/config_parser
@@ -57,6 +58,21 @@ RPC_SERVER = ${server_rootdir}/rpc_server.h \
 			 ${server_rootdir}/rpc_heartbeat_server.h \
 			 ${server_rootdir}/rpc_heartbeat_server.cpp
 
+
+RPC_CENTER = ${center_rootdir}/rpc_center.h \
+			 ${center_rootdir}/rpc_center.cpp \
+			 ${center_rootdir}/reporter_thread.h \
+			 ${center_rootdir}/reporter_thread.cpp \
+			 ${center_rootdir}/leader_thread.h \
+			 ${center_rootdir}/leader_thread.cpp \
+			 ${center_rootdir}/election_thread.h \
+			 ${center_rootdir}/election_thread.cpp \
+			 ${center_rootdir}/center_server_thread.h \
+			 ${center_rootdir}/center_server_thread.cpp \
+			 ${center_rootdir}/load_balancer/load_balancer.h \
+			 ${center_rootdir}/load_balancer/consistent_hash_load_balancer.h \
+			 ${center_rootdir}/load_balancer/consistent_hash_load_balancer.cpp
+
 # LTP = ${ut_dir}/test_libev_tp.cpp ${util_dir}/pthread_mutex.h ${server_rootdir}/libev_thread_pool.h ${server_rootdir}/libev_thread_pool.cpp
 
 #bin_PROGRAMS = ltp_client ltp_server
@@ -80,7 +96,10 @@ CC_CLIENT_TEST = ${ut_dir}/center_test/client_test.cc ${RPC_SRC} \
 cc_client_SOURCES = ${CC_CLIENT_TEST}
 
 
-CC_CENTER_TEST = ${ut_dir}/center_test/center_test.cc ${RPC_SRC} ${RPC_SERVER}
+CC_CENTER_TEST = ${ut_dir}/center_test/center_test.cc \
+				 ${RPC_SRC} \
+				 ${RPC_SERVER} \
+				 ${RPC_CENTER}
 cc_center_SOURCES = ${CC_CENTER_TEST}
 
 
