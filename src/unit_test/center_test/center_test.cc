@@ -19,7 +19,7 @@
 using namespace libevrpc;
 
 int main() {
-    RpcCenter& rc = RpcCenter::GetInstance("conf/rpc_center.ini");
+    RpcCenter& rc = RpcCenter::GetInstance("test_conf/rpc_center.ini");
     rc.StartCenter();
     rc.WaitCenter();
     rc.StopCenter();

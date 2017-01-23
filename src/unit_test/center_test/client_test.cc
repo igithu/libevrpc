@@ -22,7 +22,7 @@ using namespace libevrpc;
 
 int main() {
 
-    libevrpc::CenterClientHeartbeat center_client_heartbeat("../test_conf/test.ini");
+    CenterClientHeartbeat center_client_heartbeat("test_conf/test.ini");
     center_client_heartbeat.Start();
 
     sleep(30);
