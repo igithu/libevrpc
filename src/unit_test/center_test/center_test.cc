@@ -20,8 +20,14 @@ using namespace libevrpc;
 
 int main() {
     RpcCenter& rc = RpcCenter::GetInstance("test_conf/rpc_center.ini");
-    rc.StartCenter();
+    printf("Start Center........\n");
+    if (!rc.StartCenter()) {
+        printf("Start Center Failed\n");
+        return 0;
+    }
+    printf("Wait Center........\n");
     rc.WaitCenter();
+    printf("Stop Center........\n");
     rc.StopCenter();
     return 0;
 }

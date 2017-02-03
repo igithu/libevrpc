@@ -17,7 +17,8 @@ AM_CPPFLAGS = -I${proj_dir}/ \
 			  -I${third_dir}/libev/include/
 
 #AM_LDFLAGS = -lz -lrt
-AM_LDFLAGS = -lz -lstdc++ -lprotobuf
+#AM_LDFLAGS = -lz -lstdc++ -lprotobuf
+AM_LDFLAGS = -lz -lstdc++
 
 LDADD = ${third_dir}/protobuf/lib/*.a \
 		${third_dir}/libev/lib/*.a
