@@ -118,6 +118,7 @@ bool RpcCenter::InitRpcCenter() {
          * 需要的服务器列表文件不存在，无法初始化后与其他机器进行通信
          * 启动失败!!!
          */
+        fprintf(stderr, "Access File /tmp/centers.data Failed!\n");
         return false;
     }
 
