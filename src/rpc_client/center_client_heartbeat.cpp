@@ -68,10 +68,15 @@ CenterClientHeartbeat::~CenterClientHeartbeat() {
 }
 
 void CenterClientHeartbeat::Run() {
+    if (!InitCenterClientHB()) {
+        fprintf(stderr, "Center Init HeartBeat failed!\n");
+        return;
+    }
+
     int32_t rc_size = updatecenter_addrs_ptr_->size();
 
-    if (0 == rc_size || !InitCenterClientHB()) {
-        fprintf(stderr, "Center Init HeartBeat failed!\n");
+    if (0 == rc_size) {
+        fprintf(stderr, "updated center list size is empty\n");
         return;
     }
 
