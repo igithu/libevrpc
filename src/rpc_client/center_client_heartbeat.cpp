@@ -74,14 +74,15 @@ void CenterClientHeartbeat::Run() {
     }
 
     int32_t rc_size = updatecenter_addrs_ptr_->size();
+    int32_t ca_size = center_addrs_ptr_->size();
 
-    if (0 == rc_size) {
+    if (0 == rc_size || 0 == ca_size) {
         fprintf(stderr, "updated center list size is empty\n");
         return;
     }
 
     while (running_) {
-        int32_t random_index = random(center_addrs_ptr_->size());
+        int32_t random_index = random(ca_size);
         int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
         if (conn_fd <= 0) {
             sleep(20);
@@ -145,7 +146,14 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
         }
         center_addrs_ptr_->push_back(line);
     }
-    int32_t random_index = random(center_addrs_ptr_->size());
+
+    int32_t ca_size = center_addrs_ptr_->size();
+    if (0 == ca_size) {
+        fprintf(stderr, "The center_addrs_ptr size is 0!\n");
+        return false;
+    }
+
+    int32_t random_index = random(ca_size);
     int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
     if (conn_fd <= 0) {
         return false;
