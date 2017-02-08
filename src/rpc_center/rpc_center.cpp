@@ -503,7 +503,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
              * 处理来自其他Center服务器的请求
              */
             CentersProto response_proto;
-            if (response_proto.ParseFromString(recv_message)) {
+            if (!response_proto.ParseFromString(recv_message)) {
                 return false;
             }
             switch (response_proto.center_action()) {
@@ -540,7 +540,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
              * 处理来自RPC客户端的请求
              */
             ClientWithCenter cwc_proto;
-            if (cwc_proto.ParseFromString(recv_message)) {
+            if (!cwc_proto.ParseFromString(recv_message)) {
                 return false;
             }
             string client_addr = cwc_proto.from_addr();

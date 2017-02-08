@@ -77,7 +77,7 @@ void CenterClientHeartbeat::Run() {
     int32_t ca_size = center_addrs_ptr_->size();
 
     if (0 == rc_size || 0 == ca_size) {
-        fprintf(stderr, "updated center list size is empty\n");
+        fprintf(stderr, "updated center list size is %d\n center addrs list size is %d\n", rc_size, ca_size);
         return;
     }
 
@@ -141,9 +141,9 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
 
     const char* local_addr = GetLocalAddress();
     while (getline(in, line)) {
-        if (strcmp(line.c_str(), local_addr) == 0) {
-            continue;
-        }
+        // if (strcmp(line.c_str(), local_addr) == 0) {
+        //     continue;
+        // }
         center_addrs_ptr_->push_back(line);
     }
 
@@ -156,6 +156,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
     int32_t random_index = random(ca_size);
     int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
     if (conn_fd <= 0) {
+        fprintf(stderr, "Tcp connect %d failed\n", conn_fd);
         return false;
     }
 
@@ -165,16 +166,17 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
     string cwc_str;
     if (!cwc_proto.SerializeToString(&cwc_str)) {
         close(conn_fd);
+        fprintf(stderr, "cwc_proto serialize to string failed!\n");
         return false;
     }
 
-    if (!RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
+    if (RpcSend(conn_fd, CENTER2CLIENT, cwc_str) < 0) {
         close(conn_fd);
         return false;
     }
 
     string center_response_str;
-    if (RpcRecv(conn_fd, center_response_str, false)) {
+    if (RpcRecv(conn_fd, center_response_str, false) >= 0) {
         ClientWithCenter cwc_proto;
         if (cwc_proto.ParseFromString(center_response_str) &&
             cwc_proto.client_center_action() == CENTER_RESP_OK) {
