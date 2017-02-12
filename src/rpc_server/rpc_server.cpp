@@ -78,9 +78,6 @@ RpcServer::~RpcServer() {
 }
 
 bool RpcServer::Initialize(const string& config_file) {
-    // should read from config file
-    // strcpy(host_, "127.0.0.1");
-    // strcpy(port_, "9998");
     connection_timer_open_ = config_parser_instance_.IniGetBool("rpc_server:timer_open", true);
     if (connection_timer_open_) {
         connection_timer_manager_.Start();
