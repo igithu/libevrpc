@@ -588,6 +588,10 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             }
 
             string response_client_str;
+            /**
+             * fix me  contains invalid UTF-8 data when serializing a protocol buffer. Use the
+             * 'bytes' type if you intend to send raw bytes
+             */
             if (!cwc_response_proto.SerializeToString(&response_client_str) ||
                 !RpcSend(conn_fd, CENTER2CLIENT, response_client_str)) {
                 return false;
