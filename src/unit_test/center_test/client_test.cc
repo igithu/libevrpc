@@ -7,35 +7,36 @@
 
 
 /**
- * @file test_rpc_util.cpp
+ * @file client_test.cc
  * @author aishuyu(asy5178@163.com)
- * @date 2016/04/12 20:18:24
+ * @date 2016/12/22 21:36:33
  * @brief
  *
  **/
 
-#include <stdio.h>
 
-#include <string>
-
-#include "../util/rpc_util.h"
+#include "../rpc_client/center_client_heartbeat.h"
 
 using namespace libevrpc;
 
 
 int main() {
 
-    PrintErrorInfo("Test");
+    CenterClientHeartbeat center_client_heartbeat("test_conf/test.ini");
+    center_client_heartbeat.Start();
 
-    std::string ip_addr = "10.189.192.213";
-    printf("out test\n");
+    sleep(30);
 
-    uint32_t hash_id = MurMurHash2(ip_addr.c_str(), ip_addr.size());
+    center_client_heartbeat.Stop();
+    center_client_heartbeat.Wait();
 
-    printf("the hash id is %u", hash_id);
-
+//    delete center_client_heartbeat_ptr
     return 0;
 }
+
+
+
+
 
 
 

@@ -26,17 +26,18 @@
 #include "server_rpc_controller.h"
 #include "util/rpc_util.h"
 #include "util/rpc_communication.h"
-// #include "connection_timer_manager.h"
 
 namespace libevrpc {
 
 using std::string;
 
 RpcServer::RpcServer(const string& config_file) :
+    config_file_(config_file),
     dispatcher_thread_ptr_(NULL),
     worker_threads_ptr_(NULL),
     reader_threads_ptr_(NULL),
     writer_threads_ptr_(NULL),
+    center_cluster_heartbeat_ptr_(NULL),
     config_parser_instance_(ConfigParser::GetInstance(config_file)),
     connection_timer_manager_(ConnectionTimerManager::GetInstance(config_file.c_str())),
     connection_timer_open_(false) {
@@ -70,12 +71,13 @@ RpcServer::~RpcServer() {
         delete dispatcher_thread_ptr_;
     }
 
+    if (NULL != center_cluster_heartbeat_ptr_) {
+        delete center_cluster_heartbeat_ptr_;
+    }
+
 }
 
 bool RpcServer::Initialize(const string& config_file) {
-    // should read from config file
-    // strcpy(host_, "127.0.0.1");
-    // strcpy(port_, "9998");
     connection_timer_open_ = config_parser_instance_.IniGetBool("rpc_server:timer_open", true);
     if (connection_timer_open_) {
         connection_timer_manager_.Start();
@@ -122,14 +124,17 @@ bool RpcServer::RegisteService(Service* reg_service) {
         uint32_t hash_code = BKDRHash(method_desc->full_name().c_str());
 
         HashMap::iterator ret_iter = method_hashmap_.find(hash_code);
-        if (ret_iter == method_hashmap_.end()) {
-            method_hashmap_.insert(std::make_pair(hash_code, rpc_method));
-        } else {
-            /*
-             * if conflict, replace old one
-             */
-            delete ret_iter->second;
-            method_hashmap_[hash_code] = rpc_method;
+        {
+            WriteLockGuard wguard(hashmap_rwlock_);
+            if (ret_iter == method_hashmap_.end()) {
+                method_hashmap_.insert(std::make_pair(hash_code, rpc_method));
+            } else {
+                /*
+                 * if conflict, replace old one
+                 */
+                delete ret_iter->second;
+                method_hashmap_[hash_code] = rpc_method;
+            }
         }
     }
    return true;
@@ -141,6 +146,7 @@ bool RpcServer::Start() {
     int32_t thread_num = config_parser_instance_.IniGetInt("rpc_server:thread_num", 10);
     int32_t reader_thread_num = config_parser_instance_.IniGetInt("rpc_server:reader_thread_num", 0);
     int32_t writer_thread_num = config_parser_instance_.IniGetInt("rpc_server:writer_thread_num", 0);
+    bool p2c_mode = config_parser_instance_.IniGetBool("rpc_server:p2c_mode", false);
 
     dispatcher_thread_ptr_ = new DispatchThread();
     dispatcher_thread_ptr_->InitializeService(server_addr, server_port, &RpcServer::RpcCall, (void*)this);
@@ -150,7 +156,6 @@ bool RpcServer::Start() {
     dispatcher_thread_ptr_->Start();
     worker_threads_ptr_->Start(thread_num);
     active_wtd_num_ = thread_num;
-
 
     /*
      * if start readerpool or writerpool
@@ -163,6 +168,11 @@ bool RpcServer::Start() {
     if (0 != writer_thread_num) {
         writer_threads_ptr_ = new LibevThreadPool();
         writer_threads_ptr_->Start(writer_thread_num);
+    }
+
+    if (p2c_mode) {
+        center_cluster_heartbeat_ptr_ = new CenterClusterHeartbeat(config_file_);
+        center_cluster_heartbeat_ptr_->Start();
     }
 }
 
@@ -185,6 +195,10 @@ bool RpcServer::Wait() {
 
     if (NULL != writer_threads_ptr_) {
         writer_threads_ptr_->Wait();
+    }
+
+    if (NULL != center_cluster_heartbeat_ptr_) {
+        center_cluster_heartbeat_ptr_->Wait();
     }
 
     return true;
@@ -249,24 +263,29 @@ void* RpcServer::RpcProcessor(void *arg) {
      * find the function will be called
      */
     HashMap& method_hashmap = rpc_serv_ptr->method_hashmap_;
-    HashMap::iterator method_iter = method_hashmap.find(call_id);
-    if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
-        PrintErrorInfo("Find the method failed!");
-        delete cb_params_ptr;
-        cb_params_ptr = NULL;
-        close(event_fd);
-        return NULL;
-    }
+    Message* request = NULL;
+    RpcMethod* rpc_method = NULL;
+    {
+        ReadLockGuard rguard(rpc_serv_ptr->hashmap_rwlock_);
+        HashMap::iterator method_iter = method_hashmap.find(call_id);
+        if (method_iter == method_hashmap.end() || NULL == method_iter->second) {
+            PrintErrorInfo("Find the method failed!");
+            delete cb_params_ptr;
+            cb_params_ptr = NULL;
+            close(event_fd);
+            return NULL;
+        }
 
-    RpcMethod* rpc_method = method_iter->second;
-    Message* request = rpc_method->request->New();
-    if (!request->ParseFromString(recv_info)) {
-        PrintErrorInfo("Parse body msg error!");
-        delete cb_params_ptr;
-        delete request;
-        cb_params_ptr = NULL;
-        close(event_fd);
-        return NULL;
+        RpcMethod* rpc_method = method_iter->second;
+        Message* request = rpc_method->request->New();
+        if (!request->ParseFromString(recv_info)) {
+            PrintErrorInfo("Parse body msg error!");
+            delete cb_params_ptr;
+            delete request;
+            cb_params_ptr = NULL;
+            close(event_fd);
+            return NULL;
+        }
     }
 
     const MethodDescriptor* method_desc = rpc_method->method;

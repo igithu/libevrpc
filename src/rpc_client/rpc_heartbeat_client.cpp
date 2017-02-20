@@ -46,6 +46,7 @@ RpcHeartbeatClient::~RpcHeartbeatClient() {
     if (NULL != hb_server_addr_) {
         free(hb_server_addr_);
     }
+
     if (NULL != hb_server_port_) {
         free(hb_server_port_);
     }

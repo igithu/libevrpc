@@ -1,0 +1,45 @@
+package libevrpc;
+
+import "center_type.proto";
+import "center_client.proto";
+import "center_cluster.proto";
+
+// 选举算法使用，决定哪一台机器为Leader，便于同步全局RpcServer列表
+enum CenterStatus {
+    LOOKING = 0;
+    FOLLOWING = 1;
+    OBSERVING = 2;
+    LEADING = 3;
+    UNKONW = 4;
+    DEAD = 5;
+}
+
+enum CenterAction {
+    INQUIRY = 0;
+    PROPOSAL = 1;
+    LEADER_CONFIRM = 2;
+    ACCEPT = 3;
+    REFUSED = 4;
+    FOLLOWER_PING = 5;
+    LEADER_PING_RESPONSE = 6;
+    CENTER_REPORTER = 7;
+}
+
+message LoadBalancerMetaData {
+    optional uint32 vid = 1;
+    optional string server_addr = 2;
+}
+
+message CentersProto {
+    optional string from_center_addr = 1;
+    optional CenterStatus center_status = 2;
+    optional CenterAction center_action = 3;
+    optional uint64 start_time = 4;
+    optional uint64 lc_start_time = 5;
+    optional uint64 logical_clock = 6;
+    optional string leader_center = 7;
+    repeated RpcClusterServer server_infos_list = 8;
+    repeated LoadBalancerMetaData lb_result = 9;
+}
+
+

@@ -27,6 +27,7 @@ SERVER_INCLUDES =                               \
 		rpc_server/libev_thread_pool.h          \
 		rpc_server/server_rpc_controller.h      \
 		rpc_server/connection_timer_manager.h   \
+		rpc_server/center_cluster_heartbeat.h   \
 		rpc_server/rpc_heartbeat_server.h
 
 SERVER_SRCS =                                   \
@@ -35,7 +36,37 @@ SERVER_SRCS =                                   \
 		rpc_server/libev_thread_pool.cpp        \
 		rpc_server/server_rpc_controller.cpp    \
 		rpc_server/connection_timer_manager.cpp \
+		rpc_server/center_cluster_heartbeat.cpp \
 		rpc_server/rpc_heartbeat_server.cpp
+
+
+CENTER_INCLUDES =                                                \
+		rpc_center/rpc_center.h                                  \
+		rpc_center/center_server_thread.h                        \
+		rpc_center/election_thread.h                             \
+		rpc_center/leader_thread.h                               \
+		rpc_center/load_balancer/load_balancer.h                 \
+		rpc_center/load_balancer/consistent_hash_load_balancer.h \
+		rpc_center/reporter_thread.h                             \
+		center_proto/centers.pb.h                                \
+		center_proto/center_type.pb.h                            \
+		center_proto/center_client.pb.h                          \
+		center_proto/center_cluster.pb.h                         \
+		${COMMON_INCLUDES}
+
+
+CENTER_SRCS =                                                     \
+		rpc_center/rpc_center.cpp                                 \
+		rpc_center/center_server_thread.cpp                       \
+		rpc_center/election_thread.cpp                            \
+		rpc_center/leader_thread.cpp                              \
+		rpc_center/reporter_thread.cpp                            \
+		rpc_center/load_balancer/consistent_hash_load_balancer.cpp\
+		center_proto/centers.pb.cc                                \
+		center_proto/center_type.pb.cc                            \
+		center_proto/center_client.pb.cc                          \
+		center_proto/center_cluster.pb.cc                         \
+		${COMMON_SRCS}
 
 
 COMMON_INCLUDES =                        \
@@ -43,10 +74,10 @@ COMMON_INCLUDES =                        \
 		config_parser/dictionary.h       \
 		config_parser/iniparser.h        \
 		util/rpc_util.h                  \
-		util/thread.h                  \
+		util/thread.h                    \
 		util/disallow_copy_and_assign.h  \
 		util/rpc_communication.h         \
-		util/pthread_mutex.h         \
+		util/pthread_mutex.h             \
 		util/pthread_rwlock.h
 
 COMMON_SRCS =                            \
@@ -65,31 +96,42 @@ nobase_include_HEADERS =                 \
 
 lib_LTLIBRARIES = librpc_client.la librpc_server.la
 
-librpc_client_la_CPPFLAGS =                                     \
-		-I${top_srcdir}/src                               \
-		-I${third_dir}/gperftools/include/                \
+librpc_client_la_CPPFLAGS =                                 \
+		-I${top_srcdir}/src                                 \
+		-I${third_dir}/gperftools/include/                  \
 		-I${third_dir}/protobuf/include/
-librpc_client_la_LIBADD =                                       \
+librpc_client_la_LIBADD =                                   \
 		#${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
 		${third_dir}/protobuf/lib/*.a
 librpc_client_la_LDFLAGS = -lz -std=c++11
 librpc_client_la_SOURCES =       \
-		${CLIENT_SORCS}       \
+		${CLIENT_SORCS}          \
 		${COMMON_SRCS}
 
 
-librpc_server_la_CPPFLAGS =                      \
+librpc_server_la_CPPFLAGS =                \
 		-I${top_srcdir}/src                \
 		-I${third_dir}/gperftools/include/ \
 		-I${third_dir}/protobuf/include/   \
 		-I${third_dir}/libev/include/
-librpc_server_la_LIBADD =                                       \
+librpc_server_la_LIBADD =                                    \
 		#${third_dir}/gperftools/lib/libtcmalloc_minimal.a \
-		${third_dir}/protobuf/lib/*.a                     \
+		${third_dir}/protobuf/lib/*.a                        \
 		${third_dir}/libev/lib/*.a
 librpc_server_la_LDFLAGS = -lz -std=c++11
-librpc_server_la_SOURCES =      \
+librpc_server_la_SOURCES =   \
 		${SERVER_SRCS}       \
 		${COMMON_SRCS}
 
+
+AM_LDFLAGS = -lz -lrt -lm -lpthread -std=c++11 -lprotobuf
+#AM_LDFLAGS = -lz -lm -lpthread -std=c++11
+bin_PROGRAMS = rpc_center_server
+rpc_center_server_SOURCES = rpc_center/rpc_center_server.cc ${CENTER_INCLUDES} ${CENTER_SRCS}
+rpc_center_server_LDADD = ${third_dir}/protobuf/lib/*.a  ${third_dir}/libev/lib/*.a
+INCLUDES = -I${top_srcdir}/src                \
+		   -I${third_dir}/gperftools/include/ \
+		   -I${third_dir}/protobuf/include/   \
+		   -I${third_dir}/libev/include/      \
+		   -I${top_srcdir}/src/center_proto/
 

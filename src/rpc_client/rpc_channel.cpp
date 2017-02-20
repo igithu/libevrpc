@@ -27,15 +27,39 @@ namespace libevrpc {
 using std::string;
 using std::vector;
 
+Channel::Channel(CenterClientHeartbeat* center_client_heartbeat_ptr, const char* port) :
+    addr_(NULL),
+    port_(NULL),
+    is_channel_async_call_(false),
+    call_limit_(100),
+    tcp_conn_timeout_(1000),
+    try_time_(1),
+    center_client_heartbeat_ptr_(center_client_heartbeat_ptr) {
+
+    strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
+}
+
+
 Channel::Channel(const char* addr, const char* port) :
-    is_channel_async_call_(false), call_limit_(100), tcp_conn_timeout_(1000), try_time_(1) {
+    is_channel_async_call_(false),
+    call_limit_(100),
+    tcp_conn_timeout_(1000),
+    try_time_(1) {
+    /**
+     * copy the server addr and port when in single server
+     */
     strcpy(addr_ = (char*)malloc(strlen(addr) + 1), addr);
     strcpy(port_ = (char*)malloc(strlen(port) + 1), port);
 }
 
 Channel::~Channel() {
-    free(addr_);
-    free(port_);
+    if (NULL != addr_) {
+        free(addr_);
+    }
+
+    if (NULL != port_) {
+        free(port_);
+    }
 
     if (!thread_ids_vec_.empty()) {
         for (int i = 0; i < thread_ids_vec_.size(); ++i) {
@@ -44,21 +68,39 @@ Channel::~Channel() {
     }
 }
 
+/**
+ * 非线程安全!
+ */
 void Channel::CallMethod(const MethodDescriptor* method,
                          RpcController* controller,
                          const Message* request,
                          Message* response,
                          Closure* done) {
 
+    if (NULL == center_client_heartbeat_ptr_ &&
+       (NULL == addr_ || NULL == port_)) {
+        return;
+    }
+
     int32_t try_times = try_time_;
+    char* local_addr = NULL;
+    if (NULL != center_client_heartbeat_ptr_) {
+        local_addr = const_cast<char*>(center_client_heartbeat_ptr_->RandomGetRpcServerAddr().c_str());
+    } else {
+        strcpy(local_addr = (char*)malloc(strlen(addr_) + 1), addr_);
+    }
     do {
-        connect_fd_ = TcpConnect(addr_, port_, tcp_conn_timeout_);
+        connect_fd_ = TcpConnect(local_addr, port_, tcp_conn_timeout_);
         if (TCP_CONN_TIMEOUT != connect_fd_) {
             break;
         }
         --try_times;
         PrintErrorInfo("TcpConnect timeout! try again!");
     } while (try_times <= 0);
+
+    if (NULL != local_addr) {
+        free(local_addr);
+    }
 
     if (connect_fd_ < 0) {
         if (NULL != controller) {
@@ -80,7 +122,6 @@ void Channel::CallMethod(const MethodDescriptor* method,
         }
         if (!response->ParseFromString(rpc_params_ptr->response_str) && NULL != controller) {
             controller->SetFailed("SerializeToString response error in RpcChannel!");
-            // TODO
         }
         delete rpc_params_ptr;
     }

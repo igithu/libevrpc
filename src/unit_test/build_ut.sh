@@ -13,6 +13,14 @@ SERVER_PATH=$BUILD_ROOT/libevrpc
 
 echo $BUILD_ROOT
 
+
+if [ "$1" == "clean" ]; then
+    make distclean
+    ./bootstrap.sh clean
+    exit
+fi
+
+
 # check the bootstrap exist.
 if [ ! -f $BUILD_ROOT/bootstrap.sh ]
 then

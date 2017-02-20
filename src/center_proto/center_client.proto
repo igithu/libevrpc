@@ -1,0 +1,21 @@
+package libevrpc;
+
+import "center_type.proto";
+
+// 中心与RPC客户端信息协议
+enum ClientClusterAction {
+    CLIENT_INIT_REQ = 1;
+    UPDATE_SERVER_INFO = 2;
+    CENTER_RESP_OK = 3;
+    CENTER_RESP_ERR = 4;
+}
+
+message ClientWithCenter {
+    optional string from_addr = 1;
+    optional ClientClusterAction client_center_action = 2;
+    repeated string should_communicate_center = 3;
+    repeated string cluster_server_list = 4;
+}
+
+
+

@@ -25,11 +25,13 @@
 #include <signal.h>
 #include <stdio.h>
 
+#include <atomic>
+
 namespace libevrpc {
 
 class Thread {
     public:
-        Thread() : running_(false) {
+        Thread() : thread_running_(false) {
         }
 
         virtual ~Thread() {
@@ -38,20 +40,19 @@ class Thread {
         }
 
         bool Start() {
-            if (true == running_) {
+            if (true == thread_running_) {
                 return true;
             }
-            running_ = true;
             if (pthread_create(&tid_, NULL, hook, this) != 0) {
-                running_ = false;
                 return false;
             }
+            thread_running_ = true;
             return true;
         }
 
         // return false: cancel the thread failed.
         bool Stop(bool immediately = true) {
-            if (!IsAlive() || !running_) {
+            if (!IsAlive() || !thread_running_) {
                 return true;
             }
             if (immediately) {
@@ -60,10 +61,12 @@ class Thread {
             if (pthread_cancel(tid_) != 0) {
                 return false;
             }
+            thread_running_ = false;
+            return true;
         }
 
         bool Wait() {
-            if (!IsAlive() || !running_) {
+            if (!IsAlive() || !thread_running_) {
                 return true;
             }
             if (pthread_join(tid_, NULL) != 0) {
@@ -88,7 +91,7 @@ class Thread {
             return NULL;
         }
     private:
-        volatile bool running_;
+        volatile std::atomic<bool> thread_running_;
         pthread_t tid_;
 
     protected:

@@ -50,9 +50,11 @@ RpcHeartbeatServer::~RpcHeartbeatServer() {
     if (NULL != config_file_) {
         free(config_file_);
     }
+
     if (NULL != hb_host_) {
         free(hb_host_);
     }
+
     if (NULL != hb_port_) {
         free(hb_port_);
     }

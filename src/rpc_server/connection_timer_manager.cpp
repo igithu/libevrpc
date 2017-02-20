@@ -249,7 +249,7 @@ bool ConnectionTimerManager::ConnectionBufCrawler() {
         Mutex& buf_mutex = connection_buf_mutex_ptr_->at(buf_index);
         {
             MutexLockGuard guard(buf_mutex);
-            CT_HASH_MAP_PTR& ctm_ptr =  connection_buf_ptr_->at(buf_index);
+            CT_HASH_MAP_PTR& ctm_ptr = connection_buf_ptr_->at(buf_index);
             local_ctm_ptr = ctm_ptr;
             ctm_ptr = NULL;
         }
