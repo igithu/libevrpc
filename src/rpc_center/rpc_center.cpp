@@ -131,6 +131,7 @@ bool RpcCenter::InitRpcCenter() {
     std::ifstream in(cfile);
     string line;
     while (getline (in, line)) {
+        // FOR Test ro remove
         if (strcmp(line.c_str(), local_addr) == 0) {
             /*
              * 本地服务器信息忽略
@@ -551,11 +552,16 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     {
                         ReadLockGuard rguard(center_hash_map_rwlock_);
                         CENTER_HASH_MAP::iterator iter = center_hash_map_ptr_->lower_bound(hash_id);
-                        for (int32_t i = 0; i < 3; ++i) {
+                        for (int32_t i = 0; i < 3 && iter != center_hash_map_ptr_->end(); ++i) {
                             if (center_hash_map_ptr_->end() != iter) {
                                 ++iter;
                             } else {
                                 iter = center_hash_map_ptr_->begin();
+                            }
+
+                            string& center_addr_str = iter->second;
+                            if (center_addr_str.size() < 2) {
+                                continue;
                             }
                             cwc_response_proto.add_should_communicate_center(iter->second);
                         }
@@ -586,12 +592,9 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                 default:
                     break;
             }
+            cwc_response_proto.set_client_center_action(CENTER_RESP_OK);
 
             string response_client_str;
-            /**
-             * fix me  contains invalid UTF-8 data when serializing a protocol buffer. Use the
-             * 'bytes' type if you intend to send raw bytes
-             */
             if (!cwc_response_proto.SerializeToString(&response_client_str) ||
                 !RpcSend(conn_fd, CENTER2CLIENT, response_client_str)) {
                 return false;
