@@ -72,7 +72,6 @@ void CenterClientHeartbeat::Run() {
         fprintf(stderr, "Center Init HeartBeat failed!\n");
         return;
     }
-
     int32_t rc_size = updatecenter_addrs_ptr_->size();
     int32_t ca_size = center_addrs_ptr_->size();
 
@@ -82,18 +81,24 @@ void CenterClientHeartbeat::Run() {
     }
 
     while (running_) {
-        int32_t random_index = random(ca_size);
-        int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
-        if (conn_fd <= 0) {
-            sleep(20);
-            continue;
-        }
         ClientWithCenter cwc_proto;
         cwc_proto.set_client_center_action(UPDATE_SERVER_INFO);
 
         string cwc_str;
-        if (!cwc_proto.SerializeToString(&cwc_str) ||
-            !RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
+        if (!cwc_proto.SerializeToString(&cwc_str)) {
+            fprintf(stderr, "SerializeToString the client to center error!\n");
+            sleep(3);
+            continue;
+        }
+        int32_t random_index = random(ca_size);
+        int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
+        if (conn_fd <= 0) {
+            close(conn_fd);
+            sleep(20);
+            continue;
+        }
+
+        if (RpcSend(conn_fd, CENTER2CLIENT, cwc_str) < 0) {
             close(conn_fd);
             sleep(10);
             continue;
@@ -101,13 +106,14 @@ void CenterClientHeartbeat::Run() {
 
         string center_response_str;
         ClientWithCenter cwc_response_proto;
-        if (RpcRecv(conn_fd, center_response_str, false) ||
+        if (RpcRecv(conn_fd, center_response_str, false) >= 0 ||
             cwc_response_proto.ParseFromString(center_response_str)) {
             const RepeatedPtrField<string>& center_list = cwc_response_proto.should_communicate_center();
             UpdateCenterAddrs(&center_list);
             const RepeatedPtrField<string>& server_list = cwc_response_proto.cluster_server_list();
             UpdateServerAddrs(&server_list);
         }
+        close(conn_fd);
         sleep(20);
     }
 }
@@ -141,9 +147,10 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
 
     const char* local_addr = GetLocalAddress();
     while (getline(in, line)) {
-        // if (strcmp(line.c_str(), local_addr) == 0) {
-        //     continue;
-        // }
+        // FOR Test
+        if (strcmp(line.c_str(), local_addr) == 0) {
+            continue;
+        }
         center_addrs_ptr_->push_back(line);
     }
 
