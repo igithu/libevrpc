@@ -100,6 +100,7 @@ void CenterClientHeartbeat::Run() {
 
         if (RpcSend(conn_fd, CENTER2CLIENT, cwc_str) < 0) {
             close(conn_fd);
+            fprintf(stderr, "Send info to center error!\n");
             sleep(10);
             continue;
         }
