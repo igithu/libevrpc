@@ -419,6 +419,7 @@ bool RpcCenter::InquiryCenters() {
         string recv_message;
         int32_t center_type = RpcRecv(conn_fd, recv_message, false);
         if (center_type < 0) {
+            fprintf(stderr, "Recv msg failed in InquiryCenters!\n");
             continue;
         }
         CentersProto response_proto;
@@ -494,6 +495,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
     string recv_message;
     int32_t center_type = RpcRecv(conn_fd, recv_message, false);
     if (center_type < 0) {
+        fprintf(stderr, "Recv msg failed in CenterProcessor!\n");
         close(conn_fd);
         return false;
     }

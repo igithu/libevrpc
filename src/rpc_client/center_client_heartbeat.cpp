@@ -94,6 +94,7 @@ void CenterClientHeartbeat::Run() {
         int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
         if (conn_fd <= 0) {
             close(conn_fd);
+            fprintf(stderr, "Connect center failed!\n");
             sleep(20);
             continue;
         }
@@ -138,6 +139,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
          * 需要的服务器列表文件不存在，无法初始化后与其他机器进行通信
          * 启动失败!!!
          */
+        fprintf(stderr, "Can't read center data file!\n");
         return false;
     }
     const char* center_port = ConfigParser::GetInstance(config_file_).IniGetString("rpc_client:port", "8899");
