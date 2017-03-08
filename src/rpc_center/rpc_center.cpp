@@ -597,8 +597,11 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             cwc_response_proto.set_client_center_action(CENTER_RESP_OK);
 
             string response_client_str;
-            if (!cwc_response_proto.SerializeToString(&response_client_str) ||
-                !RpcSend(conn_fd, CENTER2CLIENT, response_client_str)) {
+            if (!cwc_response_proto.SerializeToString(&response_client_str)) {
+                close(conn_fd);
+                return false;
+            }
+            if (RpcSend(conn_fd, CENTER2CLIENT, response_client_str, true) < 0) {
                 return false;
             }
             break;

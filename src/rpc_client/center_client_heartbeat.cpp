@@ -108,7 +108,7 @@ void CenterClientHeartbeat::Run() {
 
         string center_response_str;
         ClientWithCenter cwc_response_proto;
-        if (RpcRecv(conn_fd, center_response_str, false) >= 0 ||
+        if (RpcRecv(conn_fd, center_response_str, true) >= 0 ||
             cwc_response_proto.ParseFromString(center_response_str)) {
             const RepeatedPtrField<string>& center_list = cwc_response_proto.should_communicate_center();
             UpdateCenterAddrs(&center_list);
@@ -116,7 +116,7 @@ void CenterClientHeartbeat::Run() {
             UpdateServerAddrs(&server_list);
         }
         close(conn_fd);
-        sleep(20);
+        sleep(5);
     }
 }
 
