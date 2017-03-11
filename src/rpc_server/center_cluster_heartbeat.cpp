@@ -81,6 +81,7 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 
     const char* local_addr = GetLocalAddress();
     while (getline (in, line)) {
+        // FOR test to remove
         if (strcmp(line.c_str(), local_addr) == 0) {
             continue;
         }
@@ -105,13 +106,14 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
         close(conn_fd);
         return false;
     }
-    if (!RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, false)) {
+    if (RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, false < 0)) {
+        fprintf(stderr, "Cluster send info to Center failed!\n");
         close(conn_fd);
         return false;
     }
 
     string crc_str;
-    if (!RpcRecv(conn_fd, crc_str, true) < 0) {
+    if (RpcRecv(conn_fd, crc_str, true) < 0) {
         close(conn_fd);
         return false;
     }
@@ -134,10 +136,15 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 }
 
 void CenterClusterHeartbeat::Run() {
+
+    if (!InitCenterClusterHB()) {
+        fprintf(stderr, "Center Init HeartBeat failed!\n");
+        return;
+    }
     int32_t rca_size = reporter_center_addrs_ptr_->size();
 
-    if (0 == rca_size || !InitCenterClusterHB()) {
-        fprintf(stderr, "Center Init HeartBeat failed!\n");
+    if (0 == rca_size) {
+        fprintf(stderr, "Reporter center_addrs list is empty!\n");
         return;
     }
 
@@ -181,10 +188,9 @@ void CenterClusterHeartbeat::Run() {
             close(conn_fd);
             continue;
         }
-        if (!RpcSend(conn_fd, CENTER2CLUSTER, rcs_str)) {
+        if (RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, true) < 0) {
             fprintf(stderr, "Send info to Center failed!\n");
         }
-        close(conn_fd);
     }
 }
 
