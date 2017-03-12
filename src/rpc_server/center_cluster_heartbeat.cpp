@@ -88,6 +88,12 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
         center_addrs_ptr_->push_back(line);
     }
 
+    int32_t cl_size = center_addrs_ptr_->size();
+    if (0 == cl_size) {
+        fprintf(stderr, "The center addrs list is empty!\n");
+        return false;
+    }
+
     int32_t random_index = random(center_addrs_ptr_->size());
     int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
     if (conn_fd <= 0) {
