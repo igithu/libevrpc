@@ -94,7 +94,7 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
         return false;
     }
 
-    int32_t random_index = random(center_addrs_ptr_->size());
+    int32_t random_index = random(cl_size);
     int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
     if (conn_fd <= 0) {
         return false;
@@ -183,11 +183,10 @@ void CenterClusterHeartbeat::Run() {
             continue;
         }
 
-
         RpcClusterServer rcs_proto;
         rcs_proto.set_cluster_action(CLUSTER_PING);
         rcs_proto.set_cluster_server_addr(GetLocalAddress());
-        rcs_proto.set_load(s_info.loads[0]);
+        // rcs_proto.set_load(s_info.loads[0]);
 
         string rcs_str;
         if (!rcs_proto.SerializeToString(&rcs_str)) {
@@ -197,6 +196,7 @@ void CenterClusterHeartbeat::Run() {
         if (RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, true) < 0) {
             fprintf(stderr, "Send info to Center failed!\n");
         }
+        sleep(5);
     }
 }
 

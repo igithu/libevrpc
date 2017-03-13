@@ -624,6 +624,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
              */
             RpcClusterServer rpc_cluster_server;
             if (!rpc_cluster_server.ParseFromString(recv_message)) {
+                fprintf(stderr, "Parse RpcClusterServer string Failed!\n");
                 return false;
             }
             switch (rpc_cluster_server.cluster_action()) {
