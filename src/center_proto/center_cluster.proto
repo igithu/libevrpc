@@ -17,7 +17,7 @@ enum ResponseClusterAction {
 message RpcClusterServer {
     optional ClusteAction cluster_action = 1;
     optional string cluster_server_addr = 2;
-    optional float load = 3;
+    optional uint32 load = 3;
     optional float cpu_used = 4;
     optional int32 connection_num = 5;
 }

@@ -114,7 +114,7 @@ void protobuf_AddDesc_center_5fcluster_2eproto() {
     "_type.proto\"\227\001\n\020RpcClusterServer\022.\n\016clus"
     "ter_action\030\001 \001(\0162\026.libevrpc.ClusteAction"
     "\022\033\n\023cluster_server_addr\030\002 \001(\t\022\014\n\004load\030\003 "
-    "\001(\002\022\020\n\010cpu_used\030\004 \001(\002\022\026\n\016connection_num\030"
+    "\001(\r\022\020\n\010cpu_used\030\004 \001(\002\022\026\n\016connection_num\030"
     "\005 \001(\005\"x\n\025CenterResponseCluster\022\?\n\026center"
     "_response_action\030\001 \001(\0162\037.libevrpc.Respon"
     "seClusterAction\022\036\n\026should_reporter_cente"
@@ -196,7 +196,7 @@ void RpcClusterServer::SharedCtor() {
   _cached_size_ = 0;
   cluster_action_ = 1;
   cluster_server_addr_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  load_ = 0;
+  load_ = 0u;
   cpu_used_ = 0;
   connection_num_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -306,16 +306,16 @@ bool RpcClusterServer::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(29)) goto parse_load;
+        if (input->ExpectTag(24)) goto parse_load;
         break;
       }
 
-      // optional float load = 3;
+      // optional uint32 load = 3;
       case 3: {
-        if (tag == 29) {
+        if (tag == 24) {
          parse_load:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
                  input, &load_)));
           set_has_load();
         } else {
@@ -396,9 +396,9 @@ void RpcClusterServer::SerializeWithCachedSizes(
       2, this->cluster_server_addr(), output);
   }
 
-  // optional float load = 3;
+  // optional uint32 load = 3;
   if (has_load()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(3, this->load(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->load(), output);
   }
 
   // optional float cpu_used = 4;
@@ -438,9 +438,9 @@ void RpcClusterServer::SerializeWithCachedSizes(
         2, this->cluster_server_addr(), target);
   }
 
-  // optional float load = 3;
+  // optional uint32 load = 3;
   if (has_load()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(3, this->load(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->load(), target);
   }
 
   // optional float cpu_used = 4;
@@ -478,9 +478,11 @@ int RpcClusterServer::ByteSize() const {
           this->cluster_server_addr());
     }
 
-    // optional float load = 3;
+    // optional uint32 load = 3;
     if (has_load()) {
-      total_size += 1 + 4;
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->load());
     }
 
     // optional float cpu_used = 4;
