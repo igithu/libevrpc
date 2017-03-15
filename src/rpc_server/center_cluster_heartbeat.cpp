@@ -186,7 +186,7 @@ void CenterClusterHeartbeat::Run() {
         RpcClusterServer rcs_proto;
         rcs_proto.set_cluster_action(CLUSTER_PING);
         rcs_proto.set_cluster_server_addr(GetLocalAddress());
-        // rcs_proto.set_load(s_info.loads[0]);
+        rcs_proto.set_load(s_info.loads[0]);
 
         string rcs_str;
         if (!rcs_proto.SerializeToString(&rcs_str)) {
