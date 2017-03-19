@@ -412,7 +412,7 @@ bool RpcCenter::InquiryCenters() {
         /*
          * 群发每个Center发送Proposal
          */
-        if (!RpcSend(conn_fd, CENTER2CENTER, inquiry_str)) {
+        if (RpcSend(conn_fd, CENTER2CENTER, inquiry_str < 0)) {
             fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
         }
 
@@ -527,7 +527,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                         response_proto.set_center_action(REFUSED);
                         string response_str;
                         if (!response_proto.SerializeToString(&response_str) ||
-                            !RpcSend(conn_fd, CENTER2CENTER, response_str)) {
+                            RpcSend(conn_fd, CENTER2CENTER, response_str) < 0) {
                             return false;
                         }
                     } else {
@@ -613,7 +613,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
 
                 string response_str;
                 crc.SerializeToString(&response_str);
-                if (!RpcSend(conn_fd, CENTER2CLUSTER, response_str)) {
+                if (RpcSend(conn_fd, CENTER2CLUSTER, response_str) < 0) {
                     return false;
                 }
                 return false;
@@ -660,7 +660,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                     }
                     string send_str;
                     if (crc.SerializeToString(&send_str)) {
-                        if (!RpcSend(conn_fd, CENTER2CLUSTER, send_str)) {
+                        if (RpcSend(conn_fd, CENTER2CLUSTER, send_str) < 0) {
                             return false;
                         }
                     }
@@ -702,7 +702,7 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
                 return false;
             }
 
-            if (!RpcSend(fd, CENTER2CENTER, response_str)) {
+            if (RpcSend(fd, CENTER2CENTER, response_str) < 0) {
                 fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
             }
 
@@ -748,7 +748,7 @@ bool RpcCenter::ProcessCenterData(int32_t fd, const CentersProto& centers_proto)
                 close(fd);
                 return false;
             }
-            if (!RpcSend(fd, CENTER2CENTER, cp_response_str)) {
+            if (RpcSend(fd, CENTER2CENTER, cp_response_str) < 0) {
                 fprintf(stderr, "FastLeaderElection send to %s failed!\n", centers_proto.from_center_addr().c_str());
             }
             break;
@@ -789,7 +789,7 @@ bool RpcCenter::BroadcastInfo(std::string& bc_info) {
         /*
          * 群发每个Center发送Proposal
          */
-        if (!RpcSend(conn_fd, CENTER2CENTER, bc_info)) {
+        if (RpcSend(conn_fd, CENTER2CENTER, bc_info) < 0) {
             fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
         }
         close(conn_fd);
@@ -821,7 +821,7 @@ bool RpcCenter::ReporterProcessor(int32_t conn_fd) {
     if (!centers_proto.SerializeToString(&ping_str)) {
         return false;
     }
-    if (!RpcSend(conn_fd, CENTER2CENTER, ping_str)) {
+    if (RpcSend(conn_fd, CENTER2CENTER, ping_str) < 0) {
         return false;
     }
     return CenterProcessor(conn_fd);
