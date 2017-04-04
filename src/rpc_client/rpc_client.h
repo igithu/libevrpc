@@ -48,6 +48,9 @@ class RpcClient {
          * set the rpc connection timeout and if connection failed, tye times
          */
         bool SetRpcConnectionInfo(int32_t rpc_timeout, int32_t try_time = 1);
+        /*
+         * get the rpc client
+         */
         google::protobuf::RpcController* Status();
 
         /*
