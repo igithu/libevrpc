@@ -130,7 +130,7 @@ bool RpcCenter::InitRpcCenter() {
 
     std::ifstream in(cfile);
     string line;
-    while (getline (in, line)) {
+    while (getline(in, line)) {
         // FOR Test ro remove
         if (strcmp(line.c_str(), local_addr) == 0) {
             /*
