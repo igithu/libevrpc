@@ -462,7 +462,7 @@ bool RpcCenter::ProposalLeaderElection() {
     proposal.set_leader_center(GetLeadingCenter());
 
     string proposal_str;
-    if (proposal.SerializeToString(&proposal_str)) {
+    if (!proposal.SerializeToString(&proposal_str)) {
         return false;
     }
     BroadcastInfo(proposal_str);
