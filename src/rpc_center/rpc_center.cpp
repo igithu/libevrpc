@@ -546,7 +546,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
             if (!cwc_proto.ParseFromString(recv_message)) {
                 return false;
             }
-            string client_addr = cwc_proto.from_addr();
+            const string& client_addr = cwc_proto.from_addr();
             ClientWithCenter cwc_response_proto;
             switch (cwc_proto.client_center_action()) {
                 case CLIENT_INIT_REQ: {
