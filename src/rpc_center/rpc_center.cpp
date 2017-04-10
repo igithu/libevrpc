@@ -412,7 +412,7 @@ bool RpcCenter::InquiryCenters() {
         /*
          * 群发每个Center发送Proposal
          */
-        if (RpcSend(conn_fd, CENTER2CENTER, inquiry_str < 0)) {
+        if (RpcSend(conn_fd, CENTER2CENTER, inquiry_str) < 0) {
             fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
         }
 
