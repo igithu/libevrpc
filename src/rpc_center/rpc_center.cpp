@@ -642,7 +642,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                         AddRpcServerToBuf(rpc_cluster_server);
                     }
 
-                    string server_addr = rpc_cluster_server.cluster_server_addr();
+                    const string& server_addr = rpc_cluster_server.cluster_server_addr();
                     CenterResponseCluster crc;
                     crc.set_center_response_action(CLUSTER_RESP);
                     uint32_t hash_id = MurMurHash2(server_addr.c_str(), server_addr.size());
