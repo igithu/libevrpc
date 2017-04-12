@@ -414,6 +414,7 @@ bool RpcCenter::InquiryCenters() {
          */
         if (RpcSend(conn_fd, CENTER2CENTER, inquiry_str) < 0) {
             fprintf(stderr, "Proposal send to %s failed!\n", center_addr.c_str());
+            continue;
         }
 
         string recv_message;
