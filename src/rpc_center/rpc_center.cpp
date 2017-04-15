@@ -660,10 +660,11 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                         }
                     }
                     string send_str;
-                    if (crc.SerializeToString(&send_str)) {
-                        if (RpcSend(conn_fd, CENTER2CLUSTER, send_str) < 0) {
-                            return false;
-                        }
+                    if (!crc.SerializeToString(&send_str)) {
+                        return false;
+                    }
+                    if (RpcSend(conn_fd, CENTER2CLUSTER, send_str) < 0) {
+                        return false;
                     }
                     break;
                 }
