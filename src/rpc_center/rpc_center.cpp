@@ -562,7 +562,7 @@ bool RpcCenter::CenterProcessor(int32_t conn_fd) {
                                 iter = center_hash_map_ptr_->begin();
                             }
 
-                            string& center_addr_str = iter->second;
+                            const string& center_addr_str = iter->second;
                             if (center_addr_str.size() < 2) {
                                 continue;
                             }
