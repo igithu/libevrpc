@@ -862,6 +862,19 @@ bool RpcCenter::AddRpcServerToBuf(const RpcClusterServer& rpc_cluster_server) {
     return true;
 }
 
+
+bool RpcCenter::ProcessCenterRequest(int32_t fd) {
+    return true;
+}
+
+bool RpcCenter::ProcessClientRequest(int32_t fd) {
+    return true;
+}
+
+bool RpcCenter::ProcessClusterRequest(int32_t fd) {
+    return true;
+}
+
 }  // end of namespace libevrpc
 
 
