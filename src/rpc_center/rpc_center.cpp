@@ -864,6 +864,40 @@ bool RpcCenter::AddRpcServerToBuf(const RpcClusterServer& rpc_cluster_server) {
 
 
 bool RpcCenter::ProcessCenterRequest(int32_t fd) {
+     /*
+      * 处理来自其他Center服务器的请求
+      */
+    CentersProto response_proto;
+    if (!response_proto.ParseFromString(recv_message)) {
+        return false;
+    }
+    switch (response_proto.center_action()) {
+        case INQUIRY: case PROPOSAL: case ACCEPT: case REFUSED: case LEADER_CONFIRM: {
+            if (NULL == election_thread_) {
+                return false;
+             }
+             election_thread_->PushElectionMessage(conn_fd, response_proto);
+             break;
+        }
+        default: {
+             CentersProto response_proto;
+             if (GetCenterStatus() != LEADING) {
+                 /*
+                  * 本地Center非Leader直接拒绝请求
+                  */
+                 response_proto.set_from_center_addr(GetLocalAddress());
+                 response_proto.set_center_action(REFUSED);
+                 string response_str;
+                 if (!response_proto.SerializeToString(&response_str) ||
+                     RpcSend(conn_fd, CENTER2CENTER, response_str) < 0) {
+                     return false;
+                 }
+             } else {
+                 leader_thread_->PushFollowerMessage(conn_fd, response_proto);
+             }
+             break;
+        }
+    }
     return true;
 }
 

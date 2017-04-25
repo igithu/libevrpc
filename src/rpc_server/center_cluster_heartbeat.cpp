@@ -21,9 +21,6 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
-// #include <sys/sysctl.h>
-#include <sys/sysinfo.h>
-#include <linux/kernel.h>
 
 #include <google/protobuf/repeated_field.h>
 
@@ -31,6 +28,13 @@
 #include "config_parser/config_parser.h"
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
+
+#ifdef _LINUX
+#include <sys/sysinfo.h>
+#include <linux/kernel.h>
+#else
+#endif
+// #include <sys/sysctl.h>
 
 #define random(x) (rand()%x)
 
