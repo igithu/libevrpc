@@ -29,12 +29,12 @@
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
 
-#ifdef _LINUX
+#if defined(__linux__)
 #include <sys/sysinfo.h>
 #include <linux/kernel.h>
-#else
+#elif defined(__osx__)
+#include <sys/sysctl.h>
 #endif
-// #include <sys/sysctl.h>
 
 #define random(x) (rand()%x)
 
