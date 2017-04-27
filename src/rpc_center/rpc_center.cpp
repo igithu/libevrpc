@@ -901,11 +901,11 @@ bool RpcCenter::ProcessCenterRequest(const string& recv_message, int32_t fd) {
     return true;
 }
 
-bool RpcCenter::ProcessClientRequest(int32_t fd) {
+bool RpcCenter::ProcessClientRequest(const string& recv_message, int32_t fd) {
     return true;
 }
 
-bool RpcCenter::ProcessClusterRequest(int32_t fd) {
+bool RpcCenter::ProcessClusterRequest(const string& recv_message, int32_t fd) {
     return true;
 }
 
