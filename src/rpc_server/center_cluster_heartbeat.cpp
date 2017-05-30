@@ -21,8 +21,6 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
-#include <sys/sysinfo.h>
-#include <linux/kernel.h>
 
 #include <google/protobuf/repeated_field.h>
 
@@ -30,6 +28,13 @@
 #include "config_parser/config_parser.h"
 #include "util/rpc_communication.h"
 #include "util/rpc_util.h"
+
+#if defined(__linux__)
+#include <sys/sysinfo.h>
+#include <linux/kernel.h>
+#elif defined(__osx__)
+#include <sys/sysctl.h>
+#endif
 
 #define random(x) (rand()%x)
 
@@ -81,13 +86,20 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 
     const char* local_addr = GetLocalAddress();
     while (getline (in, line)) {
+        // FOR test to remove
         if (strcmp(line.c_str(), local_addr) == 0) {
             continue;
         }
         center_addrs_ptr_->push_back(line);
     }
 
-    int32_t random_index = random(center_addrs_ptr_->size());
+    int32_t cl_size = center_addrs_ptr_->size();
+    if (0 == cl_size) {
+        fprintf(stderr, "The center addrs list is empty!\n");
+        return false;
+    }
+
+    int32_t random_index = random(cl_size);
     int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
     if (conn_fd <= 0) {
         return false;
@@ -105,13 +117,14 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
         close(conn_fd);
         return false;
     }
-    if (!RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, false)) {
+    if (RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, false < 0)) {
+        fprintf(stderr, "Cluster send info to Center failed!\n");
         close(conn_fd);
         return false;
     }
 
     string crc_str;
-    if (!RpcRecv(conn_fd, crc_str, true) < 0) {
+    if (RpcRecv(conn_fd, crc_str, true) < 0) {
         close(conn_fd);
         return false;
     }
@@ -134,10 +147,15 @@ bool CenterClusterHeartbeat::InitCenterClusterHB() {
 }
 
 void CenterClusterHeartbeat::Run() {
+
+    if (!InitCenterClusterHB()) {
+        fprintf(stderr, "Center Init HeartBeat failed!\n");
+        return;
+    }
     int32_t rca_size = reporter_center_addrs_ptr_->size();
 
-    if (0 == rca_size || !InitCenterClusterHB()) {
-        fprintf(stderr, "Center Init HeartBeat failed!\n");
+    if (0 == rca_size) {
+        fprintf(stderr, "Reporter center_addrs list is empty!\n");
         return;
     }
 
@@ -149,12 +167,23 @@ void CenterClusterHeartbeat::Run() {
         /**
          * 获取本地机器信息 CPU LOAD1等
          */
+        RpcClusterServer rcs_proto;
+        rcs_proto.set_cluster_action(CLUSTER_PING);
+        rcs_proto.set_cluster_server_addr(GetLocalAddress());
+
+#if defined(__linux__)
         struct sysinfo s_info;
         int32_t error_no = sysinfo(&s_info);
         if (error_no < 0) {
             /*
              * 获取本地机器信息失败
              */
+            continue;
+        }
+        rcs_proto.set_load(s_info.loads[0]);
+#endif
+        string rcs_str;
+        if (!rcs_proto.SerializeToString(&rcs_str)) {
             continue;
         }
 
@@ -171,20 +200,10 @@ void CenterClusterHeartbeat::Run() {
         }
 
 
-        RpcClusterServer rcs_proto;
-        rcs_proto.set_cluster_action(CLUSTER_PING);
-        rcs_proto.set_cluster_server_addr(GetLocalAddress());
-        rcs_proto.set_load(s_info.loads[0]);
-
-        string rcs_str;
-        if (!rcs_proto.SerializeToString(&rcs_str)) {
-            close(conn_fd);
-            continue;
-        }
-        if (!RpcSend(conn_fd, CENTER2CLUSTER, rcs_str)) {
+        if (RpcSend(conn_fd, CENTER2CLUSTER, rcs_str, true) < 0) {
             fprintf(stderr, "Send info to Center failed!\n");
         }
-        close(conn_fd);
+        sleep(5);
     }
 }
 

@@ -150,12 +150,12 @@ class RpcClusterServer : public ::google::protobuf::Message {
   inline ::std::string* release_cluster_server_addr();
   inline void set_allocated_cluster_server_addr(::std::string* cluster_server_addr);
 
-  // optional float load = 3;
+  // optional uint32 load = 3;
   inline bool has_load() const;
   inline void clear_load();
   static const int kLoadFieldNumber = 3;
-  inline float load() const;
-  inline void set_load(float value);
+  inline ::google::protobuf::uint32 load() const;
+  inline void set_load(::google::protobuf::uint32 value);
 
   // optional float cpu_used = 4;
   inline bool has_cpu_used() const;
@@ -190,7 +190,7 @@ class RpcClusterServer : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::std::string* cluster_server_addr_;
   int cluster_action_;
-  float load_;
+  ::google::protobuf::uint32 load_;
   float cpu_used_;
   ::google::protobuf::int32 connection_num_;
   friend void  protobuf_AddDesc_center_5fcluster_2eproto();
@@ -404,7 +404,7 @@ inline void RpcClusterServer::set_allocated_cluster_server_addr(::std::string* c
   // @@protoc_insertion_point(field_set_allocated:libevrpc.RpcClusterServer.cluster_server_addr)
 }
 
-// optional float load = 3;
+// optional uint32 load = 3;
 inline bool RpcClusterServer::has_load() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
@@ -415,14 +415,14 @@ inline void RpcClusterServer::clear_has_load() {
   _has_bits_[0] &= ~0x00000004u;
 }
 inline void RpcClusterServer::clear_load() {
-  load_ = 0;
+  load_ = 0u;
   clear_has_load();
 }
-inline float RpcClusterServer::load() const {
+inline ::google::protobuf::uint32 RpcClusterServer::load() const {
   // @@protoc_insertion_point(field_get:libevrpc.RpcClusterServer.load)
   return load_;
 }
-inline void RpcClusterServer::set_load(float value) {
+inline void RpcClusterServer::set_load(::google::protobuf::uint32 value) {
   set_has_load();
   load_ = value;
   // @@protoc_insertion_point(field_set:libevrpc.RpcClusterServer.load)

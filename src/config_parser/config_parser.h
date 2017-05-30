@@ -36,7 +36,6 @@ class ConfigParser {
     public:
         ~ConfigParser();
 
-        // static ConfigParser& GetInstance();
         static ConfigParser& GetInstance(const std::string& ini_file);
 
         int32_t GetSecKeysNum(const char* sec_key, int32_t defalut_val);
@@ -44,13 +43,9 @@ class ConfigParser {
         double IniGetDouble(const char* sec_key, double defalut_val);
         const char *IniGetString(const char* sec_key, const char* defalut_val);
         bool IniGetBool(const char* sec_key, bool defalut_val);
-        // const char *IniGetLocalIPAddr();
-        // const char *IniGetLocalHostName();
 
         void PrintErrorInfo();
 
-    private:
-        // ConfigParser();
         ConfigParser(const std::string& ini_file);
 
         bool InitConfigParser();

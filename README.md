@@ -3,8 +3,8 @@
 
 技术简述
 
-    1.现阶段使用memcached线程池模型，实现IO接收机制和线程池机制（固定线程数），其中用libev代替libevent，
-    2.客户端服务端通信序列化使用protobuf框架进行实现
+    1.现阶段使用memcached线程池模型，实现IO接收机制和线程池机制（固定线程数），其中用libev代替libevent
+    2.客户端与服务端通信之间的框架与序列化， 使用protobuf框架进行实现
 
 
 编译说明：
@@ -32,8 +32,9 @@
         4).connection_timer_manager：管理链接计时器，对超时的链接进行销毁处理
         5).rpc_heartbeat_server：RPC服务端心跳线程，接受从客户端发送来的心跳，并将心跳信息更新到connection_timer_manager中
         6).server_rpc_controller：RPC服务端内部实现控制对象，现阶段只用于错误信息的输出
-    5.unit_test：单元代码测试
-    6.util：工具类和函数
+    5.rpc_center：rpc center功能实现代码 主要实现rpc server与rpc client之间的关联请求规则
+    6.unit_test：单元代码测试
+    7.util：工具类和函数
 
 
 设计说明：

@@ -146,6 +146,11 @@ class RpcCenter {
 
         bool AddRpcServerToBuf(const RpcClusterServer& rpc_cluster_server);
 
+        // 处理各个服务器还请求函数
+        bool ProcessCenterRequest(const std::string& recv_message, int32_t fd);
+        bool ProcessClientRequest(const std::string& recv_message, int32_t fd);
+        bool ProcessClusterRequest(const std::string& recv_message, int32_t fd);
+
     private:
         /*
          * Center服务器统一端口

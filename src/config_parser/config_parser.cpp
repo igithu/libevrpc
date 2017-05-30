@@ -20,12 +20,6 @@ namespace libevrpc {
 
 using std::string;
 
-// ConfigParser::ConfigParser() :
-//     is_init_(false),
-//     ini_file_(""),
-//     dict_ini_(NULL) {
-// }
-
 ConfigParser::ConfigParser(const std::string& ini_file) :
     is_init_(false),
     ini_file_(ini_file),

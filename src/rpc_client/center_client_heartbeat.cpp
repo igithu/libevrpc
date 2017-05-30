@@ -72,7 +72,6 @@ void CenterClientHeartbeat::Run() {
         fprintf(stderr, "Center Init HeartBeat failed!\n");
         return;
     }
-
     int32_t rc_size = updatecenter_addrs_ptr_->size();
     int32_t ca_size = center_addrs_ptr_->size();
 
@@ -82,33 +81,42 @@ void CenterClientHeartbeat::Run() {
     }
 
     while (running_) {
-        int32_t random_index = random(ca_size);
-        int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
-        if (conn_fd <= 0) {
-            sleep(20);
-            continue;
-        }
         ClientWithCenter cwc_proto;
         cwc_proto.set_client_center_action(UPDATE_SERVER_INFO);
 
         string cwc_str;
-        if (!cwc_proto.SerializeToString(&cwc_str) ||
-            !RpcSend(conn_fd, CENTER2CLIENT, cwc_str)) {
+        if (!cwc_proto.SerializeToString(&cwc_str)) {
+            fprintf(stderr, "SerializeToString the client to center error!\n");
+            sleep(3);
+            continue;
+        }
+        int32_t random_index = random(ca_size);
+        int32_t conn_fd = TcpConnect(center_addrs_ptr_->at(random_index).c_str(), center_port_, 15);
+        if (conn_fd <= 0) {
             close(conn_fd);
+            fprintf(stderr, "Connect center failed!\n");
+            sleep(20);
+            continue;
+        }
+
+        if (RpcSend(conn_fd, CENTER2CLIENT, cwc_str) < 0) {
+            close(conn_fd);
+            fprintf(stderr, "Send info to center error!\n");
             sleep(10);
             continue;
         }
 
         string center_response_str;
         ClientWithCenter cwc_response_proto;
-        if (RpcRecv(conn_fd, center_response_str, false) ||
+        if (RpcRecv(conn_fd, center_response_str, true) >= 0 ||
             cwc_response_proto.ParseFromString(center_response_str)) {
             const RepeatedPtrField<string>& center_list = cwc_response_proto.should_communicate_center();
             UpdateCenterAddrs(&center_list);
             const RepeatedPtrField<string>& server_list = cwc_response_proto.cluster_server_list();
             UpdateServerAddrs(&server_list);
         }
-        sleep(20);
+        close(conn_fd);
+        sleep(5);
     }
 }
 
@@ -131,6 +139,7 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
          * 需要的服务器列表文件不存在，无法初始化后与其他机器进行通信
          * 启动失败!!!
          */
+        fprintf(stderr, "Can't read center data file!\n");
         return false;
     }
     const char* center_port = ConfigParser::GetInstance(config_file_).IniGetString("rpc_client:port", "8899");
@@ -141,9 +150,10 @@ bool CenterClientHeartbeat::InitCenterClientHB() {
 
     const char* local_addr = GetLocalAddress();
     while (getline(in, line)) {
-        // if (strcmp(line.c_str(), local_addr) == 0) {
-        //     continue;
-        // }
+        // FOR Test
+        if (strcmp(line.c_str(), local_addr) == 0) {
+            continue;
+        }
         center_addrs_ptr_->push_back(line);
     }
 

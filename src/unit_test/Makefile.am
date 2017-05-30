@@ -78,7 +78,7 @@ RPC_CENTER = ${center_rootdir}/rpc_center.h \
 
 #bin_PROGRAMS = ltp_client ltp_server
 #bin_PROGRAMS = ltp_test
-bin_PROGRAMS = cc_client cc_center
+bin_PROGRAMS = cc_cluster cc_client cc_center
 
 LTP_CLIENT = ${ut_dir}/test_hb_client.cc ${RPC_SRC} \
 			 ${client_rootdir}/rpc_heartbeat_client.h \
@@ -90,6 +90,12 @@ ltp_server_SOURCES = ${LTP_SERVER}
 
 LTP_TEST = ${ut_dir}/test_libev_tp.cc ${RPC_SRC} ${RPC_SERVER}
 ltp_test_SOURCES = ${LTP_TEST}
+
+CC_CLUSTER_TEST = ${ut_dir}/center_test/cluster_test.cc ${RPC_SRC} \
+				 ${server_rootdir}/center_cluster_heartbeat.h \
+				 ${server_rootdir}/center_cluster_heartbeat.cpp
+cc_cluster_SOURCES = ${CC_CLUSTER_TEST}
+
 
 CC_CLIENT_TEST = ${ut_dir}/center_test/client_test.cc ${RPC_SRC} \
 				 ${client_rootdir}/center_client_heartbeat.h \

@@ -132,6 +132,10 @@ void CenterServerThread::Processor(struct ev_loop *loop, struct ev_io *watcher, 
      * 每一次执行结束, 关闭链接
      */
     close(watcher->fd);
+    ev_io_stop(loop, watcher);
+    CEIO_ITEM* ci = PopCEIO(eio_uselist_);
+    CenterServerThread* cst_ptr = (CenterServerThread*)(watcher->data);
+    cst_ptr->FreeCEIO(ci);
 }
 
 CEIO_ITEM* CenterServerThread::NewCEIO() {
