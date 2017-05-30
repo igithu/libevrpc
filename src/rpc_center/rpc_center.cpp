@@ -902,10 +902,141 @@ bool RpcCenter::ProcessCenterRequest(const string& recv_message, int32_t fd) {
 }
 
 bool RpcCenter::ProcessClientRequest(const string& recv_message, int32_t fd) {
+    /*
+     * 处理来自RPC客户端的请求
+     */
+    ClientWithCenter cwc_proto;
+    if (!cwc_proto.ParseFromString(recv_message)) {
+        return false;
+    }
+    const string& client_addr = cwc_proto.from_addr();
+    ClientWithCenter cwc_response_proto;
+    switch (cwc_proto.client_center_action()) {
+        case CLIENT_INIT_REQ: {
+            uint32_t hash_id = MurMurHash2(client_addr.c_str(), client_addr.size());
+            {
+                ReadLockGuard rguard(center_hash_map_rwlock_);
+                CENTER_HASH_MAP::iterator iter = center_hash_map_ptr_->lower_bound(hash_id);
+                for (int32_t i = 0; i < 3 && iter != center_hash_map_ptr_->end(); ++i) {
+                    if (center_hash_map_ptr_->end() != iter) {
+                        ++iter;
+                    } else {
+                        iter = center_hash_map_ptr_->begin();
+                    }
+
+                    const string& center_addr_str = iter->second;
+                    if (center_addr_str.size() < 2) {
+                        continue;
+                    }
+                    cwc_response_proto.add_should_communicate_center(iter->second);
+                }
+            }
+
+            vector<string> server_list;
+            if (load_balancer_ptr_->GetRpcServer(client_addr, server_list)) {
+                for (vector<string>::iterator iter = server_list.begin();
+                     iter != server_list.end();
+                     ++iter) {
+                    cwc_response_proto.add_cluster_server_list(*iter);
+                }
+            }
+
+            break;
+        }
+        case UPDATE_SERVER_INFO: {
+            vector<string> server_list;
+            if (load_balancer_ptr_->GetRpcServer(client_addr, server_list)) {
+                for (vector<string>::iterator iter = server_list.begin();
+                     iter != server_list.end();
+                     ++iter) {
+                    cwc_response_proto.add_cluster_server_list(*iter);
+                }
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    cwc_response_proto.set_client_center_action(CENTER_RESP_OK);
+
+    string response_client_str;
+    if (!cwc_response_proto.SerializeToString(&response_client_str)) {
+        close(fd);
+        return false;
+    }
+    if (RpcSend(fd, CENTER2CLIENT, response_client_str, true) < 0) {
+        return false;
+    }
     return true;
 }
 
 bool RpcCenter::ProcessClusterRequest(const string& recv_message, int32_t fd) {
+    if (!CenterIsReady()) {
+        CenterResponseCluster crc;
+        crc.set_center_response_action(CENTER_NOT_READY);
+
+        string response_str;
+        crc.SerializeToString(&response_str);
+        if (RpcSend(fd, CENTER2CLUSTER, response_str) < 0) {
+            return false;
+        }
+        return false;
+    }
+
+    /*
+     * 处理来自RPC服务集群的请求
+     */
+    RpcClusterServer rpc_cluster_server;
+    if (!rpc_cluster_server.ParseFromString(recv_message)) {
+        fprintf(stderr, "Parse RpcClusterServer string Failed!\n");
+        return false;
+    }
+    switch (rpc_cluster_server.cluster_action()) {
+        case REGISTER: {
+            /*
+             * 1.如果接收的Center是Leader机器, 则将当前RpcServer机器信息直接写进到LoadBalancer(但是通常架构中
+             *   RpcServer 应该不会向Leader机器直接请求信息)
+             * 2.如果接收的Center是Follower机器, 则将当前RpcServer机器先写入本地的Buf中,然后由本地心跳线程将Buff中的数据
+             *   汇报Leader机器中 进行LoadBalancer计算
+             */
+            CenterStatus cur_cs = GetCenterStatus();
+            if (LEADING == cur_cs) {
+                load_balancer_ptr_->AddRpcServer(rpc_cluster_server);
+            } else {
+                AddRpcServerToBuf(rpc_cluster_server);
+            }
+
+            const string& server_addr = rpc_cluster_server.cluster_server_addr();
+            CenterResponseCluster crc;
+            crc.set_center_response_action(CLUSTER_RESP);
+            uint32_t hash_id = MurMurHash2(server_addr.c_str(), server_addr.size());
+            {
+                ReadLockGuard rguard(center_hash_map_rwlock_);
+                CENTER_HASH_MAP::iterator iter = center_hash_map_ptr_->lower_bound(hash_id);
+                for (int32_t i = 0; i < 3; ++i) {
+                    if (center_hash_map_ptr_->end() != iter) {
+                        ++iter;
+                    } else {
+                        iter = center_hash_map_ptr_->begin();
+                    }
+                    crc.add_should_reporter_center(iter->second);
+                }
+            }
+            string send_str;
+            if (!crc.SerializeToString(&send_str)) {
+                return false;
+            }
+            if (RpcSend(fd, CENTER2CLUSTER, send_str) < 0) {
+                return false;
+            }
+            break;
+        }
+        case CLUSTER_PING: {
+            break;
+        }
+        default:break;
+    }
+
     return true;
 }
 

@@ -148,8 +148,8 @@ class RpcCenter {
 
         // 处理各个服务器还请求函数
         bool ProcessCenterRequest(const std::string& recv_message, int32_t fd);
-        bool ProcessClientRequest(const string& recv_message, int32_t fd);
-        bool ProcessClusterRequest(const string& recv_message, int32_t fd);
+        bool ProcessClientRequest(const std::string& recv_message, int32_t fd);
+        bool ProcessClusterRequest(const std::string& recv_message, int32_t fd);
 
     private:
         /*

@@ -124,7 +124,7 @@ librpc_server_la_SOURCES =   \
 		${COMMON_SRCS}
 
 
-AM_LDFLAGS = -lz -lrt -lm -lpthread -std=c++11 #-lprotobuf
+AM_LDFLAGS = -lz -lm -lpthread -std=c++11 #-lprotobuf -lrt
 #AM_LDFLAGS = -lz -lm -lpthread -std=c++11
 bin_PROGRAMS = rpc_center_server
 rpc_center_server_SOURCES = rpc_center/rpc_center_server.cc ${CENTER_INCLUDES} ${CENTER_SRCS}
