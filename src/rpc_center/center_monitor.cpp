@@ -19,7 +19,23 @@
 
 
 namespace libevrpc {
+
+using std::string;
+
+CenterMonitor::CenterMonitor(const string& config_file) {
 }
+
+CenterMonitor::~CenterMonitor() {
+}
+
+CenterMonitor& CenterMonitor::GetInstance(const string& config_file) {
+    static CenterMonitor cm_instance(config_file);
+    return cm_instance;
+}
+
+
+
+}  // end of namespace
 
 
 

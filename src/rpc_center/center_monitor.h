@@ -23,6 +23,8 @@
 
 #include <string>
 
+#include "util/disallow_copy_and_assign.h"
+
 namespace libevrpc {
 
 /*
@@ -35,7 +37,9 @@ class CenterMonitor {
         static CenterMonitor& GetInstance(const std::string& config_file);
 
     private:
-        CenterMonitor();
+        CenterMonitor(const std::string& config_file);
+
+        DISALLOW_COPY_AND_ASSIGN(CenterMonitor);
 };
 
 
