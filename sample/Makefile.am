@@ -6,10 +6,10 @@ third_dir = ${top_dir}/third-64
 
 #SUBDIRS = proto
 
-INCLUDES = -I${third_dir}/protobuf/include/    \
-		   -I${third_dir}/libevrpc/include/    \
-		   -I${third_dir}/libev/include/       \
-		   -I${cs_rootdir}/
+INCLUDES = -I${third_dir}/protobuf/include/              \
+           -I${third_dir}/libevrpc/include/              \
+	   -I${third_dir}/libev/include/                 \
+	   -I${cs_rootdir}/
 
 
 #AM_LDFLAGS = -rdynamic -lpthread -lz -lm -lrt

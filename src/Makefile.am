@@ -28,7 +28,9 @@ SERVER_INCLUDES =                               \
 		rpc_server/server_rpc_controller.h      \
 		rpc_server/connection_timer_manager.h   \
 		rpc_server/center_cluster_heartbeat.h   \
-		rpc_server/rpc_heartbeat_server.h
+		rpc_server/rpc_heartbeat_server.h       \
+		center_proto/center_type.pb.h           \
+		center_proto/center_cluster.pb.h
 
 SERVER_SRCS =                                   \
 		rpc_server/rpc_server.cpp               \
@@ -37,7 +39,9 @@ SERVER_SRCS =                                   \
 		rpc_server/server_rpc_controller.cpp    \
 		rpc_server/connection_timer_manager.cpp \
 		rpc_server/center_cluster_heartbeat.cpp \
-		rpc_server/rpc_heartbeat_server.cpp
+		rpc_server/rpc_heartbeat_server.cpp    \
+		center_proto/center_type.pb.cc           \
+		center_proto/center_cluster.pb.cc
 
 
 CENTER_INCLUDES =                                                \
@@ -120,7 +124,7 @@ librpc_server_la_LIBADD =                                    \
 		${third_dir}/libev/lib/*.a
 librpc_server_la_LDFLAGS = -lz -std=c++11
 librpc_server_la_SOURCES =   \
-		${SERVER_SRCS}       \
+		${SERVER_SRCS}   \
 		${COMMON_SRCS}
 
 
